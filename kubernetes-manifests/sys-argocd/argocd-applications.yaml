@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: shpod
+  namespace: sys-argocd
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:DTLP/homelab.git
+    targetRevision: HEAD
+    path: kubernetes-manifests/shpod
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: shpod
+  syncPolicy:
+    automated: 
+      prune: true
+      selfHeal: true

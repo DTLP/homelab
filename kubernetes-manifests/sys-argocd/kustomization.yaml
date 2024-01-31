@@ -1,0 +1,34 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - argocd-applications.yaml
+
+  - https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+patches:
+  - path: argocd-svc-patch.yaml
+  - path: argocd-crb-patch.yaml
+
+secretGenerator:
+  - files:
+      - sshPrivateKey=secrets/github-ssh-key
+    literals:
+      - url=git@github.com:DTLP/homelab.git
+      - type=git
+    name: homelab-repo
+    options:
+      disableNameSuffixHash: true
+      labels:
+        argocd.argoproj.io/secret-type: repository
+# apiVersion: v1
+# kind: Secret
+# metadata:
+#   name: homelab-repo
+#   namespace: sys-argocd
+#   labels:
+#     argocd.argoproj.io/secret-type: repository
+# stringData:
+#   type: git
+#   url: git@github.com:DTLP/homelab.git
+#   sshPrivateKey: |
