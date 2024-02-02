@@ -1,0 +1,73 @@
+# reference: https://github.com/argoproj/argo-cd/blob/master/docs/operator-manual/project.yaml
+
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: main
+  # Finalizer that ensures that project is not deleted until it is not referenced by any application
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  description: main project
+  sourceRepos:
+    - git@github.com:DTLP/homelab.git
+
+  # sourceNamespaces will determine whether an Application may use a certain AppProject.
+  # If an Application specifies an AppProject that it is not allowed to, Argo CD refuses to process this Application
+  sourceNamespaces:
+    - sys-argocd
+    - sandbox
+
+  # Only permit applications to deploy to the system's namespace in the same cluster
+  destinations:
+    - namespace: sys-argocd
+      name: in-cluster
+    - namespace: sandbox
+      name: in-cluster
+
+  # orphanedResources:
+  #   warn: true
+  #   ignore:
+  #     - group: ""
+  #       kind: ConfigMap
+  #       name: vault-tls
+  #     - group: "argoproj.io"
+  #       kind: AppProject
+  #       name: default
+  #     - group: ""
+  #       kind: Secret
+  #       name: prod-aws-wildcard-crt
+  #     - group: wgpolicyk8s.io
+  #       kind: PolicyReport
+  #     # secret managed by sys-registry/cert-manager
+  #     - group: ""
+  #       kind: Secret
+  #       name: "registry-auth-cert"
+  #     # secret managed by cert-manager
+  #     - group: ""
+  #       kind: Secret
+  #       name: "{ingress-crt,telecomplus-co-uk-wildcard-crt}"
+  #     # sys-vault/tf-applier stores state in secret
+  #     - group: ""
+  #       kind: Secret
+  #       name: tfstate-*
+  #     # resources generated via semaphore-service-mirror
+  #     - group: "*"
+  #       kind: "{Service,Endpoints,EndpointSlice}"
+  #       name: "*-73736d-*"
+  #     - group: discovery.k8s.io
+  #       kind: EndpointSlice
+  #       name: "gl-*"
+
+  # roles:
+  #   # p, proj:<project>:<role-name>, <resource>, <action>, <project>/<namespace>/<application> <effect>
+  #   # Resources: applications, repositories, clusters, logs, exec
+  #   # Actions: get, create, update, delete, sync, override, action/<group/kind/action-name>
+  #   - name: admin
+  #     description: admin access to all applications under this project
+  #     policies:
+  #       - p, proj:system:admin, applications, *, system/*, allow
+  #       - p, proj:system:admin, applications, delete, system/*, deny
+  #     groups:
+  #       - uw_rg_technology_architecture-infrastructure
+  #       - asiyani@uw.co.uk

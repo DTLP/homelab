@@ -1,16 +1,16 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: sandbox
+  name: sys-argocd
 spec:
   project: default
   source:
     repoURL: git@github.com:DTLP/homelab.git
     targetRevision: HEAD
-    path: kubernetes-manifests/sandbox
+    path: kubernetes-manifests/sys-argocd
   destination:
     server: https://kubernetes.default.svc
-    namespace: sandbox
+    namespace: sys-argocd
   syncPolicy:
     syncOptions:
       - ApplyOutOfSyncOnly=true
