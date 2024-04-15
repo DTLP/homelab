@@ -1,0 +1,18 @@
+{
+    "data_dir": "data",
+    "devices": [
+        {
+            "screen_id": "vf150mprujtf0rctk4ij3ismgb",
+            "name": "[TV] Samsung 7 Series (43)",
+            "offset": 0
+        }
+    ],
+    "apikey": "",
+    "skip_categories": [
+        "exclusive_access"
+    ],
+    "channel_whitelist": [],
+    "skip_count_tracking": true,
+    "mute_ads": true,
+    "skip_ads": true
+}

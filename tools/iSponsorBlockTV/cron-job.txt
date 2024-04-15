@@ -1,0 +1,3 @@
+# Tools
+## iSponsorBlockTV
+@reboot python3 /home/pr0per/tools/iSponsorBlockTV/main.py
