@@ -14,3 +14,21 @@ spec:
   syncPolicy:
     syncOptions:
       - ApplyOutOfSyncOnly=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: sandbox
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:DTLP/homelab.git
+    targetRevision: HEAD
+    path: kubernetes-manifests/sandbox
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: sandbox
+  syncPolicy:
+    automated: 
+      prune: true
+      selfHeal: true

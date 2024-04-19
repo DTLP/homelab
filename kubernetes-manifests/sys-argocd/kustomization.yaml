@@ -22,14 +22,3 @@ secretGenerator:
       disableNameSuffixHash: true
       labels:
         argocd.argoproj.io/secret-type: repository
-# apiVersion: v1
-# kind: Secret
-# metadata:
-#   name: homelab-repo
-#   namespace: sys-argocd
-#   labels:
-#     argocd.argoproj.io/secret-type: repository
-# stringData:
-#   type: git
-#   url: git@github.com:DTLP/homelab.git
-#   sshPrivateKey: |
