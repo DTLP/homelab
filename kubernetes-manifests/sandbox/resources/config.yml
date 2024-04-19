@@ -5,7 +5,6 @@
 title: "Lab Dashboard"
 subtitle: "Homer"
 logo: "logo.png"
-# icon: "fas fa-skull-crossbones" # Optional icon
 
 header: true
 footer: false
@@ -77,12 +76,11 @@ services:
         subtitle: "Another application"
         tag: "app"
         url: "#"
-# ArgoCD
   - name: "Monitoring"
     icon: "fas fa-waveform-path"
     items:
       - name: "Grafana"
-        logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Grafana_logo.svg/512px-Grafana_logo.svg.png"
+        logo: "https://icon.icepanel.io/Technology/svg/Grafana.svg"
         url: "http://grafana.sys-mon.svc.cluster.local"
   - name: "Github"
     icon: "fab fa-github"
@@ -90,6 +88,6 @@ services:
       - name: "DTLP/homelab"
         icon: "fas fa-flask"
         url: "https://github.com/DTLP/homelab"
-      - name: "DTLP/config"
+      - name: "DTLP/dotfiles"
         icon: "fas fa-cogs"
-        url: "https://github.com/DTLP/config"
+        url: "https://github.com/DTLP/dotfiles"
