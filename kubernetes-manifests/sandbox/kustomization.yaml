@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
   - homer.yaml
   - shpod.yaml
+  - date.yaml
 
 configMapGenerator:
 - name: homer-config
