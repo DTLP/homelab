@@ -28,5 +28,5 @@ To destroy the cluster
 The original Vagrantfile and shell scripts are taken from https://github.com/arturscheiner/kuberverse and repurposed for own use.
 
 # Kubernetes manifests
-Manifests are stored in `kubernetes-manifests`.
+Manifests are stored in `kubernetes-manifests`.  
 Note: All secrets are encrypted using Strongbox (https://github.com/uw-labs/strongbox)
