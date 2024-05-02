@@ -6,7 +6,7 @@ Comment out the `project: default` line, apply, remove comment and apply again
 
 2. Get node address, service port and admin password
 ```
-k -n sys-argocd describe pods argocd-server-58578796-jzlxs | grep worker
+k -n sys-argocd describe pods -l app.kubernetes.io/name=argocd-server | grep worker
     Node:             kv-worker-0/10.0.0.20
 
 k -n sys-argocd get service argocd-server
