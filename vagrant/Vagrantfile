@@ -8,11 +8,11 @@ CONTAINER_RUNTIME = "containerd"
 CNI_PROVIDER = "calico"
 
 MASTER_COUNT = 1
-WORKER_COUNT = 2
+WORKER_COUNT = 3
 
 SCALER_MEMORY = 512
 MASTER_MEMORY = 2048
-WORKER_MEMORY = 1024
+WORKER_MEMORY = 2048
 
 # Change these values if you wish to play with the
 # networking settings of your cluster 
