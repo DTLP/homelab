@@ -16,7 +16,7 @@ WORKER_MEMORY = 2048
 
 # Change these values if you wish to play with the
 # networking settings of your cluster 
-LAB_NETWORK = "10.0.0.0"
+LAB_NETWORK = "192.168.56.0"
 
 # This value changes the intra-pod network
 POD_CIDR = "192.168.0.0/24"
@@ -203,7 +203,7 @@ class Lab
       box.vm.box = BOX_IMAGE
       box.vm.hostname = "common-box"
       box.vm.provision "shell", inline: "sudo apt-get update"
-      box.vm.network :private_network, ip: "10.0.0.31", nic_type: "virtio"
+      box.vm.network :private_network, ip: "192.168.56.1", nic_type: "virtio"
       box.vm.provider :virtualbox do |vb|
         vb.customize ["modifyvm", :id, "--cpus", 2, "--nictype1", "virtio"]
         vb.memory = WORKER_MEMORY
