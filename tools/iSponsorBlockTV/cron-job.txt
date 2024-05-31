@@ -1,3 +1,3 @@
 # Tools
-## iSponsorBlockTV
-@reboot python3 /home/pr0per/tools/iSponsorBlockTV/main.py
+## iSponsorBlockTV (https://github.com/dmunozv04/iSponsorBlockTV)
+@reboot cd github/iSponsorBlockTV/; docker-compose up
