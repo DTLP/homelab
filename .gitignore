@@ -1,4 +1,2 @@
 .terraform/
 .terraform.tfstate.lock.info
-*.tfstate
-*.tfstate.backup
