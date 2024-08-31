@@ -35,7 +35,8 @@ resource "null_resource" "cloud_init" {
   }
 
   provisioner "file" {
-    source      = local_file.cloud_init[each.key].filename
+    source = local_file.cloud_init[each.key].filename
+    # TODO: Add a variable here in place of cephfs
     destination = "/mnt/pve/cephfs/snippets/cloud_init_${each.value.hostname}.yaml"
   }
 }
@@ -55,7 +56,7 @@ resource "proxmox_vm_qemu" "vms" {
   qemu_os     = each.value.qemu_os
   onboot      = each.value.onboot
 
-  cloudinit_cdrom_storage = "ceph"
+  cloudinit_cdrom_storage = each.value.hdd_storage
   scsihw                  = "virtio-scsi-single"
   bootdisk                = "scsi0"
 
@@ -63,7 +64,7 @@ resource "proxmox_vm_qemu" "vms" {
     scsi {
       scsi0 {
         disk {
-          storage    = "ceph"
+          storage    = each.value.hdd_storage
           size       = 20
           emulatessd = true
         }
@@ -79,8 +80,9 @@ resource "proxmox_vm_qemu" "vms" {
   # Cloud Init
   ipconfig0 = "ip=${each.value.ip_address},gw=${each.value.gateway}"
   ciuser    = "root"
-  cicustom  = "user=cephfs:snippets/cloud_init_${each.value.hostname}.yaml"
-  sshkeys   = <<EOF
+  # TODO::Add a variable here in place of cephfs
+  cicustom = "user=cephfs:snippets/cloud_init_${each.value.hostname}.yaml"
+  sshkeys  = <<EOF
   ${var.ssh_public_key}
   EOF
 }
