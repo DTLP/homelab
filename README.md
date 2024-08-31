@@ -14,6 +14,7 @@ This is what I currently use to run my Proxmox lab:
   - Intel core i5-4570T processor (4 vCPUs)
   - 8GB RAM
   - 128GB SATA SSD
+  - 128GB M.2 NVMe SSD
 
 ## How to use
 Choose where to host your lab and utilise the scripts provided to build your kubernetes cluster:
