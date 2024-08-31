@@ -1,14 +1,17 @@
 # Cloud-Init config taken from:
 # https://codingpackets.com/blog/proxmox-cloud-init-with-terraform-and-saltstack
+
 data "template_file" "cloud_init" {
   for_each = var.cloud_init_virtual_machines
 
   template = file("${path.module}/scripts/${each.value.cloud_init_file}")
 
   vars = {
-    hostname      = each.value.hostname
-    admin_ssh_key = var.admin_ssh_key
-    root_password = var.root_password
+    hostname           = each.value.hostname
+    admin_ssh_key      = var.admin_ssh_key
+    root_password      = var.root_password
+    root_ssh_key       = var.root_ssh_key
+    k8s_master_node_ip = var.k8s_master_node_ip
   }
 }
 
@@ -33,7 +36,7 @@ resource "null_resource" "cloud_init" {
 
   provisioner "file" {
     source      = local_file.cloud_init[each.key].filename
-    destination = "/var/lib/vz/snippets/cloud_init_${each.value.hostname}.yml"
+    destination = "/mnt/pve/cephfs/snippets/cloud_init_${each.value.hostname}.yaml"
   }
 }
 
@@ -52,7 +55,7 @@ resource "proxmox_vm_qemu" "vms" {
   qemu_os     = each.value.qemu_os
   onboot      = each.value.onboot
 
-  cloudinit_cdrom_storage = "local-lvm"
+  cloudinit_cdrom_storage = "ceph"
   scsihw                  = "virtio-scsi-single"
   bootdisk                = "scsi0"
 
@@ -60,7 +63,7 @@ resource "proxmox_vm_qemu" "vms" {
     scsi {
       scsi0 {
         disk {
-          storage    = "local-lvm"
+          storage    = "ceph"
           size       = 20
           emulatessd = true
         }
@@ -75,7 +78,8 @@ resource "proxmox_vm_qemu" "vms" {
 
   # Cloud Init
   ipconfig0 = "ip=${each.value.ip_address},gw=${each.value.gateway}"
-  cicustom  = "user=local:snippets/cloud_init_${each.value.hostname}.yml"
+  ciuser    = "root"
+  cicustom  = "user=cephfs:snippets/cloud_init_${each.value.hostname}.yaml"
   sshkeys   = <<EOF
   ${var.ssh_public_key}
   EOF

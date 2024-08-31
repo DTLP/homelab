@@ -36,6 +36,14 @@ variable "root_password" {
   type = string
 }
 
+variable "root_ssh_key" {
+  type = string
+}
+
+variable "k8s_master_node_ip" {
+  type = string
+}
+
 variable "cloud_init_virtual_machines" {
   type = map(object({
     hostname        = string

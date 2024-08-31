@@ -9,6 +9,20 @@ packages:
   - curl
   - gnupg
   - lsb-release
+  - docker.io
+
+write_files:
+  - path: /etc/docker/daemon.json
+    content: |
+      {
+        "exec-opts": ["native.cgroupdriver=systemd"],
+        "log-driver": "json-file",
+        "log-opts": {
+          "max-size": "100m"
+        },
+        "storage-driver": "overlay2"
+      }
+    permissions: '0644'
 
 users:
   - name: "root"
@@ -21,6 +35,22 @@ users:
       - ${admin_ssh_key}
 
 runcmd:
-  - systemctl start qemu-guest-agent
   - hostnamectl set-hostname ${hostname}
+  - systemctl start qemu-guest-agent
+  - systemctl enable docker
+  - systemctl start docker
+  - curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+  - mkdir -p -m 755 /etc/apt/keyrings
+  - curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+  - echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+  - apt-get update
+  - apt-get install -y kubelet kubeadm kubectl
+  - kubeadm init --pod-network-cidr=10.0.0.0/16
+  - export KUBECONFIG=/etc/kubernetes/admin.conf
+  - kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+  - mkdir -p /root/.kube
+  - cp /etc/kubernetes/admin.conf /root/.kube/config
+  - chown $(id -u):$(id -g) /root/.kube/config
+  - kubeadm token create --print-join-command > /joincluster.sh
+  # - chmod +x /joincluster.sh
   - reboot
