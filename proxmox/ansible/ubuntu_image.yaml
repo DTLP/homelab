@@ -1,0 +1,35 @@
+---
+- name: Setup Ubuntu Cloud VM on Proxmox
+  hosts: pve3
+  become: yes
+
+  tasks:
+    - name: Ensure the directory exists
+      file:
+        path: /mnt/pve/cephfs/template/iso/
+        state: directory
+        mode: '0755'
+
+    - name: Download the Ubuntu Cloud image
+      get_url:
+        url: https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img
+        dest: /mnt/pve/cephfs/template/iso/noble-server-cloudimg-amd64.img
+        mode: '0644'
+
+    - name: Create the VM
+      command: qm create 8000 --memory 6144 --core 3 --name ubuntu-cloud --net0 virtio,bridge=vmbr0
+
+    - name: Import the disk to ceph
+      command: qm importdisk 8000 /mnt/pve/cephfs/template/iso/noble-server-cloudimg-amd64.img ceph
+
+    - name: Set SCSI hardware and attach disk
+      command: qm set 8000 --scsihw virtio-scsi-pci --scsi0 ceph:vm-8000-disk-0
+
+    - name: Set cloud-init disk
+      command: qm set 8000 --ide2 ceph:cloudinit
+
+    - name: Configure the boot options
+      command: qm set 8000 --boot c --bootdisk scsi0
+
+    - name: Set serial0 to socket and VGA to serial0
+      command: qm set 8000 --serial0 socket --vga serial0
