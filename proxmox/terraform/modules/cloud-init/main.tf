@@ -35,9 +35,8 @@ resource "null_resource" "cloud_init" {
   }
 
   provisioner "file" {
-    source = local_file.cloud_init[each.key].filename
-    # TODO: Add a variable here in place of cephfs
-    destination = "/mnt/pve/cephfs/snippets/cloud_init_${each.value.hostname}.yaml"
+    source      = local_file.cloud_init[each.key].filename
+    destination = "/mnt/pve/nvme/snippets/cloud_init_${each.value.hostname}.yaml"
   }
 }
 
@@ -80,9 +79,8 @@ resource "proxmox_vm_qemu" "vms" {
   # Cloud Init
   ipconfig0 = "ip=${each.value.ip_address},gw=${each.value.gateway}"
   ciuser    = "root"
-  # TODO::Add a variable here in place of cephfs
-  cicustom = "user=cephfs:snippets/cloud_init_${each.value.hostname}.yaml"
-  sshkeys  = <<EOF
+  cicustom  = "user=nvme:snippets/cloud_init_${each.value.hostname}.yaml"
+  sshkeys   = <<EOF
   ${var.ssh_public_key}
   EOF
 }

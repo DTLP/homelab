@@ -58,7 +58,7 @@ variable "cloud_init_virtual_machines" {
       memory          = "6144"
       qemu_os         = "l26"
       hdd_size        = "20G"
-      hdd_storage     = "ceph"
+      hdd_storage     = "nvme"
       onboot          = false
       vm_template     = "ubuntu-cloud"
       cloud_init_file = "master.yaml"
@@ -74,7 +74,7 @@ variable "cloud_init_virtual_machines" {
       memory          = "6144"
       qemu_os         = "l26"
       hdd_size        = "20G"
-      hdd_storage     = "ceph"
+      hdd_storage     = "nvme"
       onboot          = false
       vm_template     = "ubuntu-cloud"
       cloud_init_file = "worker.yaml"
@@ -90,7 +90,7 @@ variable "cloud_init_virtual_machines" {
       memory          = "6144"
       qemu_os         = "l26"
       hdd_size        = "20G"
-      hdd_storage     = "ceph"
+      hdd_storage     = "nvme"
       onboot          = false
       vm_template     = "ubuntu-cloud"
       cloud_init_file = "worker.yaml"
