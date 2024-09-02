@@ -4,9 +4,9 @@
   become: true
   vars:
     root_password: "{{ lookup('file', 'secrets/root_password') }}"
+    ansible_ssh_pass: "{{ root_password }}"
 
   tasks:
-
     - name: Setup cluster on main node
       shell: "pvecm create {{ cluster_name }}"
       when: ansible_host == main_node_ip
