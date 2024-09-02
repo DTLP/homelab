@@ -1,0 +1,35 @@
+---
+- name: Setup Ceph on Proxmox
+  hosts: pve_nodes
+  become: yes
+
+  tasks:
+    - name: Create a partition
+      command: /sbin/sgdisk -n1 -t1:8300 /dev/nvme0n1
+
+    - name: Create f filesystem
+      command: /sbin/mkfs -t ext4 /dev/nvme0n1p1
+
+    - name: Read the storage configuration file
+      command: cat /etc/pve/storage.cfg
+      register: storage_content
+
+    - name: Mount the partition
+      mount:
+        path: /mnt/pve/nvme
+        src: /dev/nvme0n1p1
+        fstype: ext4
+        state: mounted
+
+    - name: Add NVMe storage configuration
+      blockinfile:
+        path: /etc/pve/storage.cfg
+        block: |
+          dir: nvme
+                path /mnt/pve/nvme
+                content images,iso,backup,rootdir,vztmpl,snippets
+                is_mountpoint 1
+                nodes {{ play_hosts | join(', ') }}
+        marker: ""
+      run_once: true
+      when: "'dir: nvme' not in storage_content.stdout"

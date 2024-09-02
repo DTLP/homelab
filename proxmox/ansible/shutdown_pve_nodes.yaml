@@ -1,0 +1,8 @@
+---
+- name: Setup Ubuntu Cloud VM on Proxmox
+  hosts: pve_nodes
+  become: yes
+
+  tasks:
+    - name: Shutdown node
+      command: shutdown
