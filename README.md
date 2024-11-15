@@ -9,7 +9,7 @@ OR
 
 ## My Hardware
 This is what I currently use to run my Proxmox lab:
-- TP-Link TL-SF1005D V15 5-Port 10/100Mbps Desktop Switch
+- TP-Link TL-SF1008D 8-Port 10/100Mbps Desktop Switch
 - x5 HP EliteDesk 800 G1 Desktop Mini PC
   - Intel core i5-4570T processor (4 vCPUs)
   - 8GB RAM
