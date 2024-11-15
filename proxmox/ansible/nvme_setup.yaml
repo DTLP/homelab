@@ -1,5 +1,5 @@
 ---
-- name: Setup Ceph on Proxmox
+- name: Setup NVMe drives
   hosts: pve_nodes
   become: yes
 
@@ -14,11 +14,18 @@
       command: cat /etc/pve/storage.cfg
       register: storage_content
 
+    - name: Get the UUID of the NVMe partition
+      command: blkid -s UUID -o value /dev/nvme0n1p1
+      register: nvme_uuid
+
     - name: Mount the partition
       mount:
         path: /mnt/pve/nvme
-        src: /dev/nvme0n1p1
+        src: "UUID={{ nvme_uuid.stdout }}"
         fstype: ext4
+        opts: defaults
+        dump: "0"
+        passno: "2"
         state: mounted
 
     - name: Add NVMe storage configuration
