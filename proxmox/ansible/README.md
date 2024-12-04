@@ -17,9 +17,13 @@ with the rest of the nodes.
 6. Run `make nvme` to mount an extra NVMe drive on all nodes.
 7. Run `make ubuntu` to download Ubuntu Cloud image to all nodes.
 
+Note: You can limit a playbook run to one node.
+```
+make nvme ARGS="--limit pve4"
+```
+
 ## TODO:
 - ~Proxmox Cluster~
 - ~SSH config~
 - ~Replace Enterprise repos with No-Subscription~
 - ~Ubuntu OS template~
-
