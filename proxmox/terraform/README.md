@@ -15,6 +15,7 @@
 ```
 # Proxmox API token details
 # Create one here: Datacenter -> Permissions -> API Token -> Add
+(Make sure Privilege Separation box is unchecked)
 proxmox_api_token_id     = "root@pam!terraform"
 proxmox_api_token_secret = "000ab000-0c0d-0a0f-b000-00c00da00bc0"
 
