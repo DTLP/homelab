@@ -26,14 +26,19 @@
         path: /mnt/pve/{{ vm_disk }}/template/iso/
         state: directory
         mode: '0755'
-      delegate_to: pve3
 
     - name: Copy the Ubuntu Cloud image to other nodes
       synchronize:
         src: /mnt/pve/{{ vm_disk }}/template/iso/noble-server-cloudimg-amd64.img
         dest: /mnt/pve/{{ vm_disk }}/template/iso/noble-server-cloudimg-amd64.img
         mode: push
+        rsync_opts:
+          - "--rsync-path=rsync"
       delegate_to: pve3
+      vars:
+        ansible_user: root
+        ansible_ssh_private_key_file: /root/.ssh/id_ed25519
+        ansible_ssh_extra_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 
 - name: Setup Ubuntu Cloud VM on Proxmox
   hosts: pve4
