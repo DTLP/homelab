@@ -45,6 +45,8 @@ runcmd:
   - echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
   - apt-get update
   - apt-get install -y kubelet kubeadm kubectl
+  - curl -L https://github.com/projectcalico/calico/releases/download/v3.29.1/calicoctl-linux-amd64 -o /usr/local/bin/calicoctl
+  - chmod +x /usr/local/bin/calicoctl
   - kubeadm init --pod-network-cidr=192.168.0.0/16
   - export KUBECONFIG=/etc/kubernetes/admin.conf
   - kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
