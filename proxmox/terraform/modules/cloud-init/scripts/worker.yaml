@@ -27,6 +27,11 @@ write_files:
     permissions: '0600'
     content: |
       ${replace(root_ssh_key, "\n", "\n      ")}
+  - path: /etc/crictl.yaml
+    content: |
+      runtime-endpoint: "unix:///run/containerd/containerd.sock"
+      image-endpoint: "unix:///run/containerd/containerd.sock"
+    permissions: '0644'
 
 users:
   - name: "root"

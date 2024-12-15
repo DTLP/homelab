@@ -23,6 +23,11 @@ write_files:
         "storage-driver": "overlay2"
       }
     permissions: '0644'
+  - path: /etc/crictl.yaml
+    content: |
+      runtime-endpoint: "unix:///run/containerd/containerd.sock"
+      image-endpoint: "unix:///run/containerd/containerd.sock"
+    permissions: '0644'
 
 users:
   - name: "root"
