@@ -70,5 +70,5 @@ runcmd:
   - mkdir -p /root/.kube
   - cp /etc/kubernetes/admin.conf /root/.kube/config
   - chown $(id -u):$(id -g) /root/.kube/config
-  - kubeadm token create --print-join-command > /joincluster.sh
+  - kubeadm token create --ttl 0 --print-join-command > /joincluster.sh
   - reboot
