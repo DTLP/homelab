@@ -15,27 +15,18 @@ spec:
     spec:
       securityContext:
         fsGroup: 472
-        supplementalGroups:
-          - 0
+      # Update volume permissions for grafana user
+      initContainers:
+      - name: fix-permissions
+        image: busybox
+        command: ["sh", "-c", "chown -R 472:472 /var/lib/grafana && chmod -R 775 /var/lib/grafana"]
+        volumeMounts:
+        - name: grafana
+          mountPath: /var/lib/grafana
       containers:
         - name: grafana
           image: grafana/grafana:latest
           imagePullPolicy: IfNotPresent
-          env:
-            - name: GF_SERVER_ENABLE_GZIP
-              value: "true"
-            - name: GF_PATHS_DATA
-              value: /data
-            - name: GF_PATHS_PLUGINS
-              value: /data/plugins
-            - name: GF_PATHS_PROVISIONING
-              value: /provisioning
-            - name: GF_ANALYTICS_REPORTING_ENABLED
-              value: "false"
-            - name: GF_LOG_MODE
-              value: console
-            - name: GF_INSTALL_PLUGINS
-              value: grafana-piechart-panel,grafana-clock-panel
           ports:
             - containerPort: 3000
               name: http-grafana
@@ -63,44 +54,9 @@ spec:
               cpu: 250m
               memory: 750Mi
           volumeMounts:
-            - name: data
-              mountPath: /data
-            - name: grafana
-              mountPath: /provisioning
-            - name: dashboards
-              mountPath: /dashboards
-        - name: git-sync
-          image: registry.k8s.io/git-sync/git-sync:v4.2.1
-          env:
-          - name: GITSYNC_REPO
-            value: "https://github.com/DTLP/homelab.git"
-          - name: GITSYNC_LINK
-            value: "repo"
-          - name: GITSYNC_ROOT
-            value: "/dashboards"
-          resources:
-            requests:
-              cpu: 100m
-              memory: 100Mi
-            limits:
-              cpu: 1000m
-              memory: 300Mi
-          securityContext:
-            runAsUser: 65533 # git-sync user
-            runAsGroup: 0 # root group to read mounted Secrets
-          volumeMounts:
-            - mountPath: /dashboards
-              name: dashboards
+            - mountPath: /var/lib/grafana
+              name: grafana
       volumes:
-        - name: data
-          emptyDir: {}
         - name: grafana
-          configMap:
-            items:
-              - key: dashboards.yaml
-                path: dashboards/dashboards.yaml
-              - key: datasources.yaml
-                path: datasources/datasources.yaml
-            name: grafana
-        - name: dashboards
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: grafana
