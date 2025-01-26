@@ -3,4 +3,5 @@ kind: Kustomization
 
 resources:
   - grafana/
-  - prometheus/
+  - loki/
+  - promtail/
