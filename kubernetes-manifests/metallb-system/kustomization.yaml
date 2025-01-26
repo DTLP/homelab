@@ -3,5 +3,6 @@ kind: Kustomization
 
 resources:
   - metallb-addresspool.yaml
+  - metallb-l2advertisement.yaml
 
   - github.com/metallb/metallb/config/native?ref=v0.14.9
