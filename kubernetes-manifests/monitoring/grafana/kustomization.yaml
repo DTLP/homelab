@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
   - grafana-deployment.yaml
   - grafana-service.yaml
+  - grafana-volume.yaml
 
 configMapGenerator:
   - name: grafana
