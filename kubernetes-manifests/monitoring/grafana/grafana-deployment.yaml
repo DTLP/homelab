@@ -1,62 +1,114 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    app: grafana
   name: grafana
+  labels:
+    app.kubernetes.io/name: grafana
 spec:
+  replicas: 1
+  revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: grafana
+      app.kubernetes.io/name: grafana
+  strategy:
+    type: RollingUpdate
   template:
     metadata:
       labels:
-        app: grafana
-    spec:
+        app.kubernetes.io/name: grafana
+      annotations:
+        checksum/config: 2f272e6f92b50315982e04be639218622aa9bd8ee67ff14e4566f4fee8b7587e
+        checksum/dashboards-json-config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
+        checksum/sc-dashboard-provider-config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
+        checksum/secret: 2870b29b60c43282612a9a3748759ca7074dd7649791fb9b5bde84a61c7b46c2
+    spec:      
+      serviceAccountName: grafana
+      automountServiceAccountToken: true
       securityContext:
         fsGroup: 472
-      # Update volume permissions for grafana user
-      initContainers:
-      - name: fix-permissions
-        image: busybox
-        command: ["sh", "-c", "chown -R 472:472 /var/lib/grafana && chmod -R 775 /var/lib/grafana"]
-        volumeMounts:
-        - name: grafana
-          mountPath: /var/lib/grafana
+        runAsGroup: 472
+        runAsUser: 472
+      enableServiceLinks: true
       containers:
-        - name: grafana
-          image: grafana/grafana:latest
+        - name: grafana-sc-datasources
+          image: "quay.io/kiwigrid/k8s-sidecar:1.19.2"
           imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 3000
-              name: http-grafana
-              protocol: TCP
-          readinessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /robots.txt
-              port: 3000
-              scheme: HTTP
-            initialDelaySeconds: 10
-            periodSeconds: 30
-            successThreshold: 1
-            timeoutSeconds: 2
-          livenessProbe:
-            failureThreshold: 3
-            initialDelaySeconds: 30
-            periodSeconds: 10
-            successThreshold: 1
-            tcpSocket:
-              port: 3000
-            timeoutSeconds: 1
-          resources:
-            requests:
-              cpu: 250m
-              memory: 750Mi
+          env:
+            - name: METHOD
+              value: WATCH
+            - name: LABEL
+              value: ""
+            - name: FOLDER
+              value: "/etc/grafana/provisioning/datasources"
+            - name: RESOURCE
+              value: "both"
+            - name: REQ_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: grafana-admin
+                  key: admin-user
+            - name: REQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: grafana-admin
+                  key: admin-password
+            - name: REQ_URL
+              value: http://localhost:3000/api/admin/provisioning/datasources/reload
+            - name: REQ_METHOD
+              value: POST
           volumeMounts:
-            - mountPath: /var/lib/grafana
-              name: grafana
-      volumes:
+            - name: sc-datasources-volume
+              mountPath: "/etc/grafana/provisioning/datasources"
         - name: grafana
-          persistentVolumeClaim:
-            claimName: grafana
+          image: "grafana/grafana:10.3.3"
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: config
+              mountPath: "/etc/grafana/grafana.ini"
+              subPath: grafana.ini
+            - name: storage
+              mountPath: "/var/lib/grafana"
+            - name: sc-datasources-volume
+              mountPath: "/etc/grafana/provisioning/datasources"
+          ports:
+            - name: grafana
+              containerPort: 3000
+              protocol: TCP
+          env:
+            - name: GF_SECURITY_ADMIN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: grafana-admin
+                  key: admin-user
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: grafana-admin
+                  key: admin-password
+            - name: GF_PATHS_DATA
+              value: /var/lib/grafana/
+            - name: GF_PATHS_LOGS
+              value: /var/log/grafana
+            - name: GF_PATHS_PLUGINS
+              value: /var/lib/grafana/plugins
+            - name: GF_PATHS_PROVISIONING
+              value: /etc/grafana/provisioning
+          livenessProbe:
+            failureThreshold: 10
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 60
+            timeoutSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+      volumes:
+        - name: config
+          configMap:
+            name: grafana
+        - name: storage
+          emptyDir: {}
+        - name: sc-datasources-volume
+          emptyDir: {}
