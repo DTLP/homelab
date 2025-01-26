@@ -15,12 +15,12 @@ spec:
   # sourceNamespaces will determine whether an Application may use a certain AppProject.
   # If an Application specifies an AppProject that it is not allowed to, Argo CD refuses to process this Application
   sourceNamespaces:
-    - sys-argocd
+    - argocd
     - sandbox
 
   # Only permit applications to deploy to the system's namespace in the same cluster
   destinations:
-    - namespace: sys-argocd
+    - namespace: argocd
       name: in-cluster
     - namespace: sandbox
       name: in-cluster
@@ -47,7 +47,7 @@ spec:
   #     - group: ""
   #       kind: Secret
   #       name: "{ingress-crt,telecomplus-co-uk-wildcard-crt}"
-  #     # sys-vault/tf-applier stores state in secret
+  #     # vault/tf-applier stores state in secret
   #     - group: ""
   #       kind: Secret
   #       name: tfstate-*

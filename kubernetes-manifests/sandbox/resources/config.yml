@@ -81,7 +81,7 @@ services:
     items:
       - name: "Grafana"
         logo: "https://icon.icepanel.io/Technology/svg/Grafana.svg"
-        url: "http://grafana.sys-mon.svc.cluster.local"
+        url: "http://grafana.monitoring.svc.cluster.local"
   - name: "Github"
     icon: "fab fa-github"
     items:
