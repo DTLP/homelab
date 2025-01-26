@@ -1,9 +1,0 @@
-apiVersion: 1
-providers:
-- name: "default"
-  type: file
-  disableDeletion: false
-  editable: true
-  options:
-    path: /dashboards/repo/resources/grafana-dashboards/
-    foldersFromFilesStructure: true
