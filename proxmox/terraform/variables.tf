@@ -1,6 +1,6 @@
 variable "proxmox_api_url" {
   type    = string
-  default = "http://192.168.1.21:8006/api2/json"
+  default = "http://192.168.0.21:8006/api2/json"
 }
 
 variable "proxmox_api_token_id" {
@@ -16,11 +16,11 @@ variable "proxmox_api_token_secret" {
 variable "proxmox_host_ipv4_addrs" {
   type = map(string)
   default = {
-    pve1 = "192.168.1.21"
-    pve2 = "192.168.1.22"
-    pve3 = "192.168.1.23"
-    pve4 = "192.168.1.24"
-    pve5 = "192.168.1.25"
+    pve1 = "192.168.0.21"
+    pve2 = "192.168.0.22"
+    pve3 = "192.168.0.23"
+    pve4 = "192.168.0.24"
+    pve5 = "192.168.0.25"
   }
 }
 
@@ -44,7 +44,7 @@ variable "root_ssh_key" {
 
 variable "k8s_master_node_ip" {
   type    = string
-  default = "192.168.1.30"
+  default = "192.168.0.30"
 }
 
 variable "cloud_init_virtual_machines" {
@@ -52,8 +52,8 @@ variable "cloud_init_virtual_machines" {
 
     "master-0" = {
       hostname        = "master-0"
-      ip_address      = "192.168.1.30/24"
-      gateway         = "192.168.1.254"
+      ip_address      = "192.168.0.30/24"
+      gateway         = "192.168.0.1"
       target_node     = "pve1"
       cpu_cores       = 3
       cpu_sockets     = 1
@@ -68,8 +68,8 @@ variable "cloud_init_virtual_machines" {
 
     "worker-0" = {
       hostname        = "worker-0"
-      ip_address      = "192.168.1.40/24"
-      gateway         = "192.168.1.254"
+      ip_address      = "192.168.0.40/24"
+      gateway         = "192.168.0.1"
       target_node     = "pve2"
       cpu_cores       = 3
       cpu_sockets     = 1
@@ -84,8 +84,8 @@ variable "cloud_init_virtual_machines" {
 
     "worker-1" = {
       hostname        = "worker-1"
-      ip_address      = "192.168.1.41/24"
-      gateway         = "192.168.1.254"
+      ip_address      = "192.168.0.41/24"
+      gateway         = "192.168.0.1"
       target_node     = "pve3"
       cpu_cores       = 3
       cpu_sockets     = 1
@@ -100,8 +100,8 @@ variable "cloud_init_virtual_machines" {
 
     "worker-2" = {
       hostname        = "worker-2"
-      ip_address      = "192.168.1.42/24"
-      gateway         = "192.168.1.254"
+      ip_address      = "192.168.0.42/24"
+      gateway         = "192.168.0.1"
       target_node     = "pve4"
       cpu_cores       = 3
       cpu_sockets     = 1
@@ -116,8 +116,8 @@ variable "cloud_init_virtual_machines" {
 
     "worker-3" = {
       hostname        = "worker-3"
-      ip_address      = "192.168.1.43/24"
-      gateway         = "192.168.1.254"
+      ip_address      = "192.168.0.60/24"
+      gateway         = "192.168.0.1"
       target_node     = "pve5"
       cpu_cores       = 3
       cpu_sockets     = 1
