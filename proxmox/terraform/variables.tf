@@ -114,8 +114,8 @@ variable "cloud_init_virtual_machines" {
       cloud_init_file = "worker.yaml"
     }
 
-    "worker-3" = {
-      hostname        = "worker-3"
+    "nfs-0" = {
+      hostname        = "nfs-0"
       ip_address      = "192.168.0.60/24"
       gateway         = "192.168.0.1"
       target_node     = "pve5"
@@ -123,11 +123,11 @@ variable "cloud_init_virtual_machines" {
       cpu_sockets     = 1
       memory          = "6144"
       qemu_os         = "l26"
-      hdd_size        = "20G"
+      hdd_size        = "40G"
       hdd_storage     = "nvme"
       onboot          = true
       vm_template     = "ubuntu-cloud"
-      cloud_init_file = "worker.yaml"
+      cloud_init_file = "nfs.yaml"
     }
   }
 }
