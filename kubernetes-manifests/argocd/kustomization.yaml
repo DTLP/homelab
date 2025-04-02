@@ -16,6 +16,7 @@ secretGenerator:
       - sshPrivateKey=secrets/github-ssh-key
     literals:
       - url=git@github.com:DTLP/homelab.git
+      - project=default
       - type=git
     name: homelab-repo
     options:
