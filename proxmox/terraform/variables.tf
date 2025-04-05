@@ -47,6 +47,11 @@ variable "k8s_master_node_ip" {
   default = "192.168.0.30"
 }
 
+variable "nfs_server_ip" {
+  type    = string
+  default = "192.168.0.60"
+}
+
 variable "cloud_init_virtual_machines" {
   default = {
 

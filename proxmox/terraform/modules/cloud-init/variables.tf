@@ -44,6 +44,10 @@ variable "k8s_master_node_ip" {
   type = string
 }
 
+variable "nfs_server_ip" {
+  type = string
+}
+
 variable "cloud_init_virtual_machines" {
   type = map(object({
     hostname        = string

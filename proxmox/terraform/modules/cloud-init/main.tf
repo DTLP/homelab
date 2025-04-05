@@ -12,6 +12,7 @@ data "template_file" "cloud_init" {
     root_password      = var.root_password
     root_ssh_key       = var.root_ssh_key
     k8s_master_node_ip = var.k8s_master_node_ip
+    nfs_server_ip      = var.nfs_server_ip
   }
 }
 

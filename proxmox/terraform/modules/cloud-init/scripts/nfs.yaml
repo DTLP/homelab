@@ -62,4 +62,9 @@ runcmd:
   - systemctl start docker
   - curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
   - mkdir -p -m 755 /etc/apt/keyrings
+  - apt-get install -y nfs-kernel-server
+  - mkdir /data
+  - echo "/data    192.168.0.0/24(rw,sync,no_root_squash,no_subtree_check)" >> /etc/exports
+  - exportfs -a
+  - systemctl restart nfs-kernel-server
   - reboot

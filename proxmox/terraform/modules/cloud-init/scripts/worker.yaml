@@ -73,4 +73,7 @@ runcmd:
   - bash /joincluster.sh
   - mkdir -p /root/.kube
   - cp /etc/kubernetes/kubelet.conf /root/.kube/config
+  - apt-get install -y nfs-common
+  - mkdir /data
+  - sudo mount ${nfs_server_ip}:/data /data
   - reboot
