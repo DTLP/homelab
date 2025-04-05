@@ -3,4 +3,5 @@ kind: Service
 metadata:
   name: argocd-server
 spec:
-  type: NodePort
+  type: LoadBalancer
+  loadBalancerIP: 192.168.0.50
