@@ -6,6 +6,7 @@ resources:
   - grafana-configmap.yaml
   - grafana-deployment.yaml
   - grafana-role.yaml
+  - grafana-service.yaml
 
 secretGenerator:
   - name: grafana-admin
