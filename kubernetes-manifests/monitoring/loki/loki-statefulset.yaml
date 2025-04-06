@@ -44,7 +44,7 @@ spec:
               mountPath: /tmp
             - name: config
               mountPath: /etc/loki
-            - name: storage
+            - name: loki-storage
               mountPath: "/data"
               subPath: 
           ports:
@@ -85,5 +85,14 @@ spec:
         - name: config
           configMap:
             name: loki
-        - name: storage
+        - name: loki-storage
           emptyDir: {}
+  volumeClaimTemplates:
+    - metadata:
+        name: loki-storage
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 10Gi
+        storageClassName: nfs-client
