@@ -8,6 +8,11 @@ resources:
   - grafana-role.yaml
   - grafana-service.yaml
 
+configMapGenerator:
+  - name: grafana-datasources
+    files:
+      - resources/datasources.yaml
+
 secretGenerator:
   - name: grafana-admin
     envs:
