@@ -14,8 +14,8 @@ configMapGenerator:
       - resources/datasources.yaml
 
 secretGenerator:
-  - name: grafana-admin
+  - name: grafana
     envs:
-      - secrets/grafana-admin
+      - secrets/grafana
     options:
       disableNameSuffixHash: true

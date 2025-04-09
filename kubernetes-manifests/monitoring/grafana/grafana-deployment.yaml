@@ -45,12 +45,12 @@ spec:
             - name: REQ_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: grafana-admin
+                  name: grafana
                   key: admin-user
             - name: REQ_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: grafana-admin
+                  name: grafana
                   key: admin-password
             - name: REQ_URL
               value: http://localhost:3000/api/admin/provisioning/datasources/reload
@@ -78,12 +78,12 @@ spec:
             - name: GF_SECURITY_ADMIN_USER
               valueFrom:
                 secretKeyRef:
-                  name: grafana-admin
+                  name: grafana
                   key: admin-user
             - name: GF_SECURITY_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: grafana-admin
+                  name: grafana
                   key: admin-password
             - name: GF_PATHS_DATA
               value: /var/lib/grafana/
