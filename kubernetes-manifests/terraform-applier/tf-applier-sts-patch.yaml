@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: terraform-applier
+spec:
+  template:
+    metadata:
+      labels:
+        app: terraform-applier
+    spec:
+      serviceAccountName: terraform-applier
+      terminationGracePeriodSeconds: 300
+      containers:
+        - name: tf-applier
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - name: config
+              mountPath: /config/
+      volumes:
+        - name: config
+          configMap:
+            name: tf-applier-config
+  volumeClaimTemplates:
+  - metadata:
+      name: tmp
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 5Gi
+      storageClassName: nfs-client

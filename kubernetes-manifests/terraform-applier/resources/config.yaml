@@ -1,0 +1,3 @@
+git_mirror:
+  repositories:
+    - remote: https://github.com/DTLP/homelab.git

@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - github.com/utilitywarehouse/terraform-applier//manifests/base/namespaced?ref=master
+
+patches:
+  - path: tf-applier-sts-patch.yaml
+  - path: tf-applier-service-patch.yaml
+  - path: tf-applier-redis-patch.yaml
+
+configMapGenerator:
+  - name: tf-applier-config
+    files:
+      - resources/config.yaml

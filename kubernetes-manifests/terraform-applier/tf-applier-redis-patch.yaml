@@ -1,0 +1,14 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: terraform-applier-redis
+spec:
+  volumeClaimTemplates:
+  - metadata:
+      name: terraform-applier-redis-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 1Gi
+      storageClassName: nfs-client
