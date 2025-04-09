@@ -46,19 +46,19 @@ spec:
             - name: REQ_METHOD
               value: POST
           volumeMounts:
-            - name: sc-datasources-volume
+            - name: datasources
               mountPath: "/etc/grafana/provisioning/datasources"
         - name: grafana
           image: "grafana/grafana:11.6.0"
           imagePullPolicy: IfNotPresent
           volumeMounts:
-            - name: config
+            - name: grafana-config
               mountPath: "/etc/grafana/grafana.ini"
               subPath: grafana.ini
+            - name: datasources
+              mountPath: "/etc/grafana/provisioning/datasources"
             - name: storage
               mountPath: "/var/lib/grafana"
-            - name: sc-datasources-volume
-              mountPath: "/etc/grafana/provisioning/datasources"
           ports:
             - name: grafana
               containerPort: 3000
@@ -94,10 +94,10 @@ spec:
               path: /api/health
               port: 3000
       volumes:
-        - name: config
+        - name: grafana-config
           configMap:
             name: grafana
         - name: storage
           emptyDir: {}
-        - name: sc-datasources-volume
+        - name: datasources
           emptyDir: {}
