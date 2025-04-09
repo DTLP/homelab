@@ -1,5 +1,5 @@
 provider "grafana" {
-  url  = "http://grafana.lab"
+  url  = var.grafana_url
   auth = var.grafana_api_token
 }
 
