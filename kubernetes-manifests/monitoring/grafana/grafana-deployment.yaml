@@ -16,19 +16,8 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: grafana
-      annotations:
-        checksum/config: 2f272e6f92b50315982e04be639218622aa9bd8ee67ff14e4566f4fee8b7587e
-        checksum/dashboards-json-config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
-        checksum/sc-dashboard-provider-config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
-        checksum/secret: 2870b29b60c43282612a9a3748759ca7074dd7649791fb9b5bde84a61c7b46c2
-    spec:      
+    spec:
       serviceAccountName: grafana
-      automountServiceAccountToken: true
-      securityContext:
-        fsGroup: 472
-        runAsGroup: 472
-        runAsUser: 472
-      enableServiceLinks: true
       containers:
         - name: grafana-sc-datasources
           image: "quay.io/kiwigrid/k8s-sidecar:1.19.2"
