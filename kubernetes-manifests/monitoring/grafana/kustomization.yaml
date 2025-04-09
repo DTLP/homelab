@@ -4,7 +4,7 @@ kind: Kustomization
 resources:
   - grafana-clusterrole.yaml
   - grafana-configmap.yaml
-  - grafana-deployment.yaml
+  - grafana-sts.yaml
   - grafana-role.yaml
   - grafana-service.yaml
   - terraform-modules/
