@@ -7,6 +7,7 @@ resources:
   - grafana-deployment.yaml
   - grafana-role.yaml
   - grafana-service.yaml
+  - terraform-modules/
 
 configMapGenerator:
   - name: grafana-datasources

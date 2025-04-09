@@ -1,0 +1,19 @@
+apiVersion: terraform-applier.uw.systems/v1beta1
+kind: Module
+metadata:
+  name: dashboards
+  labels:
+    terraform-applier.uw.systems/instance: terraform-applier
+spec:
+  repoURL: https://github.com/DTLP/homelab
+  path: terraform/grafana
+  planOnPR: false
+  delegateServiceAccountSecretRef: terraform-applier-delegate-token
+  var:
+    - name: grafana_api_token
+      valueFrom:
+        secretKeyRef:
+          name: grafana
+          key: api-token
+    - name: grafana_url
+      value: http://grafana.monitoring.svc.cluster.local

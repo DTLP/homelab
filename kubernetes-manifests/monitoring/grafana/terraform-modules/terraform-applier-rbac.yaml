@@ -1,0 +1,39 @@
+# Used by terraform-applier modules to fetch resources in this namespace
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: terraform-applier-delegate
+---
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/service-account-token
+metadata:
+  name: terraform-applier-delegate-token
+  annotations:
+    kubernetes.io/service-account.name: terraform-applier-delegate
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: terraform-applier-delegate
+rules:
+  # Used by modules to store state in secrets, leases are used to
+  # perform locking
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "create", "update", "patch", "list"]
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["get", "create", "update", "patch", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: terraform-applier-delegate
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: terraform-applier-delegate
+subjects:
+  - kind: ServiceAccount
+    name: terraform-applier-delegate
