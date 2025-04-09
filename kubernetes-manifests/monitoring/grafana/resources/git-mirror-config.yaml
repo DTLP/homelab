@@ -1,0 +1,13 @@
+defaults:
+  root: /tmp/git-mirror
+  link_root: /tmp/links/
+  interval: 1m
+  mirror_timeout: 5m
+  git_gc: always
+
+repositories:
+  - remote: https://github.com/DTLP/homelab
+    # worktree:
+    #   - link: dashboard-links
+        # pathspecs:
+        #   - kubernetes-manifests/monitoring/grafana/resources/dashboards/*.json
