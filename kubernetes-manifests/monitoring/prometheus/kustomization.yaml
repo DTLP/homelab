@@ -10,17 +10,6 @@ configMapGenerator:
   - name: prometheus-config
     files:
       - resources/config.yaml
-    # options:
-    #   disableNameSuffixHash: true
   - name: prometheus-rules
     files:
       - resources/rules.yaml
-    # options:
-    #   disableNameSuffixHash: true
-#
-# secretGenerator:
-#   - name: grafana-admin
-#     envs:
-#       - secrets/grafana-admin
-#     options:
-#       disableNameSuffixHash: true
