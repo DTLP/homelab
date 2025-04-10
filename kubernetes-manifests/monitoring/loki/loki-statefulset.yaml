@@ -4,35 +4,21 @@ metadata:
   name: loki
   labels:
     app: loki
-  annotations:
-    {}
 spec:
-  podManagementPolicy: OrderedReady
-  replicas: 1
   selector:
     matchLabels:
       app: loki
   serviceName: loki
-  updateStrategy:
-    type: RollingUpdate
   template:
     metadata:
       labels:
         app: loki
         name: loki
       annotations:
-        checksum/config: 0b785167ce123a8028333c8058aa3faa2aece80df4522a7e0dc78ee9a8b6aca8
         prometheus.io/port: http-metrics
         prometheus.io/scrape: "true"
     spec:
       serviceAccountName: loki
-      securityContext:
-        fsGroup: 10001
-        runAsGroup: 10001
-        runAsNonRoot: true
-        runAsUser: 10001
-      initContainers:
-        []
       containers:
         - name: loki
           image: "grafana/loki:3.4.3"
@@ -44,9 +30,8 @@ spec:
               mountPath: /tmp
             - name: config
               mountPath: /etc/loki
-            - name: loki-storage
+            - name: storage
               mountPath: "/data"
-              subPath: 
           ports:
             - name: http-metrics
               containerPort: 3100
@@ -67,29 +52,15 @@ spec:
               path: /ready
               port: http-metrics
             initialDelaySeconds: 45
-          resources:
-            {}
-          securityContext:
-            readOnlyRootFilesystem: true
-          env:
-      nodeSelector:
-        {}
-      affinity:
-        {}
-      tolerations:
-        []
-      terminationGracePeriodSeconds: 4800
       volumes:
         - name: tmp
           emptyDir: {}
         - name: config
           configMap:
             name: loki
-        - name: loki-storage
-          emptyDir: {}
   volumeClaimTemplates:
     - metadata:
-        name: loki-storage
+        name: storage
       spec:
         accessModes: [ "ReadWriteOnce" ]
         resources:
