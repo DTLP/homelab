@@ -1,0 +1,5 @@
+default:
+    user: prometheus@pve
+    token_name: "pve-exporter"
+    token_value: "${PROXMOX_API_TOKEN}"
+    verify_ssl: false

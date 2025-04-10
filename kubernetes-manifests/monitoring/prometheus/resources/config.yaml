@@ -115,3 +115,24 @@ scrape_configs:
     - source_labels: [__meta_kubernetes_service_name]
       action: replace
       target_label: kubernetes_name
+  - job_name: 'pve'
+    scrape_interval: 60s
+    scrape_timeout: 30s
+    scheme: "http"
+    static_configs:
+      - targets:
+        # specifying only one IP address here,
+        # because it gathers all metrics anyway
+        - 192.168.0.21 # pve1
+    metrics_path: /pve
+    params:
+      module: [default]
+      cluster: ['1']
+      node: ['1']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: pve-exporter:9221

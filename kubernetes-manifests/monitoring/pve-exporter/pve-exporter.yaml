@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pve-exporter
+  labels:
+    app: pve-exporter
+spec:
+  selector:
+    matchLabels:
+      app: pve-exporter
+  template:
+    metadata:
+      labels:
+        app: pve-exporter
+    spec:
+      hostNetwork: true
+      containers:
+        - name: pve-exporter
+          image: prompve/prometheus-pve-exporter:latest
+          ports:
+            - name: pve-exporter
+              containerPort: 9221
+          env:
+            - name: PROXMOX_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: proxmox
+                  key: api-token
+          volumeMounts:
+            - name: config
+              mountPath: /etc/prometheus/
+          resources:
+            limits:
+              memory: 100M
+      volumes:
+        - name: config
+          configMap:
+            name: pve-exporter
+            defaultMode: 420

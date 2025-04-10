@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - pve-exporter.yaml
+  - pve-exporter-service.yaml
+
+configMapGenerator:
+  - name: pve-exporter
+    files:
+      - pve.yml=resources/pve.yaml
+
+secretGenerator:
+  - name: proxmox
+    envs:
+      - secrets/proxmox
