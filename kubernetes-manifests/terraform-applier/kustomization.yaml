@@ -5,7 +5,7 @@ resources:
   - github.com/utilitywarehouse/terraform-applier//manifests/base/namespaced?ref=master
 
 patches:
-  - path: tf-applier-sts-patch.yaml
+  - path: tf-applier-patch.yaml
   - path: tf-applier-service-patch.yaml
   - path: tf-applier-redis-patch.yaml
 
