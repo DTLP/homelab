@@ -13,3 +13,8 @@ configMapGenerator:
   - name: tf-applier-config
     files:
       - resources/config.yaml
+
+secretGenerator:
+  - name: hcp-terraform
+    files:
+      - secrets/credentials.tfrc.json
