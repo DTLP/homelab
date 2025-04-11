@@ -28,9 +28,316 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 5,
+  "id": 11,
   "links": [],
   "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 26,
+      "panels": [],
+      "repeat": "node",
+      "title": "Summary $node",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "#EAB839",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 85
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "%"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 2,
+        "x": 0,
+        "y": 1
+      },
+      "id": 29,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "(pve_cpu_usage_ratio{id=\"node/$node\"} / pve_cpu_usage_limit) * 100",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Server CPU",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "#EAB839",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 85
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "%"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 2,
+        "x": 2,
+        "y": 1
+      },
+      "id": 27,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "(pve_memory_usage_bytes{id=~\"node/$node\"} / pve_memory_size_bytes{id=~\"node/$node\"}) * 100\n",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Server Memory",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "#EAB839",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 85
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "%"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 4,
+        "y": 1
+      },
+      "id": 30,
+      "options": {
+        "displayMode": "lcd",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "left",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "text"
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "(pve_disk_usage_bytes{id=~\"storage/$node/.*\"} / pve_disk_size_bytes{id=~\"storage/$node/.*\"}) * 100\n",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Server Storage",
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "{id=\"storage/pve\\d/(.*)\", instance=\"[\\d\\.]+\", job=\"pve\"}",
+            "renamePattern": "$1"
+          }
+        }
+      ],
+      "type": "bargauge"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 25
+      },
+      "id": 25,
+      "panels": [],
+      "title": "Row title",
+      "type": "row"
+    },
     {
       "datasource": {
         "type": "prometheus",
@@ -314,7 +621,7 @@
         "h": 14,
         "w": 14,
         "x": 0,
-        "y": 0
+        "y": 26
       },
       "id": 19,
       "options": {
@@ -553,7 +860,7 @@
         "h": 7,
         "w": 7,
         "x": 14,
-        "y": 0
+        "y": 26
       },
       "id": 23,
       "options": {
@@ -664,7 +971,7 @@
         "h": 5,
         "w": 3,
         "x": 21,
-        "y": 0
+        "y": 26
       },
       "id": 7,
       "maxDataPoints": 100,
@@ -745,7 +1052,7 @@
         "h": 2,
         "w": 3,
         "x": 21,
-        "y": 5
+        "y": 31
       },
       "id": 22,
       "options": {
@@ -854,7 +1161,7 @@
         "h": 7,
         "w": 7,
         "x": 14,
-        "y": 7
+        "y": 33
       },
       "id": 24,
       "options": {
@@ -965,7 +1272,7 @@
         "h": 5,
         "w": 3,
         "x": 21,
-        "y": 7
+        "y": 33
       },
       "id": 8,
       "maxDataPoints": 100,
@@ -1071,7 +1378,7 @@
         "h": 2,
         "w": 3,
         "x": 21,
-        "y": 12
+        "y": 38
       },
       "id": 20,
       "options": {
@@ -1226,7 +1533,7 @@
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 14
+        "y": 40
       },
       "id": 2,
       "options": {
@@ -1332,7 +1639,7 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 14
+        "y": 40
       },
       "id": 5,
       "options": {
@@ -1418,7 +1725,7 @@
         "h": 11,
         "w": 3,
         "x": 0,
-        "y": 24
+        "y": 50
       },
       "id": 11,
       "options": {
@@ -1491,7 +1798,7 @@
         "h": 11,
         "w": 4,
         "x": 3,
-        "y": 24
+        "y": 50
       },
       "id": 15,
       "options": {
@@ -1630,7 +1937,7 @@
         "h": 11,
         "w": 17,
         "x": 7,
-        "y": 24
+        "y": 50
       },
       "id": 9,
       "options": {
@@ -1748,7 +2055,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 35
+        "y": 61
       },
       "id": 13,
       "options": {
@@ -1867,7 +2174,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 45
+        "y": 71
       },
       "id": 12,
       "options": {
@@ -1936,6 +2243,34 @@
         "regex": "",
         "sort": 1,
         "type": "query"
+      },
+      {
+        "current": {
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
+        "definition": "label_values(pve_node_info,name)",
+        "includeAll": true,
+        "multi": true,
+        "name": "node",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values(pve_node_info,name)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
       }
     ]
   },
@@ -1947,5 +2282,5 @@
   "timezone": "",
   "title": "Proxmox",
   "uid": "Dp7Cd57Zza",
-  "version": 1
+  "version": 35
 }
