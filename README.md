@@ -30,14 +30,16 @@ things, break things and fix them back up.
   - 8GB RAM
   - 128GB SATA SSD
   - 128GB M.2 NVMe SSD
+
 Each HP machine is running Proxmox Virtual Environment and they're all connected
 together with that tiny TP-Link switch.
 
 ### Software
-Each Proxmox node is running one Ubuntu guest VM. So far these VM roles are:
+Proxmox nodes each run just one Ubuntu guest VM. So far these VM roles are:
 - 1 kubernetes master node
 - 3 kubernetes worker nodes
 - 1 NFS server for persistent storage
+
 Proxmox resources are managed via [Terraform](https://github.com/DTLP/homelab/tree/main/terraform),
 but the initial setup is done using [Ansible](https://github.com/DTLP/homelab/tree/main/ansible). I used to use Vagrant for this before I moved to Proxmox, but I no
 longer maintain that config. You could still find it [here](https://github.com/DTLP/homelab/tree/main/vagrant).
