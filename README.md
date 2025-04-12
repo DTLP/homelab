@@ -1,20 +1,20 @@
 <p align="left">
-  <img width="40" src="docs/images/proxmox_dark.svg#gh-light-mode-only" />
-  <img width="40" src="docs/images/proxmox_light.svg#gh-dark-mode-only" />
-  <img width="40" src="docs/images/ansible_dark.svg#gh-light-mode-only" />
-  <img width="40" src="docs/images/ansible_light.svg#gh-dark-mode-only" />
-  <img width="40" src="docs/images/ubuntu_dark.svg#gh-light-mode-only" />
-  <img width="40" src="docs/images/ubuntu_light.svg#gh-dark-mode-only" />
-  <img width="40" src="docs/images/kubernetes_dark.svg#gh-light-mode-only" />
-  <img width="40" src="docs/images/kubernetes_light.svg#gh-dark-mode-only" />
-  <img width="40" src="docs/images/terraform_dark.svg#gh-light-mode-only" />
-  <img width="40" src="docs/images/terraform_light.svg#gh-dark-mode-only" />
-  <img width="40" src="docs/images/argo_dark.svg#gh-light-mode-only" />
-  <img width="40" src="docs/images/argo_light.svg#gh-dark-mode-only" />
-  <img width="40" src="docs/images/grafana_dark.svg#gh-light-mode-only" />
-  <img width="40" src="docs/images/grafana_light.svg#gh-dark-mode-only" />
-  <img width="40" src="docs/images/prometheus_dark.svg#gh-light-mode-only" />
-  <img width="40" src="docs/images/prometheus_light.svg#gh-dark-mode-only" />
+  <img width="40" src="docs/images/proxmox_dark.svg#gh-light-mode-only" title="Proxmox"/>
+  <img width="40" src="docs/images/proxmox_light.svg#gh-dark-mode-only" title="Proxmox"/>
+  <img width="40" src="docs/images/ansible_dark.svg#gh-light-mode-only" title="Ansible"/>
+  <img width="40" src="docs/images/ansible_light.svg#gh-dark-mode-only" title="Ansible"/>
+  <img width="40" src="docs/images/ubuntu_dark.svg#gh-light-mode-only" title="Ubuntu"/>
+  <img width="40" src="docs/images/ubuntu_light.svg#gh-dark-mode-only" title="Ubuntu"/>
+  <img width="40" src="docs/images/kubernetes_dark.svg#gh-light-mode-only" title="Kubernetes"/>
+  <img width="40" src="docs/images/kubernetes_light.svg#gh-dark-mode-only" title="Kubernetes"/>
+  <img width="40" src="docs/images/terraform_dark.svg#gh-light-mode-only" title="Terraform"/>
+  <img width="40" src="docs/images/terraform_light.svg#gh-dark-mode-only" title="Terraform"/>
+  <img width="40" src="docs/images/argo_dark.svg#gh-light-mode-only" title="ArgoCD"/>
+  <img width="40" src="docs/images/argo_light.svg#gh-dark-mode-only" title="ArgoCD"/>
+  <img width="40" src="docs/images/grafana_dark.svg#gh-light-mode-only" title="Grafana"/>
+  <img width="40" src="docs/images/grafana_light.svg#gh-dark-mode-only" title="Grafana"/>
+  <img width="40" src="docs/images/prometheus_dark.svg#gh-light-mode-only" title="Prometheus"/>
+  <img width="40" src="docs/images/prometheus_light.svg#gh-dark-mode-only" title="Prometheus"/>
 </p>
 
 # Homelab
