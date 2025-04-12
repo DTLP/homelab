@@ -1,26 +1,46 @@
-# <img align="left" width="40px" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Kubernetes_logo_without_workmark.svg/1200px-Kubernetes_logo_without_workmark.svg.png" alt="awesome-ebitengine" title="kubernetes" /> Kubernetes cluster lab
+<p align="left">
+  <img width="40" src="docs/images/proxmox_dark.svg#gh-light-mode-only" />
+  <img width="40" src="docs/images/proxmox_light.svg#gh-dark-mode-only" />
+  <img width="40" src="docs/images/ansible_dark.svg#gh-light-mode-only" />
+  <img width="40" src="docs/images/ansible_light.svg#gh-dark-mode-only" />
+  <img width="40" src="docs/images/ubuntu_dark.svg#gh-light-mode-only" />
+  <img width="40" src="docs/images/ubuntu_light.svg#gh-dark-mode-only" />
+  <img width="40" src="docs/images/kubernetes_dark.svg#gh-light-mode-only" />
+  <img width="40" src="docs/images/kubernetes_light.svg#gh-dark-mode-only" />
+  <img width="40" src="docs/images/terraform_dark.svg#gh-light-mode-only" />
+  <img width="40" src="docs/images/terraform_light.svg#gh-dark-mode-only" />
+  <img width="40" src="docs/images/argo_dark.svg#gh-light-mode-only" />
+  <img width="40" src="docs/images/argo_light.svg#gh-dark-mode-only" />
+  <img width="40" src="docs/images/grafana_dark.svg#gh-light-mode-only" />
+  <img width="40" src="docs/images/grafana_light.svg#gh-dark-mode-only" />
+  <img width="40" src="docs/images/prometheus_dark.svg#gh-light-mode-only" />
+  <img width="40" src="docs/images/prometheus_light.svg#gh-dark-mode-only" />
+</p>
 
-A collection of templates, manifests and scripts to quickly roll out a kubernetes cluster to study in a homelab environment.
+# Homelab
 
-## Prerequisites
-- A beefy PC that can run multiple VMs with [Vagrant](https://github.com/DTLP/homelab/tree/main/vagrant)  
-OR
-- Some other hardware running [Proxmox](https://github.com/DTLP/homelab/tree/main/proxmox)
+A place where I experiment with my own on-prem Kubernetes cluster. Here I study
+things, break things and fix them back up.
 
-## My Hardware
-This is what I currently use to run my Proxmox lab:
+## What do I use?
+### Hardware
 - TP-Link TL-SF1008D 8-Port 10/100Mbps Desktop Switch
 - x5 HP EliteDesk 800 G1 Desktop Mini PC
   - Intel core i5-4570T processor (4 vCPUs)
   - 8GB RAM
   - 128GB SATA SSD
   - 128GB M.2 NVMe SSD
+Each HP machine is running Proxmox Virtual Environment and they're all connected
+together with that tiny TP-Link switch.
 
-## How to use
-Choose where to host your lab and utilise the scripts provided to build your kubernetes cluster:
-  - Use [Vagrant](https://github.com/DTLP/homelab/tree/main/vagrant) to host on your local PC
-  - Or [Proxmox](https://github.com/DTLP/homelab/tree/main/proxmox) to deploy to another computer
+### Software
+Each Proxmox node is running one Ubuntu guest VM. So far these VM roles are:
+- 1 kubernetes master node
+- 3 kubernetes worker nodes
+- 1 NFS server for persistent storage
+Proxmox resources are managed via [Terraform](https://github.com/DTLP/homelab/tree/main/terraform),
+but the initial setup is done using [Ansible](https://github.com/DTLP/homelab/tree/main/ansible). I used to use Vagrant for this before I moved to Proxmox, but I no
+longer maintain that config. You could still find it [here](https://github.com/DTLP/homelab/tree/main/vagrant).
 
-Then jump to [kubernetes-manifests](https://github.com/DTLP/homelab/tree/main/kubernetes-manifests) to deploy things to your cluster.
-
-Note: All secrets are encrypted using Strongbox (https://github.com/uw-labs/strongbox)
+My kubernetes manifests are located in [kubernetes-manifests](https://github.com/DTLP/homelab/tree/main/kubernetes-manifests).  
+All secrets are encrypted using [Strongbox](https://github.com/uw-labs/strongbox).
