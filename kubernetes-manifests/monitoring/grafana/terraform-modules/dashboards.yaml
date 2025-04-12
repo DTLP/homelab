@@ -10,6 +10,12 @@ spec:
   schedule: "*/15 * * * *"
   planOnPR: false
   delegateServiceAccountSecretRef: terraform-applier-delegate-token
+  env:
+    - name: TF_TOKEN_app_terraform_io
+      valueFrom:
+        secretKeyRef:
+          name: hcp-terraform
+          key: token
   var:
     - name: grafana_api_token
       valueFrom:

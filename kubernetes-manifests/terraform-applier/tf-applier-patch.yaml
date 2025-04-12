@@ -20,21 +20,7 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /config/
-            - name: hcp-token
-              mountPath: /tmp/.terraform.d/
       volumes:
         - name: config
           configMap:
             name: tf-applier-config
-        - name: hcp-token
-          secret:
-            secretName: hcp-terraform
-  # volumeClaimTemplates:
-  # - metadata:
-  #     name: tmp
-  #   spec:
-  #     accessModes: ["ReadWriteOnce"]
-  #     resources:
-  #       requests:
-  #         storage: 5Gi
-  #     storageClassName: nfs-client

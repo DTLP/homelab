@@ -21,3 +21,8 @@ secretGenerator:
       - secrets/grafana
     options:
       disableNameSuffixHash: true
+  - name: hcp-terraform
+    envs:
+      - secrets/hcp-terraform
+    options:
+      disableNameSuffixHash: true
