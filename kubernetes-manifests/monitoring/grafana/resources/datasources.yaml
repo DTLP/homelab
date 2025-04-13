@@ -9,14 +9,3 @@ datasources:
     type: prometheus
     url: http://prometheus:9090
     access: proxy
-  - name: InfluxDB
-    type: influxdb
-    url: http://influxdb:8086
-    access: proxy
-    jsonData:
-      version: Flux
-      organization: homelab
-      defaultBucket: proxmox
-      tlsSkipVerify: true
-    secureJsonData:
-      token: ${INFLUXDB_API_TOKEN}
