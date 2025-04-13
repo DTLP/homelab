@@ -4,13 +4,15 @@ kind: Kustomization
 resources:
   - grafana.yaml
   - grafana-clusterrole.yaml
-  - grafana-configmap.yaml
   - grafana-role.yaml
   - grafana-service.yaml
 
   - terraform-modules/
 
 configMapGenerator:
+  - name: grafana
+    files:
+      - resources/grafana.ini
   - name: grafana-datasources
     files:
       - resources/datasources.yaml
