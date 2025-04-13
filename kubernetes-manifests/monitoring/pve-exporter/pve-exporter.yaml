@@ -16,16 +16,10 @@ spec:
       hostNetwork: true
       containers:
         - name: pve-exporter
-          image: prompve/prometheus-pve-exporter:latest
+          image: prompve/prometheus-pve-exporter:3.5.2
           ports:
             - name: pve-exporter
               containerPort: 9221
-          env:
-            - name: PROXMOX_API_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: proxmox
-                  key: api-token
           volumeMounts:
             - name: config
               mountPath: /etc/prometheus/
@@ -34,6 +28,5 @@ spec:
               memory: 100M
       volumes:
         - name: config
-          configMap:
-            name: pve-exporter
-            defaultMode: 420
+          secret:
+            secretName: pve-exporter

@@ -5,12 +5,7 @@ resources:
   - pve-exporter.yaml
   - pve-exporter-service.yaml
 
-configMapGenerator:
+secretGenerator:
   - name: pve-exporter
     files:
-      - pve.yml=resources/pve.yaml
-
-secretGenerator:
-  - name: proxmox
-    envs:
-      - secrets/proxmox
+      - pve.yml=secrets/pve.yaml
