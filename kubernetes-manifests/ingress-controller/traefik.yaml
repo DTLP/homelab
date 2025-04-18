@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traefik
+  labels:
+    app.kubernetes.io/name: traefik
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: traefik
+  template: 
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "9100"
+      labels:
+        app.kubernetes.io/name: traefik
+    spec:
+      serviceAccountName: traefik
+      containers:
+      - image: docker.io/traefik:v3.3.5
+        imagePullPolicy: IfNotPresent
+        name: traefik
+        readinessProbe:
+          httpGet:
+            path: /ping
+            port: 8080
+            scheme: HTTP
+          failureThreshold: 1
+          initialDelaySeconds: 2
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 2
+        livenessProbe:
+          httpGet:
+            path: /ping
+            port: 8080
+            scheme: HTTP
+          failureThreshold: 3
+          initialDelaySeconds: 2
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 2
+        ports:
+        - name: web
+          containerPort: 80
+        - name: web-secure
+          containerPort: 443
+        - name: dashboard
+          containerPort: 8080
+        - name: metrics
+          containerPort: 9100
+        args:
+          - "--api.insecure=true"
+          - "--ping=true"
+          - "--log.level=INFO"
+          - "--metrics.prometheus=true"
+          - "--entryPoints.web.address=:80"
+          - "--entryPoints.web.http.redirections.entryPoint.to=web-secure"
+          # Allow skipping redirection if higher priority is set in IngressRoute
+          - "--entryPoints.web.http.redirections.entryPoint.priority=1000"
+          - "--entryPoints.web-secure.address=:443"
+          - "--entryPoints.web-secure.http.tls=true"
+          - "--entryPoints.traefik.address=:8080"
+          # used for dummy cert loading service in 'certs' namespace
+          - "--providers.kubernetescrd.allowexternalnameservices=true"
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+        volumeMounts:
+          - name: data
+            mountPath: /data
+          - name: tmp
+            mountPath: /tmp
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+      volumes:
+        - name: data
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}

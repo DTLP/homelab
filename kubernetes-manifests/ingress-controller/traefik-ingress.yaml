@@ -1,0 +1,15 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: traefik
+spec:
+  entryPoints:
+    - web-secure
+  routes:
+    - kind: Rule
+      match: Host(`traefik.dtlp.cc`)
+      services:
+        - name: traefik
+          kind: Service
+          port: 8080
+  tls: {}
