@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
   - cni/
+  - cert-manager/
   - terraform-applier/
 
   - namespaces.yaml
