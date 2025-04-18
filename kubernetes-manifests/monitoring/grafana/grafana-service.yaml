@@ -15,8 +15,8 @@ spec:
   type: LoadBalancer
   loadBalancerIP: 192.168.0.51
   ports:
-    - name: service
-      port: 80
+    - name: web
+      port: 3000
       protocol: TCP
       targetPort: 3000
   selector:

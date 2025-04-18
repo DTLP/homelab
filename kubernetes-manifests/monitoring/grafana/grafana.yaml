@@ -43,11 +43,8 @@ spec:
               value: /var/lib/grafana/plugins
             - name: GF_PATHS_PROVISIONING
               value: /etc/grafana/provisioning
-            - name: INFLUXDB_API_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: influxdb
-                  key: api-token
+            - name: GF_SERVER_ROOT_URL
+              value: https://grafana.dtlp.cc
           volumeMounts:
             - name: config
               mountPath: "/etc/grafana/grafana.ini"

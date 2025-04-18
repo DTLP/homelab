@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
   - grafana.yaml
   - grafana-clusterrole.yaml
+  - grafana-ingress.yaml
   - grafana-role.yaml
   - grafana-service.yaml
 
