@@ -19,6 +19,9 @@ spec:
           image: prom/prometheus
           args:
             - "--config.file=/etc/prometheus/config.yaml"
+          env:
+            - name: PROMETHEUS_URL
+              value: https://prometheus.dtlp.cc
           ports:
             - name: http
               containerPort: 9090

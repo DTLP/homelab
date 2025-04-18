@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
   - prometheus.yaml
   - prometheus-clusterrole.yaml
+  - prometheus-ingress.yaml
   - prometheus-service.yaml
 
 configMapGenerator:
