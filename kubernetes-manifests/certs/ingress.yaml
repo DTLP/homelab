@@ -1,0 +1,19 @@
+# Once traefik loads a wildcard certificate in any ingress of any namespace, it
+# caches it, and it is automatically used for any other ingress that matches
+# the domain. This dummy ingress loads the wildcard cert `*.dtlp.cc` to make it
+# available for all ingresses.
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: tls-cert-loader
+spec:
+  entryPoints:
+    - web-secure
+  routes:
+    - match: Host(`tls-cert-loader.dtlp.cc`)
+      kind: Rule
+      services:
+        - name: dummy-cert-loader
+          port: 12345
+  tls:
+    secretName: dtlp-cc-wildcard-cert

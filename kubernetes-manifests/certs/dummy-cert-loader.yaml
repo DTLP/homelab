@@ -1,0 +1,17 @@
+# Dummy service that is used to register Ingresses and IngressRoutes in this
+# namesapce. This does not bind to any apps but allows traefik to load
+# certificate.
+#
+# Tis Service needs to have an endpoint of some kind. Using # externalName that
+# doesn't point anywhere seems to satisfy Traefik, so it loads the IngressRoutes
+# and the TLS certificate respectively.
+apiVersion: v1
+kind: Service
+metadata:
+  name: dummy-cert-loader
+spec:
+  type: ExternalName
+  externalName: 127.0.0.1
+  ports:
+    - name: dummy
+      port: 12345
