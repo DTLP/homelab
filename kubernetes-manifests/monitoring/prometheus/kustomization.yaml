@@ -13,4 +13,4 @@ configMapGenerator:
       - resources/config.yaml
   - name: prometheus-rules
     files:
-      - resources/rules.yaml
+      - resources/proxmox.yaml
