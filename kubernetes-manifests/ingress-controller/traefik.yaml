@@ -55,13 +55,15 @@ spec:
           - "--api.insecure=true"
           - "--ping=true"
           - "--log.level=INFO"
-          - "--metrics.prometheus=true"
           - "--entryPoints.web.address=:80"
           - "--entryPoints.web.http.redirections.entryPoint.to=web-secure"
           # Allow skipping redirection if higher priority is set in IngressRoute
           - "--entryPoints.web.http.redirections.entryPoint.priority=1000"
           - "--entryPoints.web-secure.address=:443"
           - "--entryPoints.web-secure.http.tls=true"
+          - "--metrics.prometheus=true"
+          - "--metrics.prometheus.entryPoint=metrics"
+          - "--entryPoints.metrics.address=:9100"
           - "--entryPoints.traefik.address=:8080"
           # used for dummy cert loading service in 'certs' namespace
           - "--providers.kubernetescrd.allowexternalnameservices=true"
