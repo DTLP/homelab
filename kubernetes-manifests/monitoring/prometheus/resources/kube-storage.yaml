@@ -1,0 +1,12 @@
+groups:
+  - name: kube-storage
+    rules:
+      - alert: PersistentVolumeClaimHighUsage
+        expr: |
+          (kubelet_volume_stats_used_bytes / kubelet_volume_stats_capacity_bytes) > 0.9
+        for: 10m
+        annotations:
+          summary: "PVC {{ $labels.persistentvolumeclaim }} in namespace {{ $labels.namespace }} is over 90% full"
+          description: "PersistentVolumeClaim {{ $labels.persistentvolumeclaim }} in namespace {{ $labels.namespace }} is using more than 90% of its capacity."
+          impact: "Potential service interruption or data loss."
+          action: "Review usage trends and cleanup the volume or consider insreasing the size."
