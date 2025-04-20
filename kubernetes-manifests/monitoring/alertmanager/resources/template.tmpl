@@ -1,0 +1,27 @@
+{{ define "title" }}{{ .CommonAnnotations.summary }}{{ end }}
+
+{{ define "body" }}
+*Status*: {{ .Alerts.Firing | len }} Alerts firing
+
+{{ if .CommonAnnotations.impact }}
+*Impact:* {{ .CommonAnnotations.impact }}
+{{ end -}}
+{{ if .CommonAnnotations.action }}
+*Action:* {{ .CommonAnnotations.action }}
+{{ end -}}
+
+*Alert Name:* {{ .CommonLabels.alertname -}}
+{{ if .CommonLabels.instance }}
+*Instance:* {{ .CommonLabels.instance }}
+{{ end -}}
+{{ if .CommonLabels.namespace }}
+*Namespace:* {{ .CommonLabels.namespace }}
+{{ end -}}
+{{ if .CommonAnnotations.dashboard }}
+*Dashboard:* {{ .CommonAnnotations.dashboard }}
+{{ end -}}
+{{ if .CommonAnnotations.logs }}
+*Logs:* {{ .CommonAnnotations.logs }}
+{{ end -}}
+
+{{ end }}

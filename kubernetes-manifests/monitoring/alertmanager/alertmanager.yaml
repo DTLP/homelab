@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alertmanager
+spec:
+  selector:
+    matchLabels:
+      app: alertmanager
+  template:
+    metadata:
+      labels:
+        app: alertmanager
+    spec:
+      containers:
+      - name: alertmanager
+        image: prom/alertmanager:v0.28.1
+        args:
+          - "--config.file=/etc/alertmanager/config.yaml"
+        ports:
+        - containerPort: 9093
+        volumeMounts:
+        - name: config
+          mountPath: /etc/alertmanager/config.yaml
+          subPath: config.yaml
+        - name: template
+          mountPath: /etc/alertmanager/template.tmpl
+          subPath: template.tmpl
+        - name: slack
+          mountPath: /etc/secrets/slack
+          subPath: slack
+      volumes:
+      - name: config
+        configMap:
+          name: alertmanager-config
+      - name: template
+        configMap:
+          name: alertmanager-template
+      - name: slack
+        secret:
+          secretName: slack
