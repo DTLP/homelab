@@ -37,12 +37,6 @@ spec:
             - name: http-metrics
               containerPort: 3100
               protocol: TCP
-            - name: grpc
-              containerPort: 9095
-              protocol: TCP
-            - name: memberlist-port
-              containerPort: 7946
-              protocol: TCP
           livenessProbe:
             httpGet:
               path: /ready
