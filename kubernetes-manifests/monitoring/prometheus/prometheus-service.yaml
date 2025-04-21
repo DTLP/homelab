@@ -13,8 +13,6 @@ metadata:
   name: prometheus
   labels:
     app: prometheus
-  annotations:
-    {}
 spec:
   type: LoadBalancer
   ports:
