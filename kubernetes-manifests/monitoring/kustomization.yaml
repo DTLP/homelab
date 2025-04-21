@@ -4,5 +4,6 @@ kind: Kustomization
 resources:
   - alertmanager/
   - grafana/
+  - kube-state-metrics/
   - loki/
   - promtail/
