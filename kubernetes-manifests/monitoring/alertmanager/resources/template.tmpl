@@ -4,24 +4,27 @@
 *Status*: {{ .Alerts.Firing | len }} Alerts firing
 
 {{ if .CommonAnnotations.impact }}
-*Impact:* {{ .CommonAnnotations.impact }}
+*Impact:* {{ .CommonAnnotations.impact -}}
 {{ end -}}
 {{ if .CommonAnnotations.action }}
 *Action:* {{ .CommonAnnotations.action }}
-{{ end -}}
+{{ end }}
 
 *Alert Name:* {{ .CommonLabels.alertname -}}
-{{ if .CommonLabels.instance }}
-*Instance:* {{ .CommonLabels.instance }}
-{{ end -}}
 {{ if .CommonLabels.namespace }}
-*Namespace:* {{ .CommonLabels.namespace }}
+*Namespace:* {{ .CommonLabels.namespace -}}
+{{ end -}}
+{{ if .CommonLabels.instance }}
+*Instance:* {{ .CommonLabels.instance -}}
 {{ end -}}
 {{ if .CommonAnnotations.dashboard }}
-*Dashboard:* {{ .CommonAnnotations.dashboard }}
+*Dashboard:* {{ .CommonAnnotations.dashboard -}}
+{{ end -}}
+{{ if .CommonAnnotations.command }}
+*Command:* {{ .CommonAnnotations.command -}}
 {{ end -}}
 {{ if .CommonAnnotations.logs }}
-*Logs:* {{ .CommonAnnotations.logs }}
+*Logs:* {{ .CommonAnnotations.logs -}}
 {{ end -}}
 
 {{ end }}
