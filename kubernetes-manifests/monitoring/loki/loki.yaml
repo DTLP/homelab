@@ -25,6 +25,17 @@ spec:
           imagePullPolicy: IfNotPresent
           args:
             - "-config.file=/etc/loki/loki.yaml"
+          ports:
+            - name: http-metrics
+              containerPort: 3100
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 250m
+              memory: 250M
+            limits:
+              cpu: 500m
+              memory: 1Gi
           volumeMounts:
             - name: tmp
               mountPath: /tmp
@@ -32,10 +43,6 @@ spec:
               mountPath: /etc/loki
             - name: storage
               mountPath: "/data"
-          ports:
-            - name: http-metrics
-              containerPort: 3100
-              protocol: TCP
           livenessProbe:
             httpGet:
               path: /ready
