@@ -1,0 +1,35 @@
+groups:
+  - name: kube-nodes
+    rules:
+      - alert: HighCPUUsage
+        expr: avg(rate(node_cpu_seconds_total{mode="user"}[10m])) by (instance) > 0.9
+        for: 10m
+        annotations:
+          summary: "High CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is greater than 90% for the last 10 minutes."
+          impact: "High CPU usage can lead to degraded performance and slow application response times."
+          action: "Investigate processes consuming high CPU. Consider scaling resources or optimizing workloads."
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemFree_bytes) / node_memory_MemTotal_bytes > 0.9
+        for: 10m
+        annotations:
+          summary: "High Memory usage on {{ $labels.instance }}"
+          description: "Memory usage exceeds 90% for the last 10 minutes."
+          impact: "High memory usage can cause system thrashing or application crashes due to out-of-memory conditions."
+          action: "Investigate memory usage with `top` or `htop`. Consider increasing memory resources or optimizing memory usage."
+      - alert: HighDiskUsage
+        expr: (node_filesystem_size_bytes - node_filesystem_free_bytes) / node_filesystem_size_bytes > 0.8
+        for: 10m
+        annotations:
+          summary: "High disk usage on {{ $labels.instance }}"
+          description: "Disk usage exceeds 80% on the node."
+          impact: "High disk usage can lead to performance degradation and eventual failure to write data, affecting services."
+          action: "Investigate disk usage with `df` or `du`. Clear unnecessary files or expand disk capacity."
+      - alert: NodeDown
+        expr: absent(node_exporter_build_info{job="node-exporter"})
+        for: 5m
+        annotations:
+          summary: "Node down: {{ $labels.instance }}"
+          description: "No metrics have been received from the node for the last 5 minutes."
+          impact: "A node being down can cause service disruptions or unavailability of critical infrastructure."
+          action: "Check the node's status using `kubectl get nodes`. Investigate if the node is unreachable or if the node-exporter pod is not running."
