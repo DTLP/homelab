@@ -18,3 +18,4 @@ receivers:
     api_url_file: /etc/secrets/slack
     title: '{{ template "title" . }}'
     text: '{{ template "body" . }}'
+    send_resolved: true
