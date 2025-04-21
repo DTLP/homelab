@@ -7,13 +7,12 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: loki
+      app.kubernetes.io/name: loki
   serviceName: loki
   template:
     metadata:
       labels:
-        app: loki
-        name: loki
+        app.kubernetes.io/name: loki
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: http-metrics
