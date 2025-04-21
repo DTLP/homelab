@@ -34,6 +34,10 @@ spec:
             - name: sys
               mountPath: /host/sys
               readOnly: true
+      tolerations:
+        - key: "node-role.kubernetes.io/control-plane"
+          operator: "Exists"
+          effect: "NoSchedule"
       volumes:
         - name: host-root
           hostPath:
