@@ -1,0 +1,11 @@
+groups:
+  - name: kube-services
+    rules:
+      - alert: KubernetesServiceDown
+        expr: up{job="kubernetes-services"} == 0
+        for: 5m
+        annotations:
+          summary: "Service is down ({{ $labels.kubernetes_namespace }}/{{ $labels.kubernetes_name }})"
+          description: "Prometheus failed to scrape the service for 5 minutes."
+          impact: "Potential service disruption."
+          action: "Check if the service pod is running, verify service annotations, and connectivity."
