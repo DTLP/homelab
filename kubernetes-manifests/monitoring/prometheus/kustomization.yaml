@@ -6,6 +6,7 @@ resources:
   - prometheus-clusterrole.yaml
   - prometheus-ingress.yaml
   - prometheus-service.yaml
+  - prometheus-token-secret.yaml
 
 configMapGenerator:
   - name: prometheus-config
