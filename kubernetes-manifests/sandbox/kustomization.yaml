@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
   - homer.yaml
+  - homer-service.yaml
 
 configMapGenerator:
 - name: homer-config

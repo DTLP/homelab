@@ -1,33 +1,28 @@
-apiVersion: v1
-kind: Pod
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: homer
   labels:
     app: homer
 spec:
-  containers:
-    - name: homer
-      image: b4bz/homer:latest
-      ports:
-      - containerPort: 8080
-      volumeMounts:
-      - name: homer-config-volume
-        mountPath: /www/assets/config.yml
-        subPath: config.yml
-  volumes:
-  - name: homer-config-volume
-    configMap:
-      name: homer-config
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: homer
-spec:
   selector:
-    app: homer
-  ports:
-  - protocol: TCP
-    port: 8080
-    targetPort: 8080
-  type: NodePort
+    matchLabels:
+      app: homer
+  template:
+    metadata:
+      labels:
+        app: homer
+    spec:
+      containers:
+        - name: homer
+          image: b4bz/homer:latest
+          ports:
+          - containerPort: 8080
+          volumeMounts:
+          - name: homer-config-volume
+            mountPath: /www/assets/config.yml
+            subPath: config.yml
+      volumes:
+      - name: homer-config-volume
+        configMap:
+          name: homer-config
