@@ -53,35 +53,29 @@ links:
     icon: "fab fa-github"
     url: "https://github.com/bastienwirtz/homer"
     target: "_blank" # optional html a tag target attribute
-  - name: "Wikipedia"
-    icon: "fas fa-book"
-    url: "https://www.wikipedia.org/"
 
-# Services
-# First level array represent a group.
-# Leave only a "items" key if not using group (group name, icon & tagstyle are optional, section separation will not be displayed).
 services:
-  - name: "Applications"
-    icon: "fas fa-cloud"
+  - name: "Infra"
+    icon: "fas fa-network-wired"
     items:
-      - name: "Awesome app"
-        logo: "assets/tools/sample.png"
-        subtitle: "Bookmark example"
-        tag: "app"
-        keywords: "self hosted reddit"
-        url: "https://www.reddit.com/r/selfhosted/"
-        target: "_blank" # optional html a tag target attribute
-      - name: "Another one"
-        logo: "assets/tools/sample2.png"
-        subtitle: "Another application"
-        tag: "app"
-        url: "#"
+      - name: "Traefik"
+        logo: "https://raw.githubusercontent.com/DTLP/homelab/refs/heads/main/docs/images/traefik_light.svg"
+        url: "https://traefik.dtlp.cc"
+      - name: "ArgoCD"
+        logo: "https://raw.githubusercontent.com/DTLP/homelab/refs/heads/main/docs/images/argo_light.svg"
+        url: "https://argocd.dtlp.cc"
   - name: "Monitoring"
-    icon: "fas fa-waveform-path"
+    icon: "fas fa-heartbeat"
     items:
+      - name: "Alertmanager"
+        logo: "https://raw.githubusercontent.com/DTLP/homelab/refs/heads/main/docs/images/prometheus_light.svg"
+        url: "https://alertmanager.dtlp.cc"
       - name: "Grafana"
-        logo: "https://icon.icepanel.io/Technology/svg/Grafana.svg"
-        url: "http://grafana.monitoring.svc.cluster.local"
+        logo: "https://raw.githubusercontent.com/DTLP/homelab/refs/heads/main/docs/images/grafana_light.svg"
+        url: "https://grafana.dtlp.cc"
+      - name: "Prometheus"
+        logo: "https://raw.githubusercontent.com/DTLP/homelab/refs/heads/main/docs/images/prometheus_light.svg"
+        url: "https://prometheus.dtlp.cc"
   - name: "Github"
     icon: "fab fa-github"
     items:
