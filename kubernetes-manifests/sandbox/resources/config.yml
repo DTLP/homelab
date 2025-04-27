@@ -8,6 +8,7 @@ logo: "logo.png"
 
 header: true
 footer: false
+columns: 4
 
 # Optional theme customization
 theme: default
@@ -85,3 +86,16 @@ services:
       - name: "DTLP/dotfiles"
         icon: "fas fa-cogs"
         url: "https://github.com/DTLP/dotfiles"
+  - name: "Proxmox"
+    logo: "https://raw.githubusercontent.com/DTLP/homelab/refs/heads/main/docs/images/proxmox_light.svg"
+    items:
+      - name: "pve1"
+        url: "https://192.168.0.21:8006"
+      - name: "pve2"
+        url: "https://192.168.0.22:8006"
+      - name: "pve3"
+        url: "https://192.168.0.23:8006"
+      - name: "pve4"
+        url: "https://192.168.0.24:8006"
+      - name: "pve5"
+        url: "https://192.168.0.25:8006"
