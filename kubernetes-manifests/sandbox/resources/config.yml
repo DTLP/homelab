@@ -57,7 +57,7 @@ links:
 
 services:
   - name: "Infra"
-    icon: "fas fa-network-wired"
+    logo: "https://raw.githubusercontent.com/DTLP/homelab/refs/heads/main/docs/images/infra_light.svg"
     items:
       - name: "Traefik"
         logo: "https://raw.githubusercontent.com/DTLP/homelab/refs/heads/main/docs/images/traefik_light.svg"
@@ -66,7 +66,7 @@ services:
         logo: "https://raw.githubusercontent.com/DTLP/homelab/refs/heads/main/docs/images/argo_light.svg"
         url: "https://argocd.dtlp.cc"
   - name: "Monitoring"
-    icon: "fas fa-heartbeat"
+    logo: "https://raw.githubusercontent.com/DTLP/homelab/refs/heads/main/docs/images/heartbeat_light.svg"
     items:
       - name: "Alertmanager"
         logo: "https://raw.githubusercontent.com/DTLP/homelab/refs/heads/main/docs/images/prometheus_light.svg"
@@ -78,7 +78,7 @@ services:
         logo: "https://raw.githubusercontent.com/DTLP/homelab/refs/heads/main/docs/images/prometheus_light.svg"
         url: "https://prometheus.dtlp.cc"
   - name: "Github"
-    icon: "fab fa-github"
+    logo: "https://raw.githubusercontent.com/DTLP/homelab/refs/heads/main/docs/images/github_light.svg"
     items:
       - name: "DTLP/homelab"
         icon: "fas fa-flask"
