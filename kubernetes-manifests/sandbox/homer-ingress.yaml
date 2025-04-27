@@ -1,0 +1,15 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: homer
+spec:
+  entryPoints:
+    - web-secure
+  routes:
+    - kind: Rule
+      match: Host(`homer.dtlp.cc`)
+      services:
+        - name: homer
+          kind: Service
+          port: 8080
+  tls: {}

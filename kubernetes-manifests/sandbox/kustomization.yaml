@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
   - homer.yaml
+  - homer-ingress.yaml
   - homer-service.yaml
 
 configMapGenerator:
