@@ -1,0 +1,53 @@
+#cloud-config
+
+package_update: true
+package_upgrade: true
+packages:
+  - qemu-guest-agent
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - gnupg
+  - lsb-release
+  - docker.io
+
+write_files:
+  - path: /etc/docker/daemon.json
+    permissions: '0644'
+    content: |
+      {
+        "exec-opts": ["native.cgroupdriver=systemd"],
+        "log-driver": "json-file",
+        "log-opts": {
+          "max-size": "100m"
+        },
+        "storage-driver": "overlay2"
+      }
+  - path: /root/.ssh/id_ed25519
+    permissions: '0600'
+    content: |
+      ${replace(root_ssh_key, "\n", "\n      ")}
+
+users:
+  - name: "root"
+    hashed_passwd: "${root_password}"
+    lock_passwd: false
+    groups: [ sudo ]
+    shell: "/bin/bash"
+    sudo: "ALL=(ALL) NOPASSWD:ALL"
+    ssh_authorized_keys:
+      - ${admin_ssh_key}
+
+runcmd:
+  - hostnamectl set-hostname ${hostname}
+  - systemctl start qemu-guest-agent
+  - systemctl enable docker
+  - systemctl start docker
+  - curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+  - mkdir -p -m 755 /etc/apt/keyrings
+  - apt-get install -y nfs-kernel-server
+  - mkdir /data
+  - echo "/data    192.168.0.0/24(rw,sync,no_root_squash,no_subtree_check)" >> /etc/exports
+  - exportfs -a
+  - systemctl restart nfs-kernel-server
+  - reboot
