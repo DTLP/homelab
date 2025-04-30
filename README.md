@@ -5,6 +5,8 @@
   <img width="40" src="docs/images/ansible_light.svg#gh-dark-mode-only" title="Ansible"/>
   <img width="40" src="docs/images/ubuntu_dark.svg#gh-light-mode-only" title="Ubuntu"/>
   <img width="40" src="docs/images/ubuntu_light.svg#gh-dark-mode-only" title="Ubuntu"/>
+  <img width="40" src="docs/images/talos_dark.svg#gh-light-mode-only" title="Talos"/>
+  <img width="40" src="docs/images/talos_light.svg#gh-dark-mode-only" title="Talos"/>
   <img width="40" src="docs/images/kubernetes_dark.svg#gh-light-mode-only" title="Kubernetes"/>
   <img width="40" src="docs/images/kubernetes_light.svg#gh-dark-mode-only" title="Kubernetes"/>
   <img width="40" src="docs/images/terraform_dark.svg#gh-light-mode-only" title="Terraform"/>
