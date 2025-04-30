@@ -3,6 +3,20 @@ kind: StatefulSet
 metadata:
   name: terraform-applier-redis
 spec:
+  template:
+    spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: redis
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsUser: 1000
+            runAsNonRoot: true
   volumeClaimTemplates:
   - metadata:
       name: terraform-applier-redis-data

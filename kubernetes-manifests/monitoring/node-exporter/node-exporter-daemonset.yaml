@@ -22,29 +22,9 @@ spec:
               name: metrics
               protocol: TCP
           args:
-            - --path.rootfs=/host/root
             - --web.listen-address=:9100
             - --web.telemetry-path=/metrics
-          volumeMounts:
-            - name: host-root
-              mountPath: /host/root
-            - name: proc
-              mountPath: /host/proc
-              readOnly: true
-            - name: sys
-              mountPath: /host/sys
-              readOnly: true
       tolerations:
         - key: "node-role.kubernetes.io/control-plane"
           operator: "Exists"
           effect: "NoSchedule"
-      volumes:
-        - name: host-root
-          hostPath:
-            path: /
-        - name: proc
-          hostPath:
-            path: /proc
-        - name: sys
-          hostPath:
-            path: /sys
