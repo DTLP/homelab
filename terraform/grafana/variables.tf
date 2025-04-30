@@ -6,6 +6,5 @@ variable "grafana_api_token" {
 variable "grafana_url" {
   description = "The URL of the Grafana service"
   type        = string
-  default     = "http://grafana.lab"
+  default     = "https://grafana.dtlp.cc"
 }
-
