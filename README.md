@@ -44,7 +44,7 @@ Proxmox nodes each run just one Ubuntu guest VM. So far these VM roles are:
 
 Proxmox resources are managed via [Terraform](https://github.com/DTLP/homelab/tree/main/terraform),
 but the initial setup is done using [Ansible](https://github.com/DTLP/homelab/tree/main/ansible). I used to use Vagrant for this before I moved to Proxmox, but I no
-longer maintain that config. You could still find it [here](https://github.com/DTLP/homelab/tree/main/vagrant).
+longer maintain that config. You could still find it [here](https://github.com/DTLP/homelab/tree/main/archive/vagrant).
 
 My kubernetes manifests are located in [kubernetes-manifests](https://github.com/DTLP/homelab/tree/main/kubernetes-manifests).  
 All secrets are encrypted using [Strongbox](https://github.com/uw-labs/strongbox).
