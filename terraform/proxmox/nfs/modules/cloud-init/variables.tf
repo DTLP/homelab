@@ -40,10 +40,6 @@ variable "root_ssh_key" {
   type = string
 }
 
-variable "k8s_master_node_ip" {
-  type = string
-}
-
 variable "nfs_server_ip" {
   type = string
 }

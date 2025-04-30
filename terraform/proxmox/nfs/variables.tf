@@ -42,11 +42,6 @@ variable "root_ssh_key" {
   type = string
 }
 
-variable "k8s_master_node_ip" {
-  type    = string
-  default = "192.168.0.30"
-}
-
 variable "nfs_server_ip" {
   type    = string
   default = "192.168.0.60"
@@ -54,71 +49,6 @@ variable "nfs_server_ip" {
 
 variable "cloud_init_virtual_machines" {
   default = {
-
-    "master-0" = {
-      hostname        = "master-0"
-      ip_address      = "192.168.0.30/24"
-      gateway         = "192.168.0.1"
-      target_node     = "pve1"
-      cpu_cores       = 3
-      cpu_sockets     = 1
-      memory          = "6144"
-      qemu_os         = "l26"
-      hdd_size        = "20G"
-      hdd_storage     = "nvme"
-      onboot          = true
-      vm_template     = "ubuntu-cloud"
-      cloud_init_file = "master.yaml"
-    }
-
-    "worker-0" = {
-      hostname        = "worker-0"
-      ip_address      = "192.168.0.40/24"
-      gateway         = "192.168.0.1"
-      target_node     = "pve2"
-      cpu_cores       = 3
-      cpu_sockets     = 1
-      memory          = "6144"
-      qemu_os         = "l26"
-      hdd_size        = "20G"
-      hdd_storage     = "nvme"
-      onboot          = true
-      vm_template     = "ubuntu-cloud"
-      cloud_init_file = "worker.yaml"
-    }
-
-    "worker-1" = {
-      hostname        = "worker-1"
-      ip_address      = "192.168.0.41/24"
-      gateway         = "192.168.0.1"
-      target_node     = "pve3"
-      cpu_cores       = 3
-      cpu_sockets     = 1
-      memory          = "6144"
-      qemu_os         = "l26"
-      hdd_size        = "20G"
-      hdd_storage     = "nvme"
-      onboot          = true
-      vm_template     = "ubuntu-cloud"
-      cloud_init_file = "worker.yaml"
-    }
-
-    "worker-2" = {
-      hostname        = "worker-2"
-      ip_address      = "192.168.0.42/24"
-      gateway         = "192.168.0.1"
-      target_node     = "pve4"
-      cpu_cores       = 3
-      cpu_sockets     = 1
-      memory          = "6144"
-      qemu_os         = "l26"
-      hdd_size        = "20G"
-      hdd_storage     = "nvme"
-      onboot          = true
-      vm_template     = "ubuntu-cloud"
-      cloud_init_file = "worker.yaml"
-    }
-
     "nfs-0" = {
       hostname        = "nfs-0"
       ip_address      = "192.168.0.60/24"

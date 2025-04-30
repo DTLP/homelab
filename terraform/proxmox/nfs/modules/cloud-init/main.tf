@@ -7,12 +7,11 @@ data "template_file" "cloud_init" {
   template = file("${path.module}/scripts/${each.value.cloud_init_file}")
 
   vars = {
-    hostname           = each.value.hostname
-    admin_ssh_key      = var.admin_ssh_key
-    root_password      = var.root_password
-    root_ssh_key       = var.root_ssh_key
-    k8s_master_node_ip = var.k8s_master_node_ip
-    nfs_server_ip      = var.nfs_server_ip
+    hostname      = each.value.hostname
+    admin_ssh_key = var.admin_ssh_key
+    root_password = var.root_password
+    root_ssh_key  = var.root_ssh_key
+    nfs_server_ip = var.nfs_server_ip
   }
 }
 
