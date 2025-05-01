@@ -13,7 +13,6 @@ spec:
       labels:
         app: pve-exporter
     spec:
-      hostNetwork: true
       containers:
         - name: pve-exporter
           image: prompve/prometheus-pve-exporter:3.5.2

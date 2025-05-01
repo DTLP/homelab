@@ -22,6 +22,13 @@ spec:
           - name: homer-config-volume
             mountPath: /www/assets/config.yml
             subPath: config.yml
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
       volumes:
       - name: homer-config-volume
         configMap:

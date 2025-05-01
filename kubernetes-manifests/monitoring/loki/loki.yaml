@@ -53,6 +53,13 @@ spec:
               path: /ready
               port: http-metrics
             initialDelaySeconds: 45
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
       volumes:
         - name: tmp
           emptyDir: {}

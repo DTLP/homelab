@@ -1,4 +1,4 @@
-# <img align="left" width="40px" src="https://www.iconsdb.com/icons/preview/orange/warning-xxl.png" alt="awesome-ebitengine" /> No longer maintained
+# <img align="left" width="40px" src="https://www.iconsdb.com/icons/preview/orange/warning-xxl.png" /> No longer maintained
 I have moved away from Vagrant to focus on learning [Proxmox](https://github.com/DTLP/homelab/tree/main/proxmox/terraform).
 
 ## Prerequisites

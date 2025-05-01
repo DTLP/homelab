@@ -69,6 +69,13 @@ spec:
             httpGet:
               path: /api/health
               port: 3000
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
       volumes:
         - name: config
           configMap:

@@ -8,4 +8,3 @@ variable "grafana_url" {
   type        = string
   default     = "https://grafana.dtlp.cc"
 }
-
