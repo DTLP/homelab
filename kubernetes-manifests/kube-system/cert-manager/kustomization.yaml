@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
   - cert-manager.yaml
   - cert-manager-cainjector.yaml
+  - cert-manager-crds.yaml
   - cert-manager-rbac.yaml
   - cert-manager-services.yaml
   - cert-manager-webhook.yaml
