@@ -3,3 +3,6 @@ kind: Kustomization
 
 resources:
   - upstream/calico.yaml
+
+patches:
+  - path: calico-node-patch.yaml
