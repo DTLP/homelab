@@ -23,6 +23,8 @@
   <img width="40" src="docs/images/cloudflare_light.svg#gh-dark-mode-only" title="Cloudflare"/>
   <img width="40" src="docs/images/traefik_dark.svg#gh-light-mode-only" title="Traefik"/>
   <img width="40" src="docs/images/traefik_light.svg#gh-dark-mode-only" title="Traefik"/>
+  <img width="40" src="docs/images/certmanager_dark.svg#gh-light-mode-only" title="Cert Manager"/>
+  <img width="40" src="docs/images/certmanager_light.svg#gh-dark-mode-only" title="Cert Manager"/>
 </p>
 
 # Homelab
