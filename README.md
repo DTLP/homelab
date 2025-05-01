@@ -17,6 +17,8 @@
   <img width="40" src="docs/images/grafana_light.svg#gh-dark-mode-only" title="Grafana"/>
   <img width="40" src="docs/images/prometheus_dark.svg#gh-light-mode-only" title="Prometheus"/>
   <img width="40" src="docs/images/prometheus_light.svg#gh-dark-mode-only" title="Prometheus"/>
+  <img width="40" src="docs/images/loki_dark.svg#gh-light-mode-only" title="Loki"/>
+  <img width="40" src="docs/images/loki_light.svg#gh-dark-mode-only" title="Loki"/>
   <img width="40" src="docs/images/cloudflare_dark.svg#gh-light-mode-only" title="Cloudflare"/>
   <img width="40" src="docs/images/cloudflare_light.svg#gh-dark-mode-only" title="Cloudflare"/>
 </p>
