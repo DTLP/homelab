@@ -6,4 +6,7 @@ resources:
   - grafana/
   - kube-state-metrics/
   - loki/
+  - node-exporter/
+  - prometheus/
   - promtail/
+  - pve-exporter/
