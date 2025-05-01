@@ -1,30 +1,30 @@
 <p align="left">
-  <img width="40" src="docs/images/proxmox_dark.svg#gh-light-mode-only" title="Proxmox"/>
-  <img width="40" src="docs/images/proxmox_light.svg#gh-dark-mode-only" title="Proxmox"/>
-  <img width="40" src="docs/images/ansible_dark.svg#gh-light-mode-only" title="Ansible"/>
-  <img width="40" src="docs/images/ansible_light.svg#gh-dark-mode-only" title="Ansible"/>
-  <img width="40" src="docs/images/ubuntu_dark.svg#gh-light-mode-only" title="Ubuntu"/>
-  <img width="40" src="docs/images/ubuntu_light.svg#gh-dark-mode-only" title="Ubuntu"/>
-  <img width="40" src="docs/images/talos_dark.svg#gh-light-mode-only" title="Talos"/>
-  <img width="40" src="docs/images/talos_light.svg#gh-dark-mode-only" title="Talos"/>
-  <img width="40" src="docs/images/kubernetes_dark.svg#gh-light-mode-only" title="Kubernetes"/>
-  <img width="40" src="docs/images/kubernetes_light.svg#gh-dark-mode-only" title="Kubernetes"/>
-  <img width="40" src="docs/images/terraform_dark.svg#gh-light-mode-only" title="Terraform"/>
-  <img width="40" src="docs/images/terraform_light.svg#gh-dark-mode-only" title="Terraform"/>
-  <img width="40" src="docs/images/argo_dark.svg#gh-light-mode-only" title="ArgoCD"/>
-  <img width="40" src="docs/images/argo_light.svg#gh-dark-mode-only" title="ArgoCD"/>
-  <img width="40" src="docs/images/grafana_dark.svg#gh-light-mode-only" title="Grafana"/>
-  <img width="40" src="docs/images/grafana_light.svg#gh-dark-mode-only" title="Grafana"/>
-  <img width="40" src="docs/images/prometheus_dark.svg#gh-light-mode-only" title="Prometheus"/>
-  <img width="40" src="docs/images/prometheus_light.svg#gh-dark-mode-only" title="Prometheus"/>
-  <img width="40" src="docs/images/loki_dark.svg#gh-light-mode-only" title="Loki"/>
-  <img width="40" src="docs/images/loki_light.svg#gh-dark-mode-only" title="Loki"/>
-  <img width="40" src="docs/images/cloudflare_dark.svg#gh-light-mode-only" title="Cloudflare"/>
-  <img width="40" src="docs/images/cloudflare_light.svg#gh-dark-mode-only" title="Cloudflare"/>
-  <img width="40" src="docs/images/traefik_dark.svg#gh-light-mode-only" title="Traefik"/>
-  <img width="40" src="docs/images/traefik_light.svg#gh-dark-mode-only" title="Traefik"/>
-  <img width="40" src="docs/images/certmanager_dark.svg#gh-light-mode-only" title="Cert Manager"/>
-  <img width="40" src="docs/images/certmanager_light.svg#gh-dark-mode-only" title="Cert Manager"/>
+  <img width="40" height="40" src="docs/images/proxmox_dark.svg#gh-light-mode-only" title="Proxmox"/>
+  <img width="40" height="40" src="docs/images/proxmox_light.svg#gh-dark-mode-only" title="Proxmox"/>
+  <img width="40" height="40" src="docs/images/ansible_dark.svg#gh-light-mode-only" title="Ansible"/>
+  <img width="40" height="40" src="docs/images/ansible_light.svg#gh-dark-mode-only" title="Ansible"/>
+  <img width="40" height="40" src="docs/images/ubuntu_dark.svg#gh-light-mode-only" title="Ubuntu"/>
+  <img width="40" height="40" src="docs/images/ubuntu_light.svg#gh-dark-mode-only" title="Ubuntu"/>
+  <img width="40" height="40" src="docs/images/talos_dark.svg#gh-light-mode-only" title="Talos"/>
+  <img width="40" height="40" src="docs/images/talos_light.svg#gh-dark-mode-only" title="Talos"/>
+  <img width="40" height="40" src="docs/images/kubernetes_dark.svg#gh-light-mode-only" title="Kubernetes"/>
+  <img width="40" height="40" src="docs/images/kubernetes_light.svg#gh-dark-mode-only" title="Kubernetes"/>
+  <img width="40" height="40" src="docs/images/terraform_dark.svg#gh-light-mode-only" title="Terraform"/>
+  <img width="40" height="40" src="docs/images/terraform_light.svg#gh-dark-mode-only" title="Terraform"/>
+  <img width="40" height="40" src="docs/images/argo_dark.svg#gh-light-mode-only" title="ArgoCD"/>
+  <img width="40" height="40" src="docs/images/argo_light.svg#gh-dark-mode-only" title="ArgoCD"/>
+  <img width="40" height="40" src="docs/images/grafana_dark.svg#gh-light-mode-only" title="Grafana"/>
+  <img width="40" height="40" src="docs/images/grafana_light.svg#gh-dark-mode-only" title="Grafana"/>
+  <img width="40" height="40" src="docs/images/prometheus_dark.svg#gh-light-mode-only" title="Prometheus"/>
+  <img width="40" height="40" src="docs/images/prometheus_light.svg#gh-dark-mode-only" title="Prometheus"/>
+  <img width="40" height="40" src="docs/images/loki_dark.svg#gh-light-mode-only" title="Loki"/>
+  <img width="40" height="40" src="docs/images/loki_light.svg#gh-dark-mode-only" title="Loki"/>
+  <img width="40" height="40" src="docs/images/cloudflare_dark.svg#gh-light-mode-only" title="Cloudflare"/>
+  <img width="40" height="40" src="docs/images/cloudflare_light.svg#gh-dark-mode-only" title="Cloudflare"/>
+  <img width="40" height="40" src="docs/images/traefik_dark.svg#gh-light-mode-only" title="Traefik"/>
+  <img width="40" height="40" src="docs/images/traefik_light.svg#gh-dark-mode-only" title="Traefik"/>
+  <img width="40" height="40" src="docs/images/certmanager_dark.svg#gh-light-mode-only" title="Cert Manager"/>
+  <img width="40" height="40" src="docs/images/certmanager_light.svg#gh-dark-mode-only" title="Cert Manager"/>
 </p>
 
 # Homelab
