@@ -40,7 +40,7 @@ data "talos_cluster_health" "this" {
   }
 }
 
-data "talos_cluster_kubeconfig" "this" {
+resource "talos_cluster_kubeconfig" "this" {
   depends_on           = [talos_machine_bootstrap.this, data.talos_cluster_health.this]
   client_configuration = talos_machine_secrets.this.client_configuration
   node                 = data.talos_client_configuration.this.endpoints[0]
@@ -56,6 +56,6 @@ output "talosconfig" {
 }
 
 output "kubeconfig" {
-  value     = data.talos_cluster_kubeconfig.this.kubeconfig_raw
+  value     = resource.talos_cluster_kubeconfig.this.kubeconfig_raw
   sensitive = true
 }
