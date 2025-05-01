@@ -1,30 +1,82 @@
 <p align="left">
-  <img width="40" height="40" src="docs/images/proxmox_dark.svg#gh-light-mode-only" title="Proxmox"/>
-  <img width="40" height="40" src="docs/images/proxmox_light.svg#gh-dark-mode-only" title="Proxmox"/>
-  <img width="40" height="40" src="docs/images/ansible_dark.svg#gh-light-mode-only" title="Ansible"/>
-  <img width="40" height="40" src="docs/images/ansible_light.svg#gh-dark-mode-only" title="Ansible"/>
-  <img width="40" height="40" src="docs/images/ubuntu_dark.svg#gh-light-mode-only" title="Ubuntu"/>
-  <img width="40" height="40" src="docs/images/ubuntu_light.svg#gh-dark-mode-only" title="Ubuntu"/>
-  <img width="40" height="40" src="docs/images/talos_dark.svg#gh-light-mode-only" title="Talos"/>
-  <img width="40" height="40" src="docs/images/talos_light.svg#gh-dark-mode-only" title="Talos"/>
-  <img width="40" height="40" src="docs/images/kubernetes_dark.svg#gh-light-mode-only" title="Kubernetes"/>
-  <img width="40" height="40" src="docs/images/kubernetes_light.svg#gh-dark-mode-only" title="Kubernetes"/>
-  <img width="40" height="40" src="docs/images/terraform_dark.svg#gh-light-mode-only" title="Terraform"/>
-  <img width="40" height="40" src="docs/images/terraform_light.svg#gh-dark-mode-only" title="Terraform"/>
-  <img width="40" height="40" src="docs/images/argo_dark.svg#gh-light-mode-only" title="ArgoCD"/>
-  <img width="40" height="40" src="docs/images/argo_light.svg#gh-dark-mode-only" title="ArgoCD"/>
-  <img width="40" height="40" src="docs/images/grafana_dark.svg#gh-light-mode-only" title="Grafana"/>
-  <img width="40" height="40" src="docs/images/grafana_light.svg#gh-dark-mode-only" title="Grafana"/>
-  <img width="40" height="40" src="docs/images/prometheus_dark.svg#gh-light-mode-only" title="Prometheus"/>
-  <img width="40" height="40" src="docs/images/prometheus_light.svg#gh-dark-mode-only" title="Prometheus"/>
-  <img width="40" height="40" src="docs/images/loki_dark.svg#gh-light-mode-only" title="Loki"/>
-  <img width="40" height="40" src="docs/images/loki_light.svg#gh-dark-mode-only" title="Loki"/>
-  <img width="40" height="40" src="docs/images/cloudflare_dark.svg#gh-light-mode-only" title="Cloudflare"/>
-  <img width="40" height="40" src="docs/images/cloudflare_light.svg#gh-dark-mode-only" title="Cloudflare"/>
-  <img width="40" height="40" src="docs/images/traefik_dark.svg#gh-light-mode-only" title="Traefik"/>
-  <img width="40" height="40" src="docs/images/traefik_light.svg#gh-dark-mode-only" title="Traefik"/>
-  <img width="40" height="40" src="docs/images/certmanager_dark.svg#gh-light-mode-only" title="Cert Manager"/>
-  <img width="40" height="40" src="docs/images/certmanager_light.svg#gh-dark-mode-only" title="Cert Manager"/>
+  <a href="https://www.proxmox.com/en/products/proxmox-virtual-environment/overview" target="_blank">
+    <picture>
+      <source srcset="docs/images/proxmox_light.svg" media="(prefers-color-scheme: dark)">
+      <img src="docs/images/proxmox_dark.svg" width="40" height="40" title="Proxmox"/>
+    </picture>
+  </a>
+  <a href="https://docs.ansible.com/ansible/latest/getting_started/index.html" target="_blank">
+    <picture>
+      <source srcset="docs/images/ansible_light.svg" media="(prefers-color-scheme: dark)">
+      <img src="docs/images/ansible_dark.svg" width="40" height="40" title="Ansible"/>
+    </picture>
+  </a>
+  <a href="https://ubuntu.com/download" target="_blank">
+    <picture>
+      <source srcset="docs/images/ubuntu_light.svg" media="(prefers-color-scheme: dark)">
+      <img src="docs/images/ubuntu_dark.svg" width="40" height="40" title="Ubuntu"/>
+    </picture>
+  </a>
+  <a href="https://www.talos.dev" target="_blank">
+    <picture>
+      <source srcset="docs/images/talos_light.svg" media="(prefers-color-scheme: dark)">
+      <img src="docs/images/talos_dark.svg" width="40" height="40" title="Talos"/>
+    </picture>
+  </a>
+  <a href="https://kubernetes.io" target="_blank">
+    <picture>
+      <source srcset="docs/images/kubernetes_light.svg" media="(prefers-color-scheme: dark)">
+      <img src="docs/images/kubernetes_dark.svg" width="40" height="40" title="Kubernetes"/>
+    </picture>
+  </a>
+  <a href="https://developer.hashicorp.com/terraform" target="_blank">
+    <picture>
+      <source srcset="docs/images/terraform_light.svg" media="(prefers-color-scheme: dark)">
+      <img src="docs/images/terraform_dark.svg" width="40" height="40" title="Terraform"/>
+    </picture>
+  </a>
+  <a href="https://argo-cd.readthedocs.io" target="_blank">
+    <picture>
+      <source srcset="docs/images/argo_light.svg" media="(prefers-color-scheme: dark)">
+      <img src="docs/images/argo_dark.svg" width="40" height="40" title="ArgoCD"/>
+    </picture>
+  </a>
+  <a href="https://grafana.com" target="_blank">
+    <picture>
+      <source srcset="docs/images/grafana_light.svg" media="(prefers-color-scheme: dark)">
+      <img src="docs/images/grafana_dark.svg" width="40" height="40" title="Grafana"/>
+    </picture>
+  </a>
+  <a href="https://prometheus.io" target="_blank">
+    <picture>
+      <source srcset="docs/images/prometheus_light.svg" media="(prefers-color-scheme: dark)">
+      <img src="docs/images/prometheus_dark.svg" width="40" height="40" title="Prometheus"/>
+    </picture>
+  </a>
+  <a href="https://grafana.com/docs/loki" target="_blank">
+    <picture>
+      <source srcset="docs/images/loki_light.svg" media="(prefers-color-scheme: dark)">
+      <img src="docs/images/loki_dark.svg" width="40" height="40" title="Loki"/>
+    </picture>
+  </a>
+  <a href="https://www.cloudflare.com" target="_blank">
+    <picture>
+      <source srcset="docs/images/cloudflare_light.svg" media="(prefers-color-scheme: dark)">
+      <img src="docs/images/cloudflare_dark.svg" width="40" height="40" title="Cloudflare"/>
+    </picture>
+  </a>
+  <a href="https://doc.traefik.io/traefik" target="_blank">
+    <picture>
+      <source srcset="docs/images/traefik_light.svg" media="(prefers-color-scheme: dark)">
+      <img src="docs/images/traefik_dark.svg" width="40" height="40" title="Traefik"/>
+    </picture>
+  </a>
+  <a href="https://cert-manager.io" target="_blank">
+    <picture>
+      <source srcset="docs/images/certmanager_light.svg" media="(prefers-color-scheme: dark)">
+      <img src="docs/images/certmanager_dark.svg" width="40" height="40" title="cert-manager"/>
+    </picture>
+  </a>
 </p>
 
 # Homelab
