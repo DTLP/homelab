@@ -5,6 +5,7 @@ resources:
   - homer.yaml
   - homer-ingress.yaml
   - homer-service.yaml
+  - popeye/
 
 configMapGenerator:
 - name: homer-config
