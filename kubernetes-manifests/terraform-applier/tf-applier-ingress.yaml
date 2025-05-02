@@ -1,0 +1,17 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: terraform-applier
+spec:
+  entryPoints:
+    - web-secure
+  routes:
+    - kind: Rule
+      match: Host(`terraform-applier.dtlp.cc`)
+      services:
+        - name: terraform-applier
+          kind: Service
+          port: 8080
+          sticky:
+            cookie: {}
+  tls: {}
