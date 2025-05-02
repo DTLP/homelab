@@ -3,3 +3,4 @@ kind: Kustomization
 
 resources:
   - popeye.yaml
+  - popeye-rbac.yaml

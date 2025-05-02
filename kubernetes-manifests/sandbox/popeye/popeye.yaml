@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name:      popeye
+  name: popeye
 spec:
   schedule: "* 10 * * *"
   concurrencyPolicy: Forbid
@@ -18,10 +18,9 @@ spec:
             - name: popeye
               image: derailed/popeye
               args:
-                # - --out=prometheus
+                - --all-namespaces
                 - --push-gtwy-url=http://pushgateway.monitoring.svc.cluster.local:9091
                 - --force-exit-zero
-                - --all-namespaces
               resources:
                 limits:
                   cpu:    500m
@@ -32,94 +31,3 @@ spec:
                   drop:
                     - ALL
                 runAsNonRoot: true
-          #     volumeMounts:
-          #       - name: config
-          #         mountPath: /etc/config/popeye/
-          # volumes:
-          #   - name: config
-          #     configMap:
-          #       name: popeye-config
----
-apiVersion: v1
-kind:       ServiceAccount
-metadata:
-  name:      popeye
----
-# Popeye needs get/list access on the following Kubernetes resources.
-apiVersion: rbac.authorization.k8s.io/v1
-kind:       ClusterRole
-metadata:
-  name: popeye
-rules:
-- apiGroups: [""]
-  resources:
-   - configmaps
-   - endpoints
-   - namespaces
-   - nodes
-   - persistentvolumes
-   - persistentvolumeclaims
-   - pods
-   - secrets
-   - serviceaccounts
-   - services
-  verbs:     ["get", "list"]
-- apiGroups: ["apps"]
-  resources:
-  - daemonsets
-  - deployments
-  - statefulsets
-  - replicasets
-  verbs:     ["get", "list"]
-- apiGroups: ["networking.k8s.io"]
-  resources:
-  - ingresses
-  - networkpolicies
-  verbs:     ["get", "list"]
-- apiGroups: ["batch.k8s.io"]
-  resources:
-  - cronjobs
-  - jobs
-  verbs:     ["get", "list"]
-- apiGroups: ["gateway.networking.k8s.io"]
-  resources:
-  - gateway-classes
-  - gateways
-  - httproutes
-  verbs:     ["get", "list"]
-- apiGroups: ["autoscaling"]
-  resources:
-  - horizontalpodautoscalers
-  verbs:     ["get", "list"]
-- apiGroups: ["policy"]
-  resources:
-  - poddisruptionbudgets
-  - podsecuritypolicies
-  verbs:     ["get", "list"]
-- apiGroups: ["rbac.authorization.k8s.io"]
-  resources:
-  - clusterroles
-  - clusterrolebindings
-  - roles
-  - rolebindings
-  verbs:     ["get", "list"]
-- apiGroups: ["metrics.k8s.io"]
-  resources:
-  - pods
-  - nodes
-  verbs:     ["get", "list"]
-
----
-# Binds Popeye to this ClusterRole.
-apiVersion: rbac.authorization.k8s.io/v1
-kind:       ClusterRoleBinding
-metadata:
-  name: popeye
-subjects:
-- kind:     ServiceAccount
-  name:     popeye
-  namespace: sandbox
-roleRef:
-  kind:     ClusterRole
-  name:     popeye
-  apiGroup: rbac.authorization.k8s.io
