@@ -65,6 +65,9 @@ services:
       - name: "ArgoCD"
         logo: "https://raw.githubusercontent.com/DTLP/homelab/refs/heads/main/docs/images/argo_light.svg"
         url: "https://argocd.dtlp.cc"
+      - name: "Terraform Applier"
+        logo: "https://raw.githubusercontent.com/DTLP/homelab/refs/heads/main/docs/images/terraform_light.svg"
+        url: "https://terraform-applier.dtlp.cc"
   - name: "Monitoring"
     logo: "https://raw.githubusercontent.com/DTLP/homelab/refs/heads/main/docs/images/heartbeat_light.svg"
     items:
