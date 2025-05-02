@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: pushgateway
+  labels:
+    app.kubernetes.io/name: pushgateway
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pushgateway
+  labels:
+    app.kubernetes.io/name: pushgateway
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 192.168.0.57
+  ports:
+    - port: 9091
+      targetPort: 9091
+  selector:
+    app.kubernetes.io/name: pushgateway

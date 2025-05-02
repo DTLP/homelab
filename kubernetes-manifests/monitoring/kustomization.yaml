@@ -9,4 +9,5 @@ resources:
   - node-exporter/
   - prometheus/
   - promtail/
+  - pushgateway/
   - pve-exporter/
