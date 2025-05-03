@@ -98,9 +98,10 @@ together with that tiny TP-Link switch making one Proxmox cluster.
 
 ### Software
 So far my Proxmox nodes host the following things:
-- 2 kubernetes master nodes on Talos
+- 3 kubernetes master nodes on Talos
 - 3 kubernetes worker nodes on Talos
 - 1 NFS server for persistent storage on Ubuntu
+- An AdGuard Home LXC 
 
 Proxmox resources are managed via [Terraform](https://github.com/DTLP/homelab/tree/main/terraform),
 but the initial setup is done using [Ansible](https://github.com/DTLP/homelab/tree/main/ansible). I used to use Vagrant for this before I moved to Proxmox, but I no
