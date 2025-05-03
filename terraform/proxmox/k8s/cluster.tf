@@ -21,6 +21,12 @@ resource "talos_machine_configuration_apply" "this" {
   client_configuration        = talos_machine_secrets.this.client_configuration
   machine_configuration_input = data.talos_machine_configuration.this[each.key].machine_configuration
   node                        = each.value.ipv4.address
+
+  config_patches = each.value.type == "controlplane" ? [
+    templatefile("./resources/controlplane-node-patch.yaml", {
+      kube_api_endpoint = var.cluster.kube_api_endpoint
+    })
+  ] : []
 }
 
 resource "talos_machine_bootstrap" "this" {

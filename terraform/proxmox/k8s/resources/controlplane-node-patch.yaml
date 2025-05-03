@@ -1,0 +1,12 @@
+machine:
+  network:
+    interfaces:
+      - interface: eth0
+        vip:
+          ip: ${kube_api_endpoint}
+cluster:
+  controlPlane:
+    endpoint: https://${kube_api_endpoint}:6443
+  apiServer:
+    certSANs:
+      - ${kube_api_endpoint}
