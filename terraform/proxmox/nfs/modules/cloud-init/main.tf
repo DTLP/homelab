@@ -43,6 +43,9 @@ resource "null_resource" "cloud_init" {
 resource "proxmox_vm_qemu" "vms" {
   for_each = { for key, value in var.cloud_init_virtual_machines : key => value if startswith(value.vm_template, "ubuntu-cloud") == true }
 
+  desc = "Managed by Terraform"
+  tags = "terraform"
+
   name        = each.value.hostname
   target_node = each.value.target_node
   clone       = each.value.vm_template
