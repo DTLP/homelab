@@ -37,6 +37,15 @@ cluster = {
         address = "192.168.0.31"
       }
     }
+    master-2 = {
+      host   = "pve5"
+      cores  = 2
+      memory = 3072
+      type   = "controlplane"
+      ipv4 = {
+        address = "192.168.0.32"
+      }
+    }
     worker-0 = {
       host   = "pve2"
       cores  = 4
