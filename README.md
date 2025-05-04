@@ -108,6 +108,5 @@ but the initial setup is done using [Ansible](https://github.com/DTLP/homelab/tr
 longer maintain that config. You could still find it [here](https://github.com/DTLP/homelab/tree/main/archive/vagrant).
 
 My kubernetes manifests are located in [kubernetes-manifests](https://github.com/DTLP/homelab/tree/main/kubernetes-manifests).  
-All secrets are encrypted using [Strongbox](https://github.com/uw-labs/strongbox).  
-AdGuard Home LXC installation script taken from 
-[Proxmox VE Helper-Scripts website](https://community-scripts.github.io/ProxmoxVE/scripts?id=adguard).
+All secrets are [age](https://github.com/FiloSottile/age) encrypted using [Strongbox](https://github.com/uw-labs/strongbox).  
+AdGuard Home LXC installation script taken from [Proxmox VE Helper-Scripts website](https://community-scripts.github.io/ProxmoxVE/scripts?id=adguard).
