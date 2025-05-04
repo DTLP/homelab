@@ -21,18 +21,18 @@ cluster = {
   talos_version     = "1.9.5"
   nodes = {
     master-0 = {
-      host   = "pve1"
+      host   = "pve2"
       cores  = 2
-      memory = 3072
+      memory = 2048
       type   = "controlplane"
       ipv4 = {
         address = "192.168.0.30"
       }
     }
     master-1 = {
-      host   = "pve1"
+      host   = "pve3"
       cores  = 2
-      memory = 3072
+      memory = 2048
       type   = "controlplane"
       ipv4 = {
         address = "192.168.0.31"
@@ -41,37 +41,46 @@ cluster = {
     master-2 = {
       host   = "pve5"
       cores  = 2
-      memory = 3072
+      memory = 2048
       type   = "controlplane"
       ipv4 = {
         address = "192.168.0.32"
       }
     }
     worker-0 = {
-      host   = "pve2"
+      host   = "pve1"
       cores  = 4
-      memory = 6144
+      memory = 4096
       type   = "worker"
       ipv4 = {
         address = "192.168.0.40"
       }
     }
     worker-1 = {
-      host   = "pve3"
+      host   = "pve2"
       cores  = 4
-      memory = 6144
+      memory = 4096
       type   = "worker"
       ipv4 = {
         address = "192.168.0.41"
       }
     }
     worker-2 = {
+      host   = "pve3"
+      cores  = 4
+      memory = 4096
+      type   = "worker"
+      ipv4 = {
+        address = "192.168.0.42"
+      }
+    }
+    worker-3 = {
       host   = "pve4"
       cores  = 4
       memory = 6144
       type   = "worker"
       ipv4 = {
-        address = "192.168.0.42"
+        address = "192.168.0.43"
       }
     }
   }

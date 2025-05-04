@@ -56,7 +56,7 @@ variable "cloud_init_virtual_machines" {
       target_node     = "pve5"
       cpu_cores       = 3
       cpu_sockets     = 1
-      memory          = "6144"
+      memory          = "4096"
       qemu_os         = "l26"
       hdd_size        = "40G"
       hdd_storage     = "nvme"

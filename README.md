@@ -99,7 +99,7 @@ together with that tiny TP-Link switch making one Proxmox cluster.
 ### Software
 So far my Proxmox nodes host the following things:
 - 3 kubernetes master nodes on Talos
-- 3 kubernetes worker nodes on Talos
+- 4 kubernetes worker nodes on Talos
 - 1 NFS server for persistent storage on Ubuntu
 - An AdGuard Home LXC 
 
