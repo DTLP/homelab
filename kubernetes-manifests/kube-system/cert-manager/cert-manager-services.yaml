@@ -73,7 +73,6 @@ spec:
 ---
 apiVersion: v1
 kind: ServiceAccount
-automountServiceAccountToken: true
 metadata:
   name: cert-manager-startupapicheck
   labels:

@@ -3,10 +3,7 @@ kind: ServiceAccount
 metadata:
   labels:
     app.kubernetes.io/name: loki
-  annotations:
-    {}
   name: loki
-automountServiceAccountToken: true
 ---
 apiVersion: v1
 kind: Service
