@@ -10,7 +10,7 @@ groups:
           impact: "High CPU usage can lead to degraded performance and slow application response times."
           action: "Investigate processes consuming high CPU. Consider scaling resources or optimizing workloads."
       - alert: HighMemoryUsage
-        expr: (node_memory_MemTotal_bytes - node_memory_MemFree_bytes) / node_memory_MemTotal_bytes > 0.9
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 90
         for: 10m
         annotations:
           summary: "High Memory usage on {{ $labels.instance }}"
