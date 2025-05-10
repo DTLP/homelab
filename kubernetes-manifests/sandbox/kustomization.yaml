@@ -4,3 +4,5 @@ kind: Kustomization
 resources:
   - homer/
   # - popeye/
+
+  - fluxcd.yaml

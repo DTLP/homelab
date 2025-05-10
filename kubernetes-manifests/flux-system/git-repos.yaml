@@ -1,0 +1,9 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: homelab
+spec:
+  interval: 5m0s
+  url: https://github.com/DTLP/homelab.git
+  ref:
+    branch: main
