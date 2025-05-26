@@ -1,0 +1,30 @@
+groups:
+  - name: kube-containers
+    rules:
+      - alert: ContainerRestartingOften
+        expr: increase(kube_pod_container_status_restarts_total[30m]) > 3
+        labels:
+          instance: "{{$labels.namespace}}/{{$labels.pod}}/{{$labels.container}}"
+        annotations:
+          summary: "Container {{$labels.namespace}}/{{$labels.pod}}/{{$labels.container}} has restarted more than 3 times in the last 30m"
+          impact: "Container may be crashlooping and not working as expected"
+          action: "Check pod status and container logs to figure out if there's a problem"
+          command: "`kubectl --namespace {{ $labels.namespace }} describe pod {{ $labels.pod }}`"
+      - alert: ContainerOOMing
+        expr: (kube_pod_container_status_last_terminated_reason{reason="OOMKilled"} and on (container,pod) (kube_pod_container_status_ready == 0))
+        for: 5m
+        labels:
+          instance: "{{$labels.namespace}}/{{$labels.pod}}/{{$labels.container}}"
+        annotations:
+          summary: "Container {{$labels.namespace}}/{{$labels.pod}}/{{$labels.container}} has been OOMKilled recently and it's not ready"
+          impact: "Container not ready, may affect service uptime"
+          action: "Investigate memory consumption and adjust container resources"
+          command: "`kubectl --namespace {{ $labels.namespace }} describe pod {{ $labels.pod }}`"
+      - alert: ContainerWaiting
+        expr: (kube_pod_container_status_waiting == 1)
+        for: 10m
+        labels:
+          instance: "{{$labels.namespace}}/{{$labels.pod}}/{{$labels.container}}"
+        annotations:
+          summary: "Container {{$labels.namespace}}/{{$labels.pod}}/{{$labels.container}} is in Waiting state for over 10min, check the Pod"
+          command: "`kubectl --namespace {{ $labels.namespace }} describe pod {{ $labels.pod }}`"
