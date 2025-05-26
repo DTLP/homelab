@@ -33,3 +33,11 @@ groups:
           description: "No metrics have been received from the node for the last 5 minutes."
           impact: "A node being down can cause service disruptions or unavailability of critical infrastructure."
           action: "Check the node's status using `kubectl get nodes`. Investigate if the node is unreachable or if the node-exporter pod is not running."
+      - alert: NodeNotReady
+        expr: kube_node_status_condition{condition="Ready", status="true"} == 0
+        for: 10m
+        annotations:
+          summary: "Node Not Ready: {{ $labels.node }}"
+          description: "The node has been in NotReady state for the last 10 minutes."
+          impact: "A NotReady node can lead to service disruptions and unavailability of workloads scheduled on it."
+          action: "Check the node's status using `kubectl describe node {{ $labels.node }}`. Investigate the cause of the NotReady state."
