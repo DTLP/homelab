@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: asciip
+  labels:
+    app: asciip
+spec:
+  containers:
+  - name: asciip
+    image: node
+    ports:
+    - containerPort: 3000
+    command: ["/bin/bash", "-c"]
+    args:
+    - |
+      set -e
+      git clone https://github.com/hhourani27/asciip &&
+      cd asciip &&
+      npm install &&
+      npm start
+  restartPolicy: Never

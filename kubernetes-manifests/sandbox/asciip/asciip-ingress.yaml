@@ -1,0 +1,15 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: asciip
+spec:
+  entryPoints:
+    - web-secure
+  routes:
+    - kind: Rule
+      match: Host(`asciip.dtlp.cc`)
+      services:
+        - name: asciip
+          kind: Service
+          port: 80
+  tls: {}
