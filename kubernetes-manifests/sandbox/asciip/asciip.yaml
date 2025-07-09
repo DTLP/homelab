@@ -18,4 +18,10 @@ spec:
       cd asciip &&
       npm install &&
       npm start
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
+      seccompProfile:
+        type: RuntimeDefault
   restartPolicy: Never
