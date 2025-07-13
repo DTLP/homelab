@@ -5,6 +5,7 @@ resources:
   - alertmanager/
   - grafana/
   - kube-state-metrics/
+  - kube-summary-exporter/
   - loki/
   - node-exporter/
   - prometheus/
