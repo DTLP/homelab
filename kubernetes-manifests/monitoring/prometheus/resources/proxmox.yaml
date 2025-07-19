@@ -12,7 +12,7 @@ groups:
       description: "CPU usage is above 80% for more than 10 minutes on node {{ $labels.id }}."
       impact: "Performance degradation and potential service interruption."
       action: "Investigate CPU consumption."
-      dashboard: http://grafana.lab/d/Dp7Cd57Zza
+      dashboard: http://grafana.dtlp.cc/d/Dp7Cd57Zza
   - alert: HighMemoryUsage
     # match nodes only. do not match lxc and qemu
     expr: (pve_memory_usage_bytes{id=~"node/(.*)"} / pve_memory_size_bytes{id=~"node/(.*)"}) * 100 > 90
@@ -24,7 +24,7 @@ groups:
       description: "Memory usage is above 90% for more than 10 minutes on node {{ $labels.id }}."
       impact: "Performance degradation and potential service interruption."
       action: "Investigate memory consumption."
-      dashboard: http://grafana.lab/d/Dp7Cd57Zza
+      dashboard: http://grafana.dtlp.cc/d/Dp7Cd57Zza
   - alert: HighStorageUsage
     # match nodes only. do not match lxc and qemu
     expr: (pve_disk_usage_bytes{id=~"storage/pve\\d+/(.*)"} / pve_disk_size_bytes{id=~"storage/pve\\d+/(.*)"}) * 100 > 80
@@ -36,4 +36,4 @@ groups:
       description: "Storage usage is above 80% for more than 10 minutes on node {{ $labels.id }}."
       impact: "Potential service interruption or data loss."
       action: "Review and clean up unnecessary files and monitor for further usage trends."
-      dashboard: http://grafana.lab/d/Dp7Cd57Zza
+      dashboard: http://grafana.dtlp.cc/d/Dp7Cd57Zza
