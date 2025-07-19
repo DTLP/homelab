@@ -1,6 +1,18 @@
 groups:
 - name: proxmox
   rules:
+  - alert: NodeDown
+    # match nodes only. do not match lxc and qemu
+    expr: pve_up{id=~"node/(.*)"} != 1
+    for: 10m
+    labels:
+      instance: "{{ $labels.id }}"
+    annotations:
+      summary: "Proxmox Node is unavailable"
+      description: "A {{ $labels.id }} proxmox node appears to be down."
+      impact: "Performance degradation and potential service interruption."
+      action: "Investigate the node and reboot if necessary."
+      dashboard: http://grafana.dtlp.cc/d/Dp7Cd57Zza
   - alert: HighCPUUsage
     # match nodes only. do not match lxc and qemu
     expr: (pve_cpu_usage_ratio{id=~"node/(.*)"} / pve_cpu_usage_limit{id=~"node/(.*)"}) * 100 > 80
