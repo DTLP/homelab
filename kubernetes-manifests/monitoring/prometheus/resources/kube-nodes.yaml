@@ -26,7 +26,7 @@ groups:
           impact: "High disk usage can lead to performance degradation and potential data loss."
           action: "Investigate disk usage with `df` or `du`. Clear unnecessary files or expand disk capacity."
       - alert: NodeDown
-        expr: absent(node_exporter_build_info{job="node-exporter"})
+        expr: up{job="node-exporter"} == 0
         for: 5m
         annotations:
           summary: "Node down: {{ $labels.instance }}"
