@@ -12,3 +12,4 @@ resources:
   - promtail/
   - pushgateway/
   - pve-exporter/
+  - version-checker/
