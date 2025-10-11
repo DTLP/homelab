@@ -21,12 +21,22 @@ ssh:
 	@echo "Running SSH setup playbook..."
 	ansible-playbook -i $(INVENTORY) ssh_setup.yaml $(ARGS)
 
+.PHONY: reboot
+reboot:
+	@echo "Rebooting Proxmox nodes..."
+	ansible-playbook -i $(INVENTORY) reboot_nodes.yaml $(ARGS)
+
 .PHONY: shutdown
 shutdown:
-	@echo "Running Shutdown PVE nodes setup playbook..."
-	ansible-playbook -i $(INVENTORY) shutdown_pve_nodes.yaml $(ARGS)
+	@echo "Shuting down Proxmox nodes..."
+	ansible-playbook -i $(INVENTORY) shutdown_nodes.yaml $(ARGS)
 
 .PHONY: ubuntu
 ubuntu:
 	@echo "Running Ubuntu Image playbook..."
 	ansible-playbook -i $(INVENTORY) ubuntu_image.yaml $(ARGS)
+
+.PHONY: upgrade
+upgrade:
+	@echo "Running System Upgrade playbook..."
+	ansible-playbook -i $(INVENTORY) dist_upgrade.yaml $(ARGS)

@@ -1,0 +1,48 @@
+---
+- name: Upgrade
+  hosts: pve_nodes
+  become: yes
+
+  tasks:
+    - name: Ensure dpkg is not in a broken state
+      command: dpkg --configure -a
+
+    - name: Wait until apt lock is released
+      shell: |
+        lsof /var/lib/dpkg/lock-frontend || lsof /var/lib/apt/lists/lock || echo "no-lock"
+      register: apt_lock_check
+      retries: 10
+      delay: 10
+      until: "'no-lock' in apt_lock_check.stdout"
+      changed_when: false
+
+    - name: Update APT package cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Perform full system upgrade (keep existing config files)
+      apt:
+        upgrade: dist
+        dpkg_options: "--force-confdef --force-confold"
+
+    - name: Remove old packages and clean APT cache
+      apt:
+        autoremove: yes
+        autoclean: yes
+
+    - name: Check if a reboot is required
+      stat:
+        path: /var/run/reboot-required
+        get_md5: no
+      register: reboot_required_file
+
+    - name: Reboot if required (e.g., after kernel upgrade)
+      reboot:
+        msg: "Reboot initiated by Ansible due to kernel or system upgrade"
+        connect_timeout: 5
+        reboot_timeout: 600
+        pre_reboot_delay: 0
+        post_reboot_delay: 30
+        test_command: uptime
+      when: reboot_required_file.stat.exists

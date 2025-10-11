@@ -1,0 +1,8 @@
+---
+- name: Reboot Proxmox nodes
+  hosts: pve_nodes
+  become: yes
+
+  tasks:
+    - name: Reboot node
+      command: systemctl reboot --force
