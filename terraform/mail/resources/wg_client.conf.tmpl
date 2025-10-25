@@ -1,0 +1,9 @@
+[Interface]
+PrivateKey = ${wg_client_private_key}
+Address = ${wg_client_private_ip_address}/32
+
+[Peer]
+PublicKey = ${wg_server_public_key}
+Endpoint = ${wg_server_endpoint_address}:${wg_server_endpoint_port}
+AllowedIPs = ${wg_server_private_ip_address}/32
+PersistentKeepalive = 25

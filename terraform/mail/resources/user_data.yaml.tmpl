@@ -1,0 +1,87 @@
+#cloud-config
+packages:
+  - docker.io
+  - wireguard
+runcmd:
+  # wireguard vpn
+  - systemctl start wg-quick@wg0
+  - systemctl enable wg-quick@wg0
+  - |
+    cat <<EOF > /etc/wireguard/wg0.conf
+    [Interface]
+    Address = ${wg_server_private_ip_address}/32
+    PrivateKey = ${wg_server_private_key}
+    ListenPort = ${wg_server_endpoint_port}
+
+    [Peer]
+    PublicKey = ${wg_client_public_key}
+    AllowedIPs = ${wg_client_private_ip_address}/32
+    EOF
+  - systemctl daemon-reload
+  - systemctl start wg-quick@wg0
+
+  # certificate
+  - docker run --rm -it \
+      -v "/etc/letsencrypt/:/etc/letsencrypt/" \
+      -v "/var/log/letsencrypt/:/var/log/letsencrypt/" \
+      -p 80:80 \
+      certbot/certbot certonly --standalone -d ${mailserver_hostname}.${domain_name}
+  - |
+    echo "# run certbot renew every Sunday at 2am" >> /etc/crontab
+  - |
+    echo "0 2 * * 0 root /usr/bin/docker run --rm \
+      -v \"/etc/letsencrypt/:/etc/letsencrypt/\" \
+      -v \"/var/log/letsencrypt/:/var/log/letsencrypt/\" \
+      -p 80:80 \
+      certbot/certbot renew --quiet --reuse-key" >> /etc/crontab
+  - systemctl restart cron
+
+  # mail server
+  - systemctl start docker
+  - systemctl enable docker
+  - |
+    cat <<EOF > /etc/systemd/system/mail.service
+    [Unit]
+    Description=mail
+    After=docker.service
+    Requires=docker.service
+
+    [Service]
+    PermissionsStartOnly=true
+    Restart=on-failure
+    ExecStart=/usr/bin/docker run \
+      --rm \
+      --name mail
+      --hostname ${mailserver_hostname}.${domain_name} \
+      --dns=1.1.1.1 \
+      --dns=1.0.0.1 \
+      --cap-add=NET_ADMIN \
+      --cap-add=SYS_PTRACE \
+      -e OVERRIDE_HOSTNAME=${mailserver_hostname}.${domain_name} \
+      -e DOMAINNAME=${domain_name} \
+      -e ENABLE_CLAMAV=1 \
+      -e ENABLE_FAIL2BAN=1 \
+      -e ENABLE_MANAGESIEVE=1 \
+      -e ENABLE_POSTGREY=0 \
+      -e ENABLE_SPAMASSASSIN=1 \
+      -e DMS_DEBUG=0 \
+      -e ONE_DIR=1 \
+      -e SPAMASSASSIN_SPAM_TO_INBOX=1 \
+      -e SSL_TYPE=letsencrypt \
+      -p 25:25 \
+      -p 465:465 \
+      -p 993:993 \
+      -v /mail/data:/var/mail:rw \
+      -v /mail/state:/var/mail-state:rw \
+      -v /mail/config/:/tmp/docker-mailserver:rw \
+      -v /etc/letsencrypt:/etc/letsencrypt:rw \
+      -v /etc/localtime:/etc/localtime:ro \
+      ghcr.io/docker-mailserver/docker-mailserver:${docker_mailserver_version}
+    ExecStop=/usr/bin/docker stop mail
+
+    [Install]
+    WantedBy=multi-user.target
+    EOF
+  - systemctl daemon-reload
+  - systemctl enable mail
+  - systemctl start mail

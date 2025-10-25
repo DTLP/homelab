@@ -1,0 +1,2 @@
+secrets/* filter=strongbox diff=strongbox
+terraform.tfvars filter=strongbox diff=strongbox
