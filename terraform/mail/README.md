@@ -1,4 +1,4 @@
-# docker-mailerver on Hetzner
+# docker-mailserver on Hetzner
 
 [Docker Mailserver Documentation](https://docker-mailserver.github.io/docker-mailserver/latest/introduction/)
 
