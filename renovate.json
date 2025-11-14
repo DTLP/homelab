@@ -5,6 +5,25 @@
   ],
   "ignorePaths": [
     "archive/**"
+  ],
+  "regexManagers": [
+    {
+      "fileMatch": ["^kubernetes-manifests/talos/tuppr/kubernetes-upgrade\\.yaml$"],
+      "matchStrings": [
+        "version:\\s*v(?<currentValue>\\d+\\.\\d+\\.\\d+)"
+      ],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "ghcr.io/siderolabs/kubelet",
+      "versioningTemplate": "semver"
+    },
+    {
+      "fileMatch": ["^kubernetes-manifests/talos/tuppr/talos-upgrade\\.yaml$"],
+      "matchStrings": [
+        "version:\\s*v(?<currentValue>\\d+\\.\\d+\\.\\d+)"
+      ],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "ghcr.io/siderolabs/installer",
+      "versioningTemplate": "semver"
+    }
   ]
 }
-
