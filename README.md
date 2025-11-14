@@ -85,27 +85,24 @@ A place where I experiment with my own on-prem Kubernetes cluster. Here I study
 things, break things and fix them back up.
 
 ## What do I use?
-### Hardware
+
 - TP-Link TL-SF1008D 8-Port 10/100Mbps Desktop Switch
 - x5 HP EliteDesk 800 G1 Desktop Mini PC
   - Intel core i5-4570T processor (4 vCPUs)
   - 8GB RAM
-  - 128GB SATA SSD
-  - 128GB M.2 NVMe SSD
+  - 128GB SATA SSD + 128GB M.2 NVMe SSD
 
 Each HP machine is running Proxmox Virtual Environment and they're all connected
-together with that tiny TP-Link switch making one Proxmox cluster.
+through the TP-Link switch to form a single Proxmox cluster.
 
-### Software
-So far my Proxmox nodes host the following things:
-- 3 kubernetes master nodes on Talos
-- 4 kubernetes worker nodes on Talos
+The Proxmox cluster hosts the following virtual machines:
+- 3 kubernetes master and 4 worker nodes running Talos
 - 1 NFS server for persistent storage on Ubuntu
 - An AdGuard Home LXC 
 
 Proxmox resources are managed via [Terraform](https://github.com/DTLP/homelab/tree/main/terraform),
 but the initial setup is done using [Ansible](https://github.com/DTLP/homelab/tree/main/ansible). I used to use Vagrant for this before I moved to Proxmox, but I no
-longer maintain that config. You could still find it [here](https://github.com/DTLP/homelab/tree/main/archive/vagrant).
+longer maintain that config. You can still find it [here](https://github.com/DTLP/homelab/tree/main/archive/vagrant).
 
 My kubernetes manifests are located in [kubernetes-manifests](https://github.com/DTLP/homelab/tree/main/kubernetes-manifests).  
 All secrets are [age](https://github.com/FiloSottile/age) encrypted using [Strongbox](https://github.com/uw-labs/strongbox).  
