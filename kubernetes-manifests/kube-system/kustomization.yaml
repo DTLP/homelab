@@ -5,6 +5,7 @@ resources:
   - cert-manager/
   - cni/
   - coredns/
+  - external-dns/
   - metrics-server/
   - terraform-applier/
 

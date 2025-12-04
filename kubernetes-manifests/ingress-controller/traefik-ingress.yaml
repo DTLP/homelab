@@ -7,6 +7,12 @@ spec:
     - web-secure
   routes:
     - kind: Rule
+      match: Host(`private-ingress.dtlp.cc`)
+      services:
+        - name: traefik
+          kind: Service
+          port: 8080
+    - kind: Rule
       match: Host(`traefik.dtlp.cc`)
       services:
         - name: traefik

@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: external-dns
+spec:
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "7979"
+        prometheus.io/scrape: "true"
+    spec:
+      containers:
+        - name: external-dns
+          args:
+            - --domain-filter=dtlp.cc
+            - --log-level=error
+            - --policy=sync
+            - --provider=cloudflare
+            - --publish-internal-services
+            - --registry=txt
+            - --source=ingress
+            - --source=service
+            - --txt-owner-id=homelab
+          env:
+            - name: CF_API_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: cloudflare
+                  key: api-email
+            - name: CF_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: cloudflare
+                  key: api-token
+          resources:
+            requests:
+              cpu: "10m"
+              memory: "128Mi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
