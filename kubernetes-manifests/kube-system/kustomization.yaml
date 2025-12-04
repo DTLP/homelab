@@ -2,8 +2,9 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - cni/
   - cert-manager/
+  - cni/
+  - coredns/
   - metrics-server/
   - terraform-applier/
 
