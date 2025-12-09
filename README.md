@@ -103,5 +103,10 @@ Proxmox resources are managed via [Terraform](https://github.com/DTLP/homelab/tr
 but the initial setup is done using [Ansible](https://github.com/DTLP/homelab/tree/main/ansible). I used to use Vagrant for this before I moved to Proxmox, but I no
 longer maintain that config. You can still find it [here](https://github.com/DTLP/homelab/tree/main/archive/vagrant).
 
-My kubernetes manifests are located in [kubernetes-manifests](https://github.com/DTLP/homelab/tree/main/kubernetes-manifests).  
-All secrets are [age](https://github.com/FiloSottile/age) encrypted using [Strongbox](https://github.com/uw-labs/strongbox).  
+My kubernetes manifests are located in [kubernetes-manifests](https://github.com/DTLP/homelab/tree/main/kubernetes-manifests).
+
+All secrets are [age](https://github.com/FiloSottile/age) encrypted using [Strongbox](https://github.com/uw-labs/strongbox).
+
+Dependencies are managed by [renovate](https://github.com/renovatebot/renovate).
+
+Talos and Kubernetes upgrades are done with [tuppr](https://github.com/home-operations/tuppr).
