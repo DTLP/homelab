@@ -24,6 +24,24 @@
       "datasourceTemplate": "docker",
       "depNameTemplate": "ghcr.io/siderolabs/installer",
       "versioningTemplate": "semver"
+    },
+    {
+      "fileMatch": ["^scripts/pre-commit$"],
+      "matchStrings": [
+        "PROMETHEUS_VERSION=\"v(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
+      ],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "prom/prometheus",
+      "versioningTemplate": "semver"
+    },
+    {
+      "fileMatch": ["^scripts/pre-commit$"],
+      "matchStrings": [
+        "ALERTMANAGER_VERSION=\"v(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
+      ],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "quay.io/prometheus/alertmanager",
+      "versioningTemplate": "semver"
     }
   ]
 }
