@@ -97,8 +97,7 @@ through the TP-Link switch to form a single Proxmox cluster.
 
 The Proxmox cluster hosts the following virtual machines:
 - 3 kubernetes master and 4 worker nodes running Talos
-- 1 NFS server for persistent storage on Ubuntu
-- An AdGuard Home LXC 
+- 1 NFS server for persistent storage on Ubuntu VM
 
 Proxmox resources are managed via [Terraform](https://github.com/DTLP/homelab/tree/main/terraform),
 but the initial setup is done using [Ansible](https://github.com/DTLP/homelab/tree/main/ansible). I used to use Vagrant for this before I moved to Proxmox, but I no
@@ -106,4 +105,3 @@ longer maintain that config. You can still find it [here](https://github.com/DTL
 
 My kubernetes manifests are located in [kubernetes-manifests](https://github.com/DTLP/homelab/tree/main/kubernetes-manifests).  
 All secrets are [age](https://github.com/FiloSottile/age) encrypted using [Strongbox](https://github.com/uw-labs/strongbox).  
-AdGuard Home LXC installation script taken from [Proxmox VE Helper-Scripts website](https://community-scripts.github.io/ProxmoxVE/scripts?id=adguard).
