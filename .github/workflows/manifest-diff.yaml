@@ -1,0 +1,176 @@
+name: Kustomize Diff
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'kubernetes-manifests/**'
+
+permissions:
+  pull-requests: write
+  issues: write
+  contents: read
+
+jobs:
+  manifest-diff:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install kustomize
+        run: |
+          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+          sudo mv kustomize /usr/local/bin/
+
+      - name: Get changed files
+        id: changes
+        run: |
+          git fetch origin ${{ github.base_ref }}
+          files=$(git diff --name-only origin/${{ github.base_ref }}...HEAD -- kubernetes-manifests)
+          echo "files<<EOF" >> $GITHUB_OUTPUT
+          echo "$files" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Determine kustomize roots
+        id: dirs
+        run: |
+          roots=""
+
+          while IFS= read -r file; do
+            [ -z "$file" ] && continue
+            dir=$(dirname "$file")
+
+            while [[ "$dir" != "." && "$dir" != "/" ]]; do
+              if [[ -f "$dir/kustomization.yaml" || \
+                    -f "$dir/kustomization.yml" || \
+                    -f "$dir/Kustomization" ]]; then
+                roots="$roots"$'\n'"$dir"
+                break
+              fi
+              dir=$(dirname "$dir")
+            done
+          done <<< "${{ steps.changes.outputs.files }}"
+
+          roots=$(echo -e "$roots" | sort -u | sed '/^$/d')
+
+          echo "dirs<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$roots" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+
+      - name: Checkout base branch to temp dir
+        run: |
+          git worktree add base_ref origin/${{ github.base_ref }}
+
+      - name: Build manifests
+        id: build
+        run: |
+          mkdir pr_build
+          mkdir base_build
+
+          while read -r dir; do
+            [ -z "$dir" ] && continue
+            pr_out="pr_build/$(echo $dir | tr '/' '_')"
+            base_out="base_build/$(echo $dir | tr '/' '_')"
+            kustomize build "$dir" > "$pr_out.yaml"
+            kustomize build "base_ref/$dir" > "$base_out.yaml"
+          done <<< "${{ steps.dirs.outputs.dirs }}"
+
+      - name: Sanitize secrets
+        id: sanitize
+        run: |
+          mkdir -p pr_manifests base_manifests
+
+          sanitize_file() {
+            awk '
+              BEGIN { in_data=0 }
+
+              # Start of data/stringData block
+              /^[[:space:]]*(data|stringData):/ {
+                print $1 ": \"***\""
+                in_data=1
+                next
+              }
+
+              # End of block (top-level key or document separator)
+              /^[^[:space:]]/ || /^---/ {
+                in_data=0
+              }
+
+              # Skip all lines inside data/stringData
+              in_data { next }
+
+              # Print all other lines
+              { print }
+            ' "$1"
+          }
+
+          for f in pr_build/*.yaml; do
+            b=$(basename "$f")
+            sanitize_file "$f" > "pr_manifests/$b"
+          done
+
+          for f in base_build/*.yaml; do
+            b=$(basename "$f")
+            sanitize_file "$f" > "base_manifests/$b"
+          done
+
+      - name: Generate diff
+        id: diff
+        run: |
+          diff_output=""
+
+          for f in pr_manifests/*.yaml; do
+            b=$(basename "$f")
+            diff_res=$(diff -u "base_manifests/$b" "$f" || true)
+            if [ -n "$diff_res" ]; then
+              diff_output="$diff_output\n### $b\n\`\`\`diff\n$diff_res\n\`\`\`"
+            fi
+          done
+
+          if [ -n "$diff_output" ]; then
+            max_length=25000
+
+            truncated_diff_output=$(echo "$diff_output" | awk -v max_length="$max_length" '{
+              len+=length()+1;
+              if (len < max_length) print;
+              else exit
+            }')
+
+            truncated_diff_output+="\n============================================="
+
+            if [ ${#diff_output} -gt $max_length ]; then
+              truncated_diff_output+="\n(Diff output is truncated to ${max_length} characters)"
+            fi
+
+            add=$(echo "$diff_output" | grep -o '\+kind' | wc -l)
+            destroy=$(echo "$diff_output" | grep -o '\-kind' | wc -l)
+            change=$(echo "$diff_output" | grep -o '^@@' | wc -l)
+
+            truncated_diff_output+="\nk8s objects: $add to add, $destroy to destroy"
+            truncated_diff_output+="\n$change changed hunks"
+
+            echo "diff<<EOF" >> "$GITHUB_OUTPUT"
+            echo -e "$truncated_diff_output" >> "$GITHUB_OUTPUT"
+            echo "EOF" >> "$GITHUB_OUTPUT"
+          else
+            echo "diff=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Post PR comment
+        if: steps.diff.outputs.diff != ''
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: kustomize-diff
+          recreate: true
+          message: ${{ steps.diff.outputs.diff }}
+
+      - name: Delete PR comment
+        if: steps.diff.outputs.diff == ''
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: kustomize-diff
+          delete: true
