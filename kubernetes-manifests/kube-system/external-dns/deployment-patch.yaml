@@ -33,6 +33,10 @@ spec:
                 secretKeyRef:
                   name: cloudflare
                   key: api-token
+          ports:
+            - name: metrics
+              containerPort: 7979
+              protocol: TCP
           resources:
             requests:
               cpu: "10m"
