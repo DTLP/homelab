@@ -15,7 +15,7 @@ spec:
         app.kubernetes.io/name: loki
       annotations:
         prometheus.io/scrape: "true"
-        prometheus.io/port: http-metrics
+        prometheus.io/port: "3100"
         prometheus.io/path: "/metrics"
     spec:
       serviceAccountName: loki
