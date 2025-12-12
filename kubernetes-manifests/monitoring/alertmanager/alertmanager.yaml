@@ -16,6 +16,7 @@ spec:
         image: prom/alertmanager:v0.30.0
         args:
           - "--config.file=/etc/alertmanager/config.yaml"
+          - "--web.external-url=https://alertmanager.dtlp.cc"
         ports:
         - containerPort: 9093
         volumeMounts:
