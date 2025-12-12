@@ -1,7 +1,11 @@
 {{ define "title" }}{{ .CommonAnnotations.summary }}{{ end }}
 
 {{ define "body" }}
-*Status*: {{ .Alerts.Firing | len }} Alerts firing
+{{ if gt (len .Alerts.Firing) 0 }}
+*Status*: {{ len .Alerts.Firing }} alert(s) firing
+{{ else }}
+*Status*: {{ len .Alerts.Resolved }} alert(s) resolved
+{{ end }}
 
 {{ if .CommonAnnotations.impact }}
 *Impact:* {{ .CommonAnnotations.impact -}}
