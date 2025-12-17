@@ -42,7 +42,7 @@ spec:
     spec:
       serviceAccountName: version-checker
       containers:
-        - image: quay.io/jetstack/version-checker:v0.9.3
+        - image: quay.io/jetstack/version-checker:v0.10.0
           imagePullPolicy: Always
           args:
             - --test-all-containers=true
