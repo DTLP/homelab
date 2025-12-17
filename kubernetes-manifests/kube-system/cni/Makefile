@@ -1,5 +1,3 @@
-.DEFAULT_GOAL := get-upstream
-
 .PHONY: get-upstream
 get-upstream:
 	curl -Ls \

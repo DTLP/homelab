@@ -1,7 +1,7 @@
 VERSION ?= 0.0.47
-OUTPUT ?= upstream/tuppr.yaml
 NAMESPACE ?= talos
 
+.PHONY: get-upstream
 get-upstream:
 	helm template tuppr oci://ghcr.io/home-operations/charts/tuppr \
 		--version $(VERSION) \
@@ -11,5 +11,4 @@ get-upstream:
 		grep -v 'app.kubernetes.io/version:' | \
 		grep -v 'app.kubernetes.io/managed-by:' | \
 		grep -v '^# Source:' \
-		> $(OUTPUT)
-
+		> upstream/tuppr.yaml
