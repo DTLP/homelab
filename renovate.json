@@ -11,9 +11,12 @@
       "^kubernetes-manifests/.+\\.yaml$"
     ]
   },
-  "regexManagers": [
+  "customManagers": [
     {
-      "fileMatch": ["^kubernetes-manifests/talos/tuppr/kubernetes-upgrade\\.yaml$"],
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^kubernetes-manifests/talos/tuppr/kubernetes-upgrade\\.yaml$/"
+      ],
       "matchStrings": [
         "version:\\s*v(?<currentValue>\\d+\\.\\d+\\.\\d+)"
       ],
@@ -22,7 +25,10 @@
       "versioningTemplate": "semver"
     },
     {
-      "fileMatch": ["^kubernetes-manifests/talos/tuppr/talos-upgrade\\.yaml$"],
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^kubernetes-manifests/talos/tuppr/talos-upgrade\\.yaml$/"
+      ],
       "matchStrings": [
         "version:\\s*v(?<currentValue>\\d+\\.\\d+\\.\\d+)"
       ],
@@ -31,7 +37,10 @@
       "versioningTemplate": "semver"
     },
     {
-      "fileMatch": ["^scripts/pre-commit$"],
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^scripts/pre-commit$/"
+      ],
       "matchStrings": [
         "PROMETHEUS_VERSION=\"v(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
       ],
@@ -40,7 +49,10 @@
       "versioningTemplate": "semver"
     },
     {
-      "fileMatch": ["^scripts/pre-commit$"],
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^scripts/pre-commit$/"
+      ],
       "matchStrings": [
         "ALERTMANAGER_VERSION=\"v(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
       ],
