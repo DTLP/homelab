@@ -22,6 +22,18 @@
     {
       "customType": "regex",
       "managerFilePatterns": [
+        "/^kubernetes-manifests\\/kube-system\\/cert-manager\\/Makefile$/"
+      ],
+      "matchStrings": [
+        "VERSION=v(?<currentValue>\\d+\\.\\d+\\.\\d+)"
+      ],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "quay.io/jetstack/cert-manager-controller",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
         "/^kubernetes-manifests/talos/tuppr/kubernetes-upgrade\\.yaml$/"
       ],
       "matchStrings": [
