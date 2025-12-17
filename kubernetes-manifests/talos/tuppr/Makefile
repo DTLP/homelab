@@ -1,5 +1,5 @@
 VERSION ?= 0.0.47
-OUTPUT ?= upstream.yaml
+OUTPUT ?= upstream/tuppr.yaml
 NAMESPACE ?= talos
 
 get-upstream:
