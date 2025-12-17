@@ -6,6 +6,11 @@
   "ignorePaths": [
     "archive/**"
   ],
+  "kubernetes": {
+    "managerFilePatterns": [
+      "^kubernetes-manifests/.+\\.yaml$"
+    ]
+  },
   "regexManagers": [
     {
       "fileMatch": ["^kubernetes-manifests/talos/tuppr/kubernetes-upgrade\\.yaml$"],
