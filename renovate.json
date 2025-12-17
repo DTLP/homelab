@@ -7,7 +7,7 @@
     "github-actions",
     "kubernetes",
     "kustomize",
-    "regex",
+    "custom.regex",
     "terraform"
   ],
   "ignorePaths": [
