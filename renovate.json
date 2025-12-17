@@ -3,6 +3,13 @@
   "extends": [
     "config:recommended"
   ],
+  "enabledManagers": [
+    "github-actions",
+    "kubernetes",
+    "kustomize",
+    "regex",
+    "terraform"
+  ],
   "ignorePaths": [
     "archive/**"
   ],
