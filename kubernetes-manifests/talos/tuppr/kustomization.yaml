@@ -6,4 +6,4 @@ resources:
   - talos-upgrade.yaml
   - upstream.yaml
 
-  - https://github.com/home-operations/tuppr/config/crd?ref=0.0.46
+  - https://github.com/home-operations/tuppr/config/crd?ref=0.0.47
