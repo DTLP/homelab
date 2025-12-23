@@ -233,7 +233,7 @@ spec:
             readOnlyRootFilesystem: true
             runAsNonRoot: true
             runAsUser: 65532
-          image: ghcr.io/home-operations/tuppr:0.0.48
+          image: ghcr.io/home-operations/tuppr:0.0.50
           imagePullPolicy: IfNotPresent
           command:
             - /manager
