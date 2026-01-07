@@ -19,7 +19,7 @@ spec:
     spec:
       serviceAccountName: traefik
       containers:
-      - image: docker.io/traefik:v3.6.2
+      - image: docker.io/traefik:v3.6.6
         imagePullPolicy: IfNotPresent
         name: traefik
         readinessProbe:
