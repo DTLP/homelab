@@ -20,7 +20,7 @@ function check_alerts() {
 }
 
 ALERTMANAGER_VERSION="v0.30.0"
-PROMETHEUS_VERSION="v3.8.1"
+PROMETHEUS_VERSION="v3.9.1"
 
 function is_yaml() {
   local file=$1
