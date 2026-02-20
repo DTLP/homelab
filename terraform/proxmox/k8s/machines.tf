@@ -18,7 +18,7 @@ resource "proxmox_virtual_environment_vm" "this" {
   }
 
   agent {
-    enabled = true
+    enabled = false
   }
 
   network_device {
@@ -49,5 +49,12 @@ resource "proxmox_virtual_environment_vm" "this" {
     dns {
       servers = var.cluster.dns.servers
     }
+  }
+
+  # Avoid recreating existing VMs when Talos image version is changed
+  lifecycle {
+    ignore_changes = [
+      disk[0].file_id
+    ]
   }
 }
