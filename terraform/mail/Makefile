@@ -31,6 +31,9 @@ alias-create:
 	mailbox=$(word 3,$(MAKECMDGOALS)); \
 	ssh -i ${SSH_KEY} ${SSH_USER}@${MAIL_HOST} docker exec mail setup alias add $$alias_name@dtlp.cc $$mailbox@dtlp.cc
 
+alias-list:
+	ssh -i ${SSH_KEY} ${SSH_USER}@${MAIL_HOST} docker exec mail setup alias list
+
 alias-delete:
 	@if [ "$(words $(MAKECMDGOALS))" -ne 3 ]; then \
 		echo "Usage: make alias-delete <alias> <mailbox>"; \
