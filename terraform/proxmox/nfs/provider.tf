@@ -1,7 +1,14 @@
-provider "proxmox" {
-  pm_api_url          = var.proxmox_api_url
-  pm_api_token_id     = var.proxmox_api_token_id
-  pm_api_token_secret = var.proxmox_api_token_secret
+locals {
+  token = file("../secrets/token")
+}
 
-  pm_tls_insecure = true
+provider "proxmox" {
+  endpoint  = var.pve.endpoint
+  api_token = local.token
+  ssh {
+    agent       = true
+    username    = var.pve.ssh.username
+    private_key = file(var.pve.ssh.private_key_file)
+  }
+  insecure = var.pve.insecure
 }
