@@ -23,10 +23,6 @@ write_files:
         },
         "storage-driver": "overlay2"
       }
-  - path: /root/.ssh/id_ed25519
-    permissions: '0600'
-    content: |
-      ${replace(root_ssh_key, "\n", "\n      ")}
 
 users:
   - name: "root"
