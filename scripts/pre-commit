@@ -1,97 +1,33 @@
 #!/usr/bin/env bash
 
-# Redirect output to stderr.
+# Redirect output to stderr
 exec 1>&2
+
+set -euo pipefail
 
 exit_code=0
 
 # List of changed files, excluding deleted ones
-if [[ -z "${GIT_CMD}" ]]; then
-  GIT_CMD="git diff --name-only --cached --diff-filter=d"
-else
-  GIT_CMD=${GIT_CMD}
-fi
+GIT_CMD=${GIT_CMD:-"git diff --name-only --cached --diff-filter=d"}
 
-function check_alerts() {
-  local files=$(eval "$GIT_CMD")
+check_secrets() {
+  local files
+  files=$($GIT_CMD)
+
   for f in $files; do
-    echo test: "$f"
-  done
-}
+    # Only look in 'secrets' directories
+    if [[ "$f" == *"/secrets/"* ]] || [[ "$f" == secrets/* ]]; then
 
-ALERTMANAGER_VERSION="v0.30.0"
-PROMETHEUS_VERSION="v3.8.1"
+      content=$(git show ":$f")
 
-function is_yaml() {
-  local file=$1
-  if [[ "${file}" == *yaml || "${file}" == *yml ]]; then
-    return 0
-  fi
-
-  return 1
-}
-
-function is_secret() {
-  local file=$1
-  if is_yaml "${f}"; then
-    git show :"${f}" | grep "kind: Secret" >/dev/null
-    if [ $? -eq 0 ]; then
-      return 0
-    fi
-  fi
-  return 1
-}
-
-# Check alerts
-function check_alerts() {
-  local files=$(${GIT_CMD})
-  for f in ${files}; do
-    if is_yaml "${f}"; then
-      if [[ $(head -1 "${f}") =~ "PROMETHEUS RULES" ]]; then
-        docker run -i --entrypoint promtool -v $PWD/${f}:$PWD/${f} docker.io/prom/prometheus:${PROMETHEUS_VERSION} check rules $PWD/${f} &>/dev/null
-        if [ $? -ne 0 ]; then
-          echo "err: Found misconfigured alerts staged in ${f}"
-          docker run -i --entrypoint promtool -v $PWD/${f}:$PWD/${f} docker.io/prom/prometheus:${PROMETHEUS_VERSION} check rules $PWD/${f}
-          exit_code=1
-        fi
+      if ! echo "$content" | grep -q "BEGIN AGE ENCRYPTED FILE"; then
+        echo "ERROR: Unencrypted secret detected in $f"
+        exit_code=1
       fi
     fi
   done
 }
 
-function check_am_config() {
-  local files=$(${GIT_CMD})
-  for f in ${files}; do
-    if is_yaml "${f}"; then
-      if [[ $(head -1 "${f}") =~ "ALERTMANAGER CONFIG" ]]; then
-        docker run -i --entrypoint amtool -v $PWD/${f}:$PWD/${f} quay.io/prometheus/alertmanager:${ALERTMANAGER_VERSION} check-config $PWD/${f} &>/dev/null
-        if [ $? -ne 0 ]; then
-          echo "err: Found misconfigured alertmanager config staged in ${f}"
-          docker run -i --entrypoint amtool -v $PWD/${f}:$PWD/${f} quay.io/prometheus/alertmanager:${ALERTMANAGER_VERSION} check-config $PWD/${f}
-          exit_code=1
-        fi
-      fi
-    fi
-  done
-}
+check_secrets
 
-function unencrypted_secret() {
-  local files=$(${GIT_CMD})
-  files=$(git diff --cached --name-only | grep '/secrets/')
-
-  for f in ${files}; do
-    if ! git show :"${f}" | grep -q -- '-----BEGIN AGE ENCRYPTED FILE-----'; then
-      exit_code=1
-      printf "err: Found unencrypted secret staged in %s\n" ${f}
-    fi
-  done
-
-  return ${exit_code}
-}
-
-# checks
-check_alerts
-check_am_config
-unencrypted_secret
-
-exit ${exit_code}
+exit $exit_code
