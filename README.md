@@ -77,6 +77,12 @@
       <img src="docs/images/certmanager_dark.svg" width="40" height="40" title="cert-manager"/>
     </picture>
   </a>
+  <a href="https://github.com/fosrl/pangolin" target="_blank">
+    <picture>
+      <source srcset="docs/images/pangolin_light.svg" media="(prefers-color-scheme: dark)">
+      <img src="docs/images/pangolin_dark.svg" width="40" height="40" title="pangolin"/>
+    </picture>
+  </a>
 </p>
 
 # Homelab
