@@ -4,6 +4,9 @@ data "template_file" "cloud_init" {
   vars = {
     domain_name                  = var.domain_name
     mailserver_hostname          = var.mailserver_hostname
+    pangolin_server_secret       = var.pangolin_server_secret
+    traefik_config_b64           = base64encode(file("${path.module}/resources/traefik_config.yaml"))
+    traefik_dynamic_config_b64   = base64encode(file("${path.module}/resources/traefik_dynamic_config.yaml"))
     wg_server_endpoint_port      = var.wg_server_endpoint_port
     wg_server_private_ip_address = var.wg_server_private_ip_address
     wg_client_private_ip_address = var.wg_client_private_ip_address
@@ -93,7 +96,14 @@ resource "hcloud_firewall" "mail" {
   rule {
     direction  = "in"
     protocol   = "tcp"
-    port       = "80" # Let’s Encrypt webserver
+    port       = "80" # Let’s Encrypt webserver & Pangolin
+    source_ips = ["0.0.0.0/0", "::/0"]
+  }
+
+  rule {
+    direction  = "in"
+    protocol   = "tcp"
+    port       = "443" # Pangolin web dashboard
     source_ips = ["0.0.0.0/0", "::/0"]
   }
 
@@ -114,7 +124,21 @@ resource "hcloud_firewall" "mail" {
   rule {
     direction  = "in"
     protocol   = "udp"
-    port       = "51820" # WireGuard
+    port       = "21820" # Pangolin - WireGuard - Client connections
+    source_ips = ["0.0.0.0/0", "::/0"]
+  }
+
+  rule {
+    direction  = "in"
+    protocol   = "udp"
+    port       = "51820" # Pangolin - WireGuard - Newt connectons
+    source_ips = ["0.0.0.0/0", "::/0"]
+  }
+
+  rule {
+    direction  = "in"
+    protocol   = "udp"
+    port       = "51821" # WireGuard Admin tunnel
     source_ips = ["0.0.0.0/0", "::/0"]
   }
 }

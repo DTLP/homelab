@@ -22,6 +22,12 @@ variable "docker_mailserver_version" {
   type        = string
 }
 
+variable "pangolin_server_secret" {
+  description = "Pangolin server secret"
+  type        = string
+  sensitive   = true
+}
+
 variable "ssh_public_key" {
   description = "SSH Public Key for the mail server"
   type        = string
@@ -29,7 +35,7 @@ variable "ssh_public_key" {
 
 variable "wg_server_endpoint_port" {
   description = "Port used by the WireGuard server for all client connections"
-  default     = "51820"
+  default     = "51821"
   type        = string
 }
 
