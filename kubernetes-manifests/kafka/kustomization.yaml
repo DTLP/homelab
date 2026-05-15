@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - kafka.yaml
+  - kafka-ui.yaml
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - kafka.yaml
+  - kafka-ui.yaml
+  - producer.yaml
+  - consumer.yaml
+
+configMapGenerator:
+  - name: producer-script
+    files:
+      - scripts/producer.py
+  - name: consumer-script
+    files:
+      - scripts/consumer.py
