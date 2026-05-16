@@ -107,3 +107,7 @@ services:
     items:
       - name: "AsciiP"
         url: "https://asciip.dtlp.cc"
+      - name: "Excalidraw"
+        url: "https://excalidraw.dtlp.cc"
+      - name: "IT Tools"
+        url: "https://it-tools.dtlp.cc"

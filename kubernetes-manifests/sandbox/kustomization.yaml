@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
   - asciip/
+  - excalidraw/
   - homer/
   - it-tools/
   # - popeye/
