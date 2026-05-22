@@ -4,7 +4,7 @@ metadata:
   name: talos
 spec:
   talos:
-    version: v1.12.4
+    version: v1.13.2
 
   policy:
     debug: false         # Optional, verbose logging
