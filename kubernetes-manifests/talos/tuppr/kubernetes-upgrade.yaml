@@ -4,7 +4,7 @@ metadata:
   name: kubernetes
 spec:
   kubernetes:
-    version: v1.35.1
+    version: v1.36.1
 
   healthChecks:
     - apiVersion: v1
