@@ -18,7 +18,7 @@ cluster = {
     gateway = "192.168.0.1"
   }
   kube_api_endpoint = "192.168.0.39"
-  talos_version     = "1.12.4"
+  talos_version     = "1.13.2"
   nodes = {
     master-0 = {
       host   = "pve2"
