@@ -1,4 +1,4 @@
-VERSION ?= 0.0.47
+VERSION ?= 0.1.35
 NAMESPACE ?= talos
 
 .PHONY: get-upstream
