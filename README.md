@@ -102,6 +102,7 @@ Each HP machine is running Proxmox Virtual Environment and they're all connected
 through the TP-Link switch to form a single Proxmox cluster.
 
 The Proxmox cluster hosts the following virtual machines:
+
 - 3 kubernetes master and 4 worker nodes running Talos
 - 1 NFS server for persistent storage on Ubuntu VM
 
@@ -114,5 +115,3 @@ My kubernetes manifests are located in [kubernetes-manifests](https://github.com
 All secrets are [age](https://github.com/FiloSottile/age) encrypted using [Strongbox](https://github.com/uw-labs/strongbox).
 
 Dependencies are managed by [renovate](https://github.com/renovatebot/renovate).
-
-Talos and Kubernetes upgrades are done with [tuppr](https://github.com/home-operations/tuppr).
