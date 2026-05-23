@@ -1,8 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended"
-  ],
+  "extends": ["config:recommended"],
   "enabledManagers": [
     "github-actions",
     "kubernetes",
@@ -10,13 +8,9 @@
     "custom.regex",
     "terraform"
   ],
-  "ignorePaths": [
-    "archive/**"
-  ],
+  "ignorePaths": ["archive/**"],
   "kubernetes": {
-    "managerFilePatterns": [
-      "/^kubernetes-manifests/.+\\.yaml$/"
-    ]
+    "managerFilePatterns": ["/^kubernetes-manifests/.+\\.yaml$/"]
   },
   "customManagers": [
     {
@@ -24,42 +18,14 @@
       "managerFilePatterns": [
         "/^kubernetes-manifests\\/kube-system\\/cert-manager\\/Makefile$/"
       ],
-      "matchStrings": [
-        "VERSION=v(?<currentValue>\\d+\\.\\d+\\.\\d+)"
-      ],
+      "matchStrings": ["VERSION=v(?<currentValue>\\d+\\.\\d+\\.\\d+)"],
       "datasourceTemplate": "docker",
       "depNameTemplate": "quay.io/jetstack/cert-manager-controller",
       "versioningTemplate": "semver"
     },
     {
       "customType": "regex",
-      "managerFilePatterns": [
-        "/^kubernetes-manifests/talos/tuppr/kubernetes-upgrade\\.yaml$/"
-      ],
-      "matchStrings": [
-        "version:\\s*v(?<currentValue>\\d+\\.\\d+\\.\\d+)"
-      ],
-      "datasourceTemplate": "docker",
-      "depNameTemplate": "ghcr.io/siderolabs/kubelet",
-      "versioningTemplate": "semver"
-    },
-    {
-      "customType": "regex",
-      "managerFilePatterns": [
-        "/^kubernetes-manifests/talos/tuppr/talos-upgrade\\.yaml$/"
-      ],
-      "matchStrings": [
-        "version:\\s*v(?<currentValue>\\d+\\.\\d+\\.\\d+)"
-      ],
-      "datasourceTemplate": "docker",
-      "depNameTemplate": "ghcr.io/siderolabs/installer",
-      "versioningTemplate": "semver"
-    },
-    {
-      "customType": "regex",
-      "managerFilePatterns": [
-        "/^scripts/pre-commit$/"
-      ],
+      "managerFilePatterns": ["/^scripts/pre-commit$/"],
       "matchStrings": [
         "PROMETHEUS_VERSION=\"v(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
       ],
@@ -69,9 +35,7 @@
     },
     {
       "customType": "regex",
-      "managerFilePatterns": [
-        "/^scripts/pre-commit$/"
-      ],
+      "managerFilePatterns": ["/^scripts/pre-commit$/"],
       "matchStrings": [
         "ALERTMANAGER_VERSION=\"v(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
       ],
