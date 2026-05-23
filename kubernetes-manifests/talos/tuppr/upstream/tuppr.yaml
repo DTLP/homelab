@@ -19,6 +19,14 @@ spec:
   roles:
     - os:admin
 ---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app.kubernetes.io/name: tuppr
+  name: tuppr-webhook-server-cert
+  namespace: "talos"
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -26,74 +34,127 @@ metadata:
   labels:
     app.kubernetes.io/name: tuppr
 rules:
-# Health check permissions - read-only access to all resources
-- apiGroups:
-  - "*"
-  resources:
-  - "*"
-  verbs:
-  - get
-  - list
-  - watch
-# Core resource permissions for controller operations
-- apiGroups:
-  - ""
-  resources:
-  - events
-  verbs:
-  - create
-  - patch
-- apiGroups:
-  - ""
-  resources:
-  - nodes
-  - pods
-  - secrets
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - batch
-  resources:
-  - jobs
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - tuppr.home-operations.com
-  resources:
-  - kubernetesupgrades
-  - talosupgrades
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - tuppr.home-operations.com
-  resources:
-  - kubernetesupgrades/finalizers
-  - talosupgrades/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - tuppr.home-operations.com
-  resources:
-  - kubernetesupgrades/status
-  - talosupgrades/status
-  verbs:
-  - get
-  - patch
-  - update
+  # Health check permissions - read-only access to all resources
+  - apiGroups:
+      - "*"
+    resources:
+      - "*"
+    verbs:
+      - get
+      - list
+      - watch
+  # Core resource permissions for controller operations
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - get
+      - list
+      - delete
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - get
+      - list
+      - watch
+      - delete
+  - apiGroups:
+      - ""
+    resources:
+      - pods/eviction
+    verbs:
+      - create
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+    verbs:
+      - get
+      - list
+      - watch
+      - patch
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - batch
+    resources:
+      - jobs
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - tuppr.home-operations.com
+    resources:
+      - kubernetesupgrades
+      - talosupgrades
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - tuppr.home-operations.com
+    resources:
+      - kubernetesupgrades/finalizers
+      - talosupgrades/finalizers
+    verbs:
+      - update
+  - apiGroups:
+      - tuppr.home-operations.com
+    resources:
+      - kubernetesupgrades/status
+      - talosupgrades/status
+    verbs:
+      - get
+      - patch
+      - update
+  # Self-signed certificate management
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - create
+      - update
+      - patch
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - admissionregistration.k8s.io
+    resources:
+      - validatingwebhookconfigurations
+    verbs:
+      - get
+      - list
+      - watch
+      - patch
+      - update
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -106,9 +167,9 @@ roleRef:
   kind: ClusterRole
   name: tuppr-manager-role
 subjects:
-- kind: ServiceAccount
-  name: tuppr
-  namespace: talos
+  - kind: ServiceAccount
+    name: tuppr
+    namespace: talos
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -118,37 +179,37 @@ metadata:
   labels:
     app.kubernetes.io/name: tuppr
 rules:
-- apiGroups:
-  - ""
-  resources:
-  - configmaps
-  verbs:
-  - get
-  - list
-  - watch
-  - create
-  - update
-  - patch
-  - delete
-- apiGroups:
-  - coordination.k8s.io
-  resources:
-  - leases
-  verbs:
-  - get
-  - list
-  - watch
-  - create
-  - update
-  - patch
-  - delete
-- apiGroups:
-  - ""
-  resources:
-  - events
-  verbs:
-  - create
-  - patch
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -162,25 +223,9 @@ roleRef:
   kind: Role
   name: tuppr-leader-election-role
 subjects:
-- kind: ServiceAccount
-  name: tuppr
-  namespace: talos
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: tuppr-webhook-service
-  namespace: talos
-  labels:
-    app.kubernetes.io/name: tuppr
-spec:
-  ports:
-    - port: 443
-      protocol: TCP
-      targetPort: 9443
-      name: webhook
-  selector:
-    app.kubernetes.io/name: tuppr
+  - kind: ServiceAccount
+    name: tuppr
+    namespace: talos
 ---
 apiVersion: v1
 kind: Service
@@ -196,6 +241,22 @@ spec:
       targetPort: metrics
       protocol: TCP
       name: metrics
+  selector:
+    app.kubernetes.io/name: tuppr
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tuppr-webhook-service
+  namespace: talos
+  labels:
+    app.kubernetes.io/name: tuppr
+spec:
+  ports:
+    - port: 443
+      protocol: TCP
+      targetPort: 9443
+      name: webhook
   selector:
     app.kubernetes.io/name: tuppr
 ---
@@ -229,25 +290,34 @@ spec:
             allowPrivilegeEscalation: false
             capabilities:
               drop:
-              - ALL
+                - ALL
             readOnlyRootFilesystem: true
             runAsNonRoot: true
             runAsUser: 65532
-          image: ghcr.io/home-operations/tuppr:0.0.51
+          image: ghcr.io/home-operations/tuppr:0.1.35
           imagePullPolicy: IfNotPresent
           command:
             - /manager
           args:
+            - --log-level=debug
             - --leader-elect=true
             - --metrics-bind-address=:8080
             - --health-probe-bind-address=:8081
             - --talosconfig-secret=tuppr-talosconfig
             - --metrics-secure=false
+            - --metrics-service-name=tuppr-metrics-service
+            - --webhook-config-name=tuppr-validating-webhook
+            - --webhook-service-name=tuppr-webhook-service
+            - --webhook-secret-name=tuppr-webhook-server-cert
           env:
             - name: CONTROLLER_NAMESPACE
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+            - name: CONTROLLER_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
           ports:
             - name: webhook-server
               containerPort: 9443
@@ -270,12 +340,10 @@ spec:
               port: 8081
             initialDelaySeconds: 5
             periodSeconds: 10
-          resources:
-            {}
+          resources: {}
           volumeMounts:
             - mountPath: /tmp/k8s-webhook-server/serving-certs
               name: cert
-              readOnly: true
             - name: talosconfig
               mountPath: /var/run/secrets/talos.dev
               readOnly: true
@@ -295,32 +363,50 @@ spec:
           key: node-role.kubernetes.io/control-plane
           operator: Exists
 ---
-apiVersion: cert-manager.io/v1
-kind: Certificate
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
 metadata:
-  name: tuppr-serving-cert
-  namespace: talos
+  name: tuppr-validating-webhook
   labels:
     app.kubernetes.io/name: tuppr
-spec:
-  dnsNames:
-    - tuppr-webhook-service.talos.svc
-    - tuppr-webhook-service.talos.svc.cluster.local
-  issuerRef:
-    kind: Issuer
-    name: tuppr-selfsigned-issuer
-  secretName: tuppr-webhook-server-cert
-  privateKey:
-    rotationPolicy: Always
-  duration: 8760h  # 1 year
-  renewBefore: 720h  # 30 days
----
-apiVersion: cert-manager.io/v1
-kind: Issuer
-metadata:
-  name: tuppr-selfsigned-issuer
-  namespace: talos
-  labels:
-    app.kubernetes.io/name: tuppr
-spec:
-  selfSigned: {}
+webhooks:
+  - name: vkubernetesupgrade.kb.io
+    admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: tuppr-webhook-service
+        namespace: talos
+        path: /validate-tuppr-home-operations-com-v1alpha1-kubernetesupgrade
+    failurePolicy: Fail
+    sideEffects: None
+    rules:
+      - apiGroups:
+          - tuppr.home-operations.com
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - kubernetesupgrades
+  - name: vtalosupgrade.kb.io
+    admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: tuppr-webhook-service
+        namespace: talos
+        path: /validate-tuppr-home-operations-com-v1alpha1-talosupgrade
+    failurePolicy: Fail
+    sideEffects: None
+    rules:
+      - apiGroups:
+          - tuppr.home-operations.com
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - talosupgrades
