@@ -11,10 +11,6 @@ clusterPodNets:
 clusterSvcNets:
   - 10.96.0.0/12
 
-controlPlane:
-  patches:
-    - patches/vip.yaml
-
 nodes:
   - hostname: master-0
     ipAddress: 192.168.0.30
@@ -50,3 +46,19 @@ nodes:
     ipAddress: 192.168.0.43
     controlPlane: false
     installDisk: /dev/sda
+
+controlPlane:
+  patches:
+    - patches/vip.yaml
+  schematic:
+    customization:
+      systemExtensions:
+        officialExtensions:
+          - siderolabs/qemu-guest-agent
+
+worker:
+  schematic:
+    customization:
+      systemExtensions:
+        officialExtensions:
+          - siderolabs/qemu-guest-agent
