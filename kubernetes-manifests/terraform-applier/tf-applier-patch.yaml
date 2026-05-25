@@ -9,7 +9,6 @@ spec:
         app: terraform-applier
     spec:
       serviceAccountName: terraform-applier
-      serviceAccountName: prometheus
       securityContext:
         seccompProfile:
           type: RuntimeDefault
@@ -39,11 +38,11 @@ spec:
           configMap:
             name: tf-applier-config
   volumeClaimTemplates:
-  - metadata:
-      name: tmp
-    spec:
-      accessModes: ["ReadWriteOnce"]
-      resources:
-        requests:
-          storage: 20Gi
-      storageClassName: nfs-client
+    - metadata:
+        name: tmp
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 20Gi
+        storageClassName: nfs-client
