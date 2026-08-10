@@ -87,31 +87,110 @@
 
 # Homelab
 
-A place where I experiment with my own on-prem Kubernetes cluster. Here I study
-things, break things and fix them back up.
+An on-prem Kubernetes cluster where I study infrastructure, break things, and
+fix them back up. Everything in this repository is declarative: the cluster,
+the applications running on it, and the infrastructure underneath are all
+defined as code and tracked in git.
 
-## What do I use?
+## Hardware
 
-- TP-Link TL-SF1008D 8-Port 10/100Mbps Desktop Switch
-- x5 HP EliteDesk 800 G1 Desktop Mini PC
-  - Intel core i5-4570T processor (4 vCPUs)
+- 1x TP-Link TL-SF1008D 8-Port 10/100Mbps Desktop Switch
+- 5x HP EliteDesk 800 G1 Desktop Mini PC
+  - Intel Core i5-4570T (4 vCPUs)
   - 8GB RAM
   - 128GB SATA SSD + 128GB M.2 NVMe SSD
 
-Each HP machine is running Proxmox Virtual Environment and they're all connected
-through the TP-Link switch to form a single Proxmox cluster.
+The five HP machines form a single Proxmox VE cluster, networked together
+through the TP-Link switch.
+
+## Virtual infrastructure
 
 The Proxmox cluster hosts the following virtual machines:
 
-- 3 kubernetes master and 4 worker nodes running Talos
-- 1 NFS server for persistent storage on Ubuntu VM
+| VM(s)         | Count | OS     | Role                               |
+| ------------- | ----- | ------ | ---------------------------------- |
+| Control plane | 3     | Talos  | Kubernetes masters                 |
+| Worker nodes  | 4     | Talos  | Kubernetes workers                 |
+| NFS server    | 1     | Ubuntu | Persistent storage for the cluster |
 
-Proxmox resources are managed via [Terraform](https://github.com/DTLP/homelab/tree/main/terraform),
-but the initial setup is done using [Ansible](https://github.com/DTLP/homelab/tree/main/ansible). I used to use Vagrant for this before I moved to Proxmox, but I no
-longer maintain that config. You can still find it [here](https://github.com/DTLP/homelab/tree/main/archive/vagrant).
+- Talos version and Kubernetes version are pinned in [`talos/talenv.yaml`](talos/talenv.yaml) and templated via [Talhelper](https://github.com/budimanjojo/talhelper).
+- A VIP backed by kube-vip provides a stable API endpoint for the control plane.
+- The NFS VM serves cluster PVCs through `nfs-client`, the default `StorageClass`.
 
-My kubernetes manifests are located in [kubernetes-manifests](https://github.com/DTLP/homelab/tree/main/kubernetes-manifests).
+## How it's managed
 
-All secrets are [age](https://github.com/FiloSottile/age) encrypted using [Strongbox](https://github.com/uw-labs/strongbox).
+### Proxmox → Ansible
 
-Dependencies are managed by [renovate](https://github.com/renovatebot/renovate).
+The Proxmox nodes are bootstrapped with Ansible: cluster formation, SSH access,
+NVMe mount, and the Ubuntu cloud image are all handled by playbooks in
+[`ansible/`](ansible). See [`ansible/README.md`](ansible/README.md) and run
+targets via `make`:
+
+```
+make start    # cluster + ssh + nvme + ubuntu
+make upgrade  # apt dist-upgrade on all nodes
+make stop     # shutdown the cluster
+```
+
+### Proxmox → Talos → Kubernetes → Terraform
+
+Once the Proxmox cluster exists, Terraform takes over. Each workspace is a
+self-contained module with state stored remotely in HCP Terraform:
+
+- [`terraform/proxmox/k8s`](terraform/proxmox/k8s) — creates the Talos VMs,
+  applies the machine configuration, boots the cluster and exports the
+  kubeconfig.
+- [`terraform/proxmox/nfs`](terraform/proxmox/nfs) — the NFS storage VM.
+- [`terraform/grafana`](terraform/grafana) — Grafana dashboards.
+- [`terraform/hetzner`](terraform/hetzner) — a docker-mailserver VM on Hetzner
+  Cloud, reachable over a WireGuard tunnel.
+
+### Kubernetes manifests
+
+All workloads live in [`kubernetes-manifests/`](kubernetes-manifests), composed
+with Kustomize and version-pinned per directory. Infrastructure deployed today:
+
+- **Networking** — Calico CNI, MetalLB, Traefik ingress, external-dns
+- **Certificates** — cert-manager with Cloudflare DNS-01 challenges
+- **Monitoring** — Prometheus, Grafana, Alertmanager, Loki, Promtail,
+  kube-state-metrics, node-exporter, pushgateway, pve-exporter
+- **Storage** — NFS client provisioner
+- **Experiments** — Kafka, and a `sandbox/` namespace for play apps (Homer,
+  Excalidraw, IT-Tools, asciip)
+
+GitOps delivery is split by concern:
+
+- **terraform-applier** applies the Terraform workspaces (e.g. the Grafana
+  dashboards module) on a schedule.
+- **Flux** is being trialed for application manifests, currently managing the
+  `sandbox` namespace.
+- **ArgoCD** is installed but currently manages only its own manifests.
+
+### Secrets
+
+All secrets are [age](https://github.com/FiloSottile/age) encrypted with
+[Strongbox](https://github.com/uw-labs/strongbox). A git filter encrypts
+secret files on commit and decrypts them on checkout, so the repository
+only ever contains encrypted blobs. A pre-commit hook
+([`scripts/pre-commit`](scripts/pre-commit)) refuses to stage an unencrypted
+secret.
+
+### Keeping things fresh
+
+- [Renovate](https://github.com/renovatebot/renovate) watches Kubernetes
+  images, Kustomize bases, Terraform providers, GitHub Actions and custom
+  version pins, and opens dependency PRs automatically.
+- A CI workflow ([`.github/workflows/manifest-diff.yaml`](.github/workflows/manifest-diff.yaml))
+  renders Kustomize diffs of changed manifests on every pull request.
+
+## Repository layout
+
+```
+ansible/                   Initial Proxmox cluster setup playbooks
+archive/                   Previously used configs, kept for reference
+docs/                      Documentation and logos
+kubernetes-manifests/      Kustomize app manifests, grouped by namespace
+scripts/                   Local tooling (pre-commit hook)
+talos/                     Talos cluster configuration (Talhelper)
+terraform/                 Terraform workspaces (Proxmox, Grafana, Hetzner)
+```
