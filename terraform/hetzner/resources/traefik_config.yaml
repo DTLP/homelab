@@ -26,8 +26,7 @@ log:
 certificatesResolvers:
   letsencrypt:
     acme:
-      httpChallenge:
-        entryPoint: web
+      tlsChallenge: {}
       email: "dmitry.lapo@hotmail.com"
       storage: "/letsencrypt/acme.json"
       caServer: "https://acme-v02.api.letsencrypt.org/directory"
