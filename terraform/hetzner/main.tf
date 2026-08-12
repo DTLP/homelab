@@ -40,7 +40,7 @@ resource "hcloud_network_subnet" "mail" {
 
 resource "hcloud_primary_ip" "mail" {
   name          = "mail"
-  datacenter    = "nbg1-dc3" # DE Nuremberg 1 Virtual DC 3
+  location      = "nbg1" # DE Nuremberg 1
   type          = "ipv4"
   assignee_type = "server"
   auto_delete   = false
@@ -48,8 +48,8 @@ resource "hcloud_primary_ip" "mail" {
 
 resource "hcloud_server" "mail" {
   name        = "mail"
-  datacenter  = "nbg1-dc3" # DE Nuremberg 1 Virtual DC 3
-  server_type = "cx22"     # 2 vCPU, 4GB RAM, 40GB SSD, € 0.006/h
+  location    = "nbg1" # DE Nuremberg 1
+  server_type = "cx22" # 2 vCPU, 4GB RAM, 40GB SSD, € 0.006/h
   image       = "ubuntu-24.04"
 
   ssh_keys  = [hcloud_ssh_key.mail.id]
