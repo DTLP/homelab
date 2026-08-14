@@ -10,6 +10,10 @@ write_files:
     encoding: b64
     content: ${traefik_dynamic_config_b64}
 runcmd:
+  # disable SSH password authentication
+  - sed -i 's/^#\?PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+  - systemctl restart ssh
+
   # wireguard vpn
   - systemctl start wg-quick@wg0
   - systemctl enable wg-quick@wg0
