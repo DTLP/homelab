@@ -39,11 +39,10 @@ resource "hcloud_network_subnet" "mail" {
 }
 
 resource "hcloud_primary_ip" "mail" {
-  name          = "mail"
-  location      = "nbg1" # DE Nuremberg 1
-  type          = "ipv4"
-  assignee_type = "server"
-  auto_delete   = false
+  name        = "mail"
+  location    = "nbg1" # DE Nuremberg 1
+  type        = "ipv4"
+  auto_delete = false
 }
 
 resource "hcloud_server" "mail" {
