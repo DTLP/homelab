@@ -4,7 +4,7 @@ kind: Kustomization
 resources:
   - tf-applier-ingress.yaml
 
-  - github.com/utilitywarehouse/terraform-applier//manifests/base/namespaced?ref=master
+  - github.com/utilitywarehouse/terraform-applier//manifests/base/namespaced?ref=v2.6.1
 
 patches:
   - path: tf-applier-patch.yaml

@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: consumer
-          image: python:3.12-slim
+          image: python:3.12.14-slim
           command:
             - sh
             - -c

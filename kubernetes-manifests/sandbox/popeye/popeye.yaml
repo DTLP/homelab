@@ -16,7 +16,7 @@ spec:
               type: RuntimeDefault
           containers:
             - name: popeye
-              image: derailed/popeye
+              image: derailed/popeye:v0.22.1
               args:
                 - --all-namespaces
                 - --push-gtwy-url=http://pushgateway.monitoring.svc.cluster.local:9091

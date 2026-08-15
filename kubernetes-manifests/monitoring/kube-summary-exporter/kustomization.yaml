@@ -4,4 +4,4 @@ kind: Kustomization
 resources:
   - rbac.yaml
 
-  - github.com/utilitywarehouse/kube-summary-exporter//manifests/base?ref=master
+  - github.com/utilitywarehouse/kube-summary-exporter//manifests/base?ref=v0.4.8
