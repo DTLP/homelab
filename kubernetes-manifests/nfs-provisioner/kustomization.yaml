@@ -1,10 +1,9 @@
 namespace: nfs-provisioner
 resources:
+  - argocd-app.yaml
   - github.com/kubernetes-sigs/nfs-subdir-external-provisioner//deploy
+  - network-policies.yaml
 
 patches:
   - path: nfs-deployment-patch.yaml
   - path: nfs-storageclass-patch.yaml
-
-resources:
-  - network-policies.yaml

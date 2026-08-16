@@ -1,19 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: argocd
+  name: monitoring
 spec:
   project: main
   source:
     repoURL: git@github.com:DTLP/homelab.git
     targetRevision: main
-    path: kubernetes-manifests/argocd
+    path: kubernetes-manifests/monitoring
   destination:
     name: in-cluster
-    namespace: argocd
+    namespace: monitoring
   syncPolicy:
-    syncOptions:
-      - ApplyOutOfSyncOnly=true
-    automated: 
+    automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - ApplyOutOfSyncOnly=true

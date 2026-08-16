@@ -11,13 +11,14 @@ resources:
 patches:
   - path: argocd-cmd-params-cm-patch.yaml
   - path: argocd-server-svc-patch.yaml
+  - path: disable-components-patch.yaml
 
 secretGenerator:
   - files:
       - sshPrivateKey=secrets/github-ssh-key
     literals:
       - url=git@github.com:DTLP/homelab.git
-      - project=default
+      - project=main
       - type=git
     name: homelab-repo
     options:

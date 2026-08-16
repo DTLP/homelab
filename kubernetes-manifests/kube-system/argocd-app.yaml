@@ -1,19 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: argocd
+  name: kube-system
 spec:
   project: main
   source:
     repoURL: git@github.com:DTLP/homelab.git
     targetRevision: main
-    path: kubernetes-manifests/argocd
+    path: kubernetes-manifests/kube-system
   destination:
     name: in-cluster
-    namespace: argocd
+    namespace: kube-system
   syncPolicy:
-    syncOptions:
-      - ApplyOutOfSyncOnly=true
-    automated: 
+    automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - ApplyOutOfSyncOnly=true
