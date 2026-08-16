@@ -49,6 +49,7 @@ nodes:
 controlPlane:
   patches:
     - patches/vip.yaml
+    - patches/pod-security.yaml
   schematic:
     customization:
       systemExtensions:
