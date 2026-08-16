@@ -145,6 +145,21 @@ self-contained module with state stored remotely in HCP Terraform:
 - [`terraform/hetzner`](terraform/hetzner) — a docker-mailserver VM on Hetzner
   Cloud, reachable over a WireGuard tunnel.
 
+The Talos cluster runs **Calico** for pod networking. A fresh cluster is
+provisioned with the default Flannel CNI disabled by the
+[`cni-none-patch`](terraform/proxmox/k8s/resources/cni-none-patch.yaml) applied
+to every node, so `terraform apply` never installs Flannel. Calico and all other
+workloads are then installed from `kubernetes-manifests/` by
+[`scripts/bootstrap.sh`](scripts/bootstrap.sh):
+
+```
+make bootstrap   # install Calico, MetalLB, cert-manager, ingress, apps, policies
+```
+
+The script applies Calico first (pod networking and policy enforcement must
+exist before any workload starts) and the NetworkPolicies last, so no workload
+runs unprotected.
+
 ### Kubernetes manifests
 
 All workloads live in [`kubernetes-manifests/`](kubernetes-manifests), composed
