@@ -5,3 +5,4 @@ resources:
   - cert.yaml
   - dummy-cert-loader.yaml
   - ingress.yaml
+  - network-policies.yaml

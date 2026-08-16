@@ -1,0 +1,12 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: policy
+  namespace: certs
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+  egress:
+    - {}

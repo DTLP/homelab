@@ -7,3 +7,4 @@ resources:
   - https://github.com/fluxcd/flux2/manifests/policies?ref=v2.7.5
 
   - git-repos.yaml
+  - network-policies.yaml
