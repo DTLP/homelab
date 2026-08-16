@@ -5,5 +5,6 @@ NAMESPACE ?= kube-system
 get-upstream:
 	curl -L https://github.com/cert-manager/cert-manager/releases/download/$(VERSION)/cert-manager.yaml \
 	| sed -E 's|(\s*)namespace: "?cert-manager"?|\1namespace: "$(NAMESPACE)"|g' \
+	| sed -E "s|cert-manager.io/inject-ca-from-secret: \"cert-manager/|cert-manager.io/inject-ca-from-secret: \"$(NAMESPACE)/|g" \
 	| sed 's/\xC2\xA0/ /g' \
 	> upstream/cert-manager.yaml
