@@ -13,3 +13,7 @@ spec:
           env:
             - name: CALICO_IPV4POOL_IPIP
               value: "Never"
+            - name: CALICO_IPV4POOL_VXLAN
+              value: "Never"
+            - name: CALICO_IPV4POOL_CIDR
+              value: "10.244.0.0/16"
