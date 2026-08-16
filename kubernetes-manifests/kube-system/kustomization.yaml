@@ -10,3 +10,4 @@ resources:
   - terraform-applier/
 
   - namespaces.yaml
+  - network-policies.yaml

@@ -8,3 +8,4 @@ resources:
   - traefik-ingressclass.yaml
   - traefik-rbac.yaml
   - traefik-service.yaml
+  - network-policies.yaml
