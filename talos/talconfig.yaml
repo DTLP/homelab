@@ -53,6 +53,7 @@ controlPlane:
   patches:
     - patches/vip.yaml
     - patches/pod-security.yaml
+    - patches/user-namespaces.yaml
   schematic:
     customization:
       systemExtensions:
@@ -60,6 +61,8 @@ controlPlane:
           - siderolabs/qemu-guest-agent
 
 worker:
+  patches:
+    - patches/user-namespaces.yaml
   schematic:
     customization:
       systemExtensions:
