@@ -6,6 +6,7 @@ resources:
   - upstream/install.yaml
   - patches/kyverno-admission-controller-pdb.yaml
   - patches/kyverno-background-controller-clusterrole.yaml
+  - policies/
 
 patches:
   - path: patches/remove-namespace.yaml
