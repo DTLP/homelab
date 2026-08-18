@@ -1,0 +1,14 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: load-balancer-ip
+  namespace: kube-system
+spec:
+  policyRefs:
+    - name: restrict-load-balancer-ip
+      kind: ValidatingPolicy
+  matchConditions:
+    - name: pinned-load-balancer-ips
+      expression: >-
+        (object.metadata.namespace == 'ingress-controller' &&
+          object.metadata.name == 'traefik')

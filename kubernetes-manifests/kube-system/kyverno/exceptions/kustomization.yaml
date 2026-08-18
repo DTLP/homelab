@@ -5,3 +5,4 @@ namespace: kube-system
 resources:
   - node-exporter.yaml
   - promtail.yaml
+  - traefik.yaml
