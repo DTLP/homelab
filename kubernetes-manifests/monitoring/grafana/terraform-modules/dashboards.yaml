@@ -9,7 +9,7 @@ spec:
   path: terraform/grafana
   schedule: "*/15 * * * *"
   planOnPR: false
-  delegateServiceAccountSecretRef: terraform-applier-delegate-token
+  delegateServiceAccount: terraform-applier-delegate
   env:
     - name: TF_TOKEN_app_terraform_io
       valueFrom:
