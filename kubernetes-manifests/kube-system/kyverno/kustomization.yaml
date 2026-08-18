@@ -4,9 +4,10 @@ namespace: kube-system
 
 resources:
   - upstream/install.yaml
-  - patches/kyverno-admission-controller-pdb.yaml
-  - patches/kyverno-background-controller-clusterrole.yaml
+  - exceptions/
   - policies/
+  - kyverno-admission-controller-pdb.yaml
+  - kyverno-background-controller-clusterrole.yaml
 
 patches:
   - path: patches/remove-namespace.yaml

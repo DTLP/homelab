@@ -1,0 +1,17 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: node-exporter
+  namespace: kube-system
+spec:
+  policyRefs:
+    - name: restrict-scheduling-to-master-nodes
+      kind: ValidatingPolicy
+  matchConditions:
+    - name: node-exporter
+      expression: >-
+        object.metadata.namespace == 'monitoring' &&
+        (
+          object.metadata.name == 'node-exporter' ||
+          object.metadata.name.startsWith('node-exporter-')
+        )

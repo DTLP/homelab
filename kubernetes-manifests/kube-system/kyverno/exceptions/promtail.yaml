@@ -1,0 +1,19 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: promtail
+  namespace: kube-system
+spec:
+  policyRefs:
+    - name: restrict-scheduling-to-master-nodes
+      kind: ValidatingPolicy
+    - name: hostpath-vols
+      kind: ValidatingPolicy
+  matchConditions:
+    - name: promtail
+      expression: >-
+        object.metadata.namespace == 'monitoring' &&
+        (
+          object.metadata.name == 'promtail' ||
+          object.metadata.name.startsWith('promtail-')
+        )
