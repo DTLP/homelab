@@ -14,8 +14,6 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: promtail
-      annotations:
-        checksum/config: 0f49fcd7a8fab642f9644e0a4d67b9f2bf9ce3e2cbf1f2ebfa7a301dbd59a7e0
     spec:
       serviceAccountName: promtail
       enableServiceLinks: true
@@ -28,6 +26,7 @@ spec:
           imagePullPolicy: IfNotPresent
           args:
             - "-config.file=/etc/promtail/promtail.yaml"
+            - "-config.expand-env=true"
           volumeMounts:
             - name: config
               mountPath: /etc/promtail
@@ -38,6 +37,9 @@ spec:
               readOnly: true
             - mountPath: /var/log/pods
               name: pods
+              readOnly: true
+            - mountPath: /var/log
+              name: host-logs
               readOnly: true
           env:
             - name: HOSTNAME
@@ -83,3 +85,6 @@ spec:
         - hostPath:
             path: /var/log/pods
           name: pods
+        - hostPath:
+            path: /var/log
+          name: host-logs

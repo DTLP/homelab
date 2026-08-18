@@ -45,13 +45,6 @@ scrape_configs:
         - __meta_kubernetes_namespace
         target_label: namespace
       - action: replace
-        replacement: $1
-        separator: /
-        source_labels:
-        - namespace
-        - app
-        target_label: job
-      - action: replace
         source_labels:
         - __meta_kubernetes_pod_name
         target_label: pod
@@ -75,6 +68,15 @@ scrape_configs:
         - __meta_kubernetes_pod_annotation_kubernetes_io_config_hash
         - __meta_kubernetes_pod_container_name
         target_label: __path__
+
+  # Talos host/systemd service logs
+  - job_name: host-logs
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          hostname: ${HOSTNAME}
+          __path__: /var/log/*.log
 
 limits_config:
 

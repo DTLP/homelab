@@ -10,5 +10,3 @@ configMapGenerator:
   - name: promtail
     files:
       - resources/promtail.yaml
-    options:
-      disableNameSuffixHash: true
