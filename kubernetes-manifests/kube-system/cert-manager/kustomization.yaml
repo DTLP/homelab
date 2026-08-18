@@ -5,6 +5,9 @@ resources:
   - cluster-issuer.yaml
   - upstream/cert-manager.yaml
 
+patches:
+  - path: remove-namespace.yaml
+
 secretGenerator:
   - name: cloudflare
     envs:

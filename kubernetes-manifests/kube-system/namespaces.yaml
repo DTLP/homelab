@@ -46,9 +46,4 @@ metadata:
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: talos
----
-apiVersion: v1
-kind: Namespace
-metadata:
   name: terraform-applier
