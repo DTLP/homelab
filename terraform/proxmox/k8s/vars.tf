@@ -22,7 +22,6 @@ variable "cluster" {
       subnet  = string
     })
     kube_api_endpoint = string
-    talos_version     = string
     nodes = map(object({
       host   = string
       cores  = number
