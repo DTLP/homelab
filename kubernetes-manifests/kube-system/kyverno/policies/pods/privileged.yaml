@@ -1,0 +1,35 @@
+# https://kyverno.io/policies/pod-security/baseline/disallow-privileged-containers/disallow-privileged-containers/
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: disallow-privileged-containers
+  annotations:
+    policies.kyverno.io/title: Disallow Privileged Containers
+    policies.kyverno.io/category: Pod Security Standards (Baseline)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Privileged mode disables most security mechanisms and must not be allowed. This policy
+      ensures Pods do not call for privileged mode.
+spec:
+  validationActions: [Deny]
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  variables:
+    - name: allContainers
+      expression: >-
+        object.spec.?containers.orValue([]) + 
+        object.spec.?initContainers.orValue([]) + 
+        object.spec.?ephemeralContainers.orValue([])
+  validations:
+    - expression: >-
+        variables.allContainers.all(c, 
+          c.?securityContext.?privileged.orValue(false) == false
+        )
+      messageExpression: >-
+        'Privileged mode is disallowed. The following containers have privileged set to true: ' + 
+        variables.allContainers.filter(c, c.?securityContext.?privileged.orValue(false) == true).map(c, c.name).join(', ')

@@ -23,7 +23,7 @@ spec:
               protocol: TCP
           args:
             - --web.listen-address=:9100
-            - --web.telemetry-path=/metrics
+            - --web.disable-exporter-metrics
       tolerations:
         - key: "node-role.kubernetes.io/control-plane"
           operator: "Exists"
