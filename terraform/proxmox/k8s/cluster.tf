@@ -8,11 +8,13 @@ data "talos_client_configuration" "this" {
 }
 
 data "talos_machine_configuration" "this" {
-  for_each         = var.cluster.nodes
-  cluster_name     = var.cluster.name
-  cluster_endpoint = "https://${data.talos_client_configuration.this.endpoints[0]}:6443"
-  machine_type     = each.value.type
-  machine_secrets  = talos_machine_secrets.this.machine_secrets
+  for_each           = var.cluster.nodes
+  cluster_name       = var.cluster.name
+  cluster_endpoint   = "https://${data.talos_client_configuration.this.endpoints[0]}:6443"
+  machine_type       = each.value.type
+  machine_secrets    = talos_machine_secrets.this.machine_secrets
+  talos_version      = local.talos_version
+  kubernetes_version = local.kubernetes_version
 }
 
 resource "talos_machine_configuration_apply" "this" {
@@ -24,7 +26,7 @@ resource "talos_machine_configuration_apply" "this" {
 
   config_patches = concat([
     file("./resources/cni-none-patch.yaml")
-  ], each.value.type == "controlplane" ? [
+    ], each.value.type == "controlplane" ? [
     templatefile("./resources/controlplane-node-patch.yaml.tmpl", {
       kube_api_endpoint = var.cluster.kube_api_endpoint
     })

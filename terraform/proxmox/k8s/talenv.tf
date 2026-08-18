@@ -5,6 +5,8 @@ data "local_file" "talenv" {
 }
 
 locals {
-  talos_version = trimprefix(trimspace(yamldecode(data.local_file.talenv.content).TALOS_VERSION), "v")
+  talos_env          = yamldecode(data.local_file.talenv.content)
+  talos_version      = trimprefix(trimspace(local.talos_env.TALOS_VERSION), "v")
+  kubernetes_version = trimprefix(trimspace(local.talos_env.KUBERNETES_VERSION), "v")
 }
 
