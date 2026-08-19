@@ -2,6 +2,7 @@ clusterName: homelab
 endpoint: https://192.168.0.39:6443
 
 talosVersion: ${TALOS_VERSION}
+kubernetesVersion: ${KUBERNETES_VERSION}
 
 domain: cluster.local
 
