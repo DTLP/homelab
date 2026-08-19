@@ -1,7 +1,44 @@
 TALENV := talenv.yaml
 NODES := 192.168.0.30 192.168.0.31 192.168.0.32 192.168.0.40 192.168.0.41 192.168.0.42 192.168.0.43
+HOSTS := master-0 master-1 master-2 worker-0 worker-1 worker-2 worker-3
 
-.PHONY: upgrade-k8s upgrade-talos
+.PHONY: help genconfig apply-config sync upgrade-k8s upgrade-talos
+
+help:
+	@echo "Talos cluster management targets"
+	@echo ""
+	@echo "  genconfig                  Regenerate machine configs (talhelper genconfig)"
+	@echo "  apply-config [NODE=...]    Apply config to nodes. NODE accepts an IP or hostname;"
+	@echo "                             omit NODE to apply to all nodes."
+	@echo "  sync                       genconfig + apply-config"
+	@echo "  upgrade-k8s                Upgrade Kubernetes control plane to KUBERNETES_VERSION"
+	@echo "  upgrade-talos              Upgrade nodes to TALOS_VERSION, skipping nodes already on it"
+	@echo ""
+	@echo "apply-config options:"
+	@echo "  make apply-config                     apply to all nodes"
+	@echo "  make apply-config NODE=master-0       apply to one node by hostname"
+	@echo "  make apply-config NODE=192.168.0.30   apply to one node by IP"
+
+genconfig:
+	@talhelper genconfig
+
+apply-config:
+	@[ -z "$(NODE)" ] || echo "==> applying to node $(NODE) only"; \
+	for pair in $(join $(addsuffix =,$(NODES)),$(HOSTS)); do \
+		node=$${pair%%=*}; host=$${pair#*=}; \
+		if [ -n "$(NODE)" ] && [ "$$node" != "$(NODE)" ] && [ "$$host" != "$(NODE)" ]; then \
+			continue; \
+		fi; \
+		file=clusterconfig/homelab-$$host.yaml; \
+		if [ -f "$$file" ]; then \
+			echo "==> applying config to $$node ($$host)"; \
+			talosctl apply-config -n $$node -f $$file; \
+		else \
+			echo "==> skipping $$node: no config file $$file"; \
+		fi; \
+	done
+
+sync: genconfig apply-config
 
 upgrade-k8s:
 	@KUBERNETES_VERSION=$$(grep '^KUBERNETES_VERSION' $(TALENV) | cut -d ':' -f2 | tr -d ' ') && \
