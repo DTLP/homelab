@@ -19,40 +19,108 @@ nodes:
     ipAddress: 192.168.0.30
     controlPlane: true
     installDisk: /dev/sda
+    networkInterfaces:
+      - deviceSelector:
+          hardwareAddr: "bc:24:11:eb:91:f1"
+        dhcp: false
+        addresses:
+          - "192.168.0.30/24"
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 192.168.0.1
+        vip:
+          ip: 192.168.0.39
 
   - hostname: master-1
     ipAddress: 192.168.0.31
     controlPlane: true
     installDisk: /dev/sda
+    networkInterfaces:
+      - deviceSelector:
+          hardwareAddr: "bc:24:11:91:c6:d8"
+        dhcp: false
+        addresses:
+          - "192.168.0.31/24"
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 192.168.0.1
+        vip:
+          ip: 192.168.0.39
 
   - hostname: master-2
     ipAddress: 192.168.0.32
     controlPlane: true
     installDisk: /dev/sda
+    networkInterfaces:
+      - deviceSelector:
+          hardwareAddr: "bc:24:11:f0:46:0b"
+        dhcp: false
+        addresses:
+          - "192.168.0.32/24"
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 192.168.0.1
+        vip:
+          ip: 192.168.0.39
 
   - hostname: worker-0
     ipAddress: 192.168.0.40
     controlPlane: false
     installDisk: /dev/sda
+    networkInterfaces:
+      - deviceSelector:
+          hardwareAddr: "bc:24:11:f2:05:a4"
+        dhcp: false
+        addresses:
+          - "192.168.0.40/24"
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 192.168.0.1
 
   - hostname: worker-1
     ipAddress: 192.168.0.41
     controlPlane: false
     installDisk: /dev/sda
+    networkInterfaces:
+      - deviceSelector:
+          hardwareAddr: "bc:24:11:b9:96:78"
+        dhcp: false
+        addresses:
+          - "192.168.0.41/24"
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 192.168.0.1
 
   - hostname: worker-2
     installDisk: /dev/sda
     ipAddress: 192.168.0.42
     controlPlane: false
+    networkInterfaces:
+      - deviceSelector:
+          hardwareAddr: "bc:24:11:3f:1b:93"
+        dhcp: false
+        addresses:
+          - "192.168.0.42/24"
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 192.168.0.1
 
   - hostname: worker-3
     ipAddress: 192.168.0.43
     controlPlane: false
     installDisk: /dev/sda
+    networkInterfaces:
+      - deviceSelector:
+          hardwareAddr: "bc:24:11:0f:a7:c3"
+        dhcp: false
+        addresses:
+          - "192.168.0.43/24"
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 192.168.0.1
 
 controlPlane:
   patches:
-    - patches/vip.yaml
     - patches/pod-security.yaml
     - patches/user-namespaces.yaml
   schematic:
