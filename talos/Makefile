@@ -12,6 +12,7 @@ help:
 	@echo "                             omit NODE to apply to all nodes."
 	@echo "  sync                       genconfig + apply-config"
 	@echo "  upgrade-k8s                Upgrade Kubernetes control plane to KUBERNETES_VERSION"
+	@echo "                             (DRY_RUN=1 to dry run first)"
 	@echo "  upgrade-talos              Upgrade nodes to TALOS_VERSION, skipping nodes already on it"
 	@echo ""
 	@echo "apply-config options:"
@@ -42,7 +43,8 @@ sync: genconfig apply-config
 
 upgrade-k8s:
 	@KUBERNETES_VERSION=$$(grep '^KUBERNETES_VERSION' $(TALENV) | cut -d ':' -f2 | tr -d ' ') && \
-	talosctl upgrade-k8s --to $$KUBERNETES_VERSION -n 192.168.0.30
+	DRY=$$([ -n "$(DRY_RUN)" ] && echo --dry-run || true) && \
+	talosctl upgrade-k8s --to $$KUBERNETES_VERSION -n 192.168.0.30 $$DRY
 
 upgrade-talos:
 	@TALOS_VERSION=$$(grep '^TALOS_VERSION' $(TALENV) | cut -d ':' -f2 | tr -d ' ') && \
