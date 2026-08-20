@@ -52,7 +52,7 @@ resource "hcloud_server" "mail" {
   image       = "ubuntu-24.04"
 
   ssh_keys  = [hcloud_ssh_key.mail.id]
-  user_data = file(local_sensitive_file.cloud_init.filename)
+  user_data = local_sensitive_file.cloud_init.content
 
   public_net {
     ipv4_enabled = true
