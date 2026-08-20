@@ -15,6 +15,24 @@
   "customManagers": [
     {
       "customType": "regex",
+      "managerFilePatterns": ["/^talos\\/talenv\\.yaml$/"],
+      "matchStrings": ["TALOS_VERSION:\\s*v?(?<currentValue>\\d+\\.\\d+\\.\\d+)"],
+      "datasourceTemplate": "github-tags",
+      "depNameTemplate": "siderolabs/talos",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^talos\\/talenv\\.yaml$/"],
+      "matchStrings": [
+        "KUBERNETES_VERSION:\\s*v?(?<currentValue>\\d+\\.\\d+\\.\\d+)"
+      ],
+      "datasourceTemplate": "github-tags",
+      "depNameTemplate": "kubernetes/kubernetes",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
       "managerFilePatterns": [
         "/^kubernetes-manifests\\/kube-system\\/cert-manager\\/Makefile$/"
       ],
