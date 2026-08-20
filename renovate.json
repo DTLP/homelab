@@ -12,6 +12,20 @@
   "kubernetes": {
     "managerFilePatterns": ["/^kubernetes-manifests/.+\\.yaml$/"]
   },
+  "packageRules": [
+    {
+      "matchPackageNames": ["reg.kyverno.io/kyverno/**"],
+      "groupName": "kyverno"
+    },
+    {
+      "matchPackageNames": ["quay.io/jetstack/cert-manager-*"],
+      "groupName": "cert-manager"
+    },
+    {
+      "matchPackageNames": ["docker.io/calico/**"],
+      "groupName": "calico"
+    }
+  ],
   "customManagers": [
     {
       "customType": "regex",
