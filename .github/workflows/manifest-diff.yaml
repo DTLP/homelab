@@ -22,7 +22,8 @@ jobs:
 
       - name: Install kustomize
         run: |
-          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash 5.8.1
+          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" -o install_kustomize.sh
+          bash install_kustomize.sh 5.8.1
           sudo mv kustomize /usr/local/bin/
 
       - name: Get changed files
