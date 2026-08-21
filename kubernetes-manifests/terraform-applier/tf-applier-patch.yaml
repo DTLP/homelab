@@ -16,6 +16,8 @@ spec:
       containers:
         - name: tf-applier
           imagePullPolicy: Always
+          args:
+            - --disable-pr-planner
           ports:
             - name: http
               containerPort: 8080
