@@ -24,4 +24,4 @@ spec:
           name: grafana
           key: api-token
     - name: grafana_url
-      value: http://grafana.monitoring.svc.cluster.local
+      value: http://grafana.monitoring.svc.cluster.local:3000
