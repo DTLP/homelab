@@ -1,0 +1,68 @@
+# Grafana admin credentials are read from the grafana secret, so every
+        # fresh pod provisions the "terraform-applier" service account + API
+        # token via the Grafana API and publishes it as the
+        # "terraform-applier-grafana-token" secret for the terraform-applier
+        # dashboards Module to consume.
+        - name: terraform-applier-token
+          image: registry.uw.systems/system-public/alpine-bash-curl-jq:3.24
+          command: ["bash", "/scripts/provision.sh"]
+          env:
+            - name: GF_SECURITY_ADMIN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: grafana
+                  key: admin-user
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: grafana
+                  key: admin-password
+          resources:
+            requests:
+              cpu: 0m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - name: tf-applier-token-script
+              mountPath: /scripts
+              readOnly: true
+            - name: grafana-sidecar-sa-token
+              mountPath: /var/run/secrets/grafana-sidecar-sa
+              readOnly: true
+            - name: tf-applier-token-tmp
+              mountPath: /tmp
+        # Volumes appended to the StatefulSet's spec.template.spec.volumes.
+        - name: tf-applier-token-script
+          configMap:
+            name: grafana-tf-applier-token-provision
+            defaultMode: 0555
+        - name: tf-applier-token-tmp
+          emptyDir: {}
+        - name: grafana-sidecar-sa-token
+          projected:
+            sources:
+              - serviceAccountToken:
+                  path: token
+              - configMap:
+                  name: kube-root-ca.crt
+                  items:
+                    - key: ca.crt
+                      path: ca.crt
+              - downwardAPI:
+                  items:
+                    - path: namespace
+                      fieldRef:
+                        fieldPath: metadata.namespace
