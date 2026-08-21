@@ -8,6 +8,7 @@ spec:
   repoURL: https://github.com/DTLP/homelab
   path: terraform/grafana
   schedule: "*/15 * * * *"
+  autoApply: true
   planOnPR: false
   delegateServiceAccount: terraform-applier-delegate
   env:
