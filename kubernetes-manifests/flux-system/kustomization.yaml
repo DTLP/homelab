@@ -2,10 +2,10 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - argocd-app.yaml
-  - https://github.com/fluxcd/flux2/manifests/bases/source-controller?ref=v2.7.5
-  - https://github.com/fluxcd/flux2/manifests/bases/kustomize-controller?ref=v2.7.5
-  - https://github.com/fluxcd/flux2/manifests/rbac?ref=v2.7.5
-  - https://github.com/fluxcd/flux2/manifests/policies?ref=v2.7.5
+  - https://github.com/fluxcd/flux2/manifests/bases/source-controller?ref=v2.9.4
+  - https://github.com/fluxcd/flux2/manifests/bases/kustomize-controller?ref=v2.9.4
+  - https://github.com/fluxcd/flux2/manifests/rbac?ref=v2.9.4
+  - https://github.com/fluxcd/flux2/manifests/policies?ref=v2.9.4
 
   - git-repos.yaml
   - network-policies.yaml
