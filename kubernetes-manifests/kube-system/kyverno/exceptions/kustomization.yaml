@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: kube-system
 
 resources:
+  - metallb.yaml
   - node-exporter.yaml
   - promtail.yaml
   - traefik.yaml

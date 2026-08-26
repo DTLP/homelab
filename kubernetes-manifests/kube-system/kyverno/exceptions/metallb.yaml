@@ -1,0 +1,23 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: metallb-speaker
+  namespace: kube-system
+spec:
+  policyRefs:
+    - name: restrict-scheduling-to-master-nodes
+      kind: ValidatingPolicy
+    - name: pod-capabilities
+      kind: ValidatingPolicy
+    - name: disallow-host-network-pods
+      kind: ValidatingPolicy
+    - name: disallow-host-ports
+      kind: ValidatingPolicy
+  matchConditions:
+    - name: metallb-speaker
+      expression: >-
+        object.metadata.namespace == 'metallb-system' &&
+        (
+          object.metadata.name == 'speaker' ||
+          object.metadata.name.startsWith('speaker-')
+        )
