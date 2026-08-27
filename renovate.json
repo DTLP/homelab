@@ -58,7 +58,8 @@
       ],
       "datasourceTemplate": "docker",
       "depNameTemplate": "quay.io/jetstack/cert-manager-controller",
-      "versioningTemplate": "semver"
+      "versioningTemplate": "semver",
+      "commitMessageTopic": "cert-manager"
     },
     {
       "customType": "regex",
