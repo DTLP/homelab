@@ -30,7 +30,7 @@ resource "proxmox_virtual_environment_vm" "this" {
 
   disk {
     datastore_id = "nvme"
-    file_id      = one([for image in proxmox_virtual_environment_download_file.this : image if image.node_name == each.value.host]).id
+    file_id      = one([for image in proxmox_download_file.this : image if image.node_name == each.value.host]).id
     file_format  = "raw"
     interface    = "virtio0"
     size         = 50

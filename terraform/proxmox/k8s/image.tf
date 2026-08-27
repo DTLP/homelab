@@ -1,4 +1,9 @@
-resource "proxmox_virtual_environment_download_file" "this" {
+moved {
+  from = proxmox_virtual_environment_download_file.this
+  to   = proxmox_download_file.this
+}
+
+resource "proxmox_download_file" "this" {
   count                   = length(var.pve.nodes)
   content_type            = "iso"
   datastore_id            = "nvme"
