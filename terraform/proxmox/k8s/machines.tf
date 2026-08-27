@@ -4,6 +4,8 @@ resource "proxmox_virtual_environment_vm" "this" {
   description = "Managed by Terraform"
   tags        = ["terraform"]
   node_name   = each.value.host
+  migrate     = true
+  timeout_migrate = 7200
   on_boot     = true
 
   cpu {
@@ -18,11 +20,12 @@ resource "proxmox_virtual_environment_vm" "this" {
   }
 
   agent {
-    enabled = true
+    enabled = false
   }
 
   network_device {
-    bridge = "vmbr0"
+    bridge      = "vmbr0"
+    mac_address = each.key == "worker-0" ? "BC:24:11:F2:05:A4" : null
   }
 
   disk {

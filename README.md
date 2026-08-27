@@ -109,12 +109,12 @@ The Proxmox cluster hosts the following virtual machines:
 
 | VM(s)         | Count | OS     | Role                               |
 | ------------- | ----- | ------ | ---------------------------------- |
-| Control plane | 3     | Talos  | Kubernetes masters                 |
+| Control plane | 1     | Talos  | Kubernetes master (master-0)       |
 | Worker nodes  | 4     | Talos  | Kubernetes workers                 |
 | NFS server    | 1     | Ubuntu | Persistent storage for the cluster |
 
 - Talos version and Kubernetes version are pinned in [`talos/talenv.yaml`](talos/talenv.yaml) and templated via [Talhelper](https://github.com/budimanjojo/talhelper).
-- A VIP backed by kube-vip provides a stable API endpoint for the control plane.
+- A single control plane node (`master-0`) serves as the API endpoint.
 - The NFS VM serves cluster PVCs through `nfs-client`, the default `StorageClass`.
 
 ## How it's managed

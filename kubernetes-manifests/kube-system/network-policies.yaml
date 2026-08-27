@@ -59,9 +59,3 @@ spec:
     - from:
         - ipBlock:
             cidr: 192.168.0.30/32
-        - ipBlock:
-            cidr: 192.168.0.31/32
-        - ipBlock:
-            cidr: 192.168.0.32/32
-        - ipBlock:
-            cidr: 192.168.0.39/32

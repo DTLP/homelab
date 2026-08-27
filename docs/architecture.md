@@ -23,8 +23,6 @@ flowchart TB
 
     subgraph CP["Control plane (Talos)"]
         M0["master-0<br/>192.168.0.30"]
-        M1["master-1<br/>192.168.0.31"]
-        M2["master-2<br/>192.168.0.32"]
     end
 
     subgraph WK["Workers (Talos)"]
@@ -37,17 +35,11 @@ flowchart TB
     NFS["nfs-0 (Ubuntu)<br/>192.168.0.60<br/>/data"]
 
     P1 --> M0
-    P2 --> M1
-    P3 --> M2
-    P4 --> W0
-    P4 --> W1
-    P5 --> W2
+    P2 --> W0
+    P3 --> W1
+    P4 --> W2
     P5 --> W3
     P5 --> NFS
-
-    M0 --- VIP["kube-apiserver VIP<br/>192.168.0.39"]
-    M1 --- VIP
-    M2 --- VIP
 ```
 
 ## Ingress and TLS

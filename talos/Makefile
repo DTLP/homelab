@@ -1,6 +1,6 @@
 TALENV := talenv.yaml
-NODES := 192.168.0.30 192.168.0.31 192.168.0.32 192.168.0.40 192.168.0.41 192.168.0.42 192.168.0.43
-HOSTS := master-0 master-1 master-2 worker-0 worker-1 worker-2 worker-3
+NODES := 192.168.0.30 192.168.0.40 192.168.0.41 192.168.0.42 192.168.0.43
+HOSTS := master-0 worker-0 worker-1 worker-2 worker-3
 
 .PHONY: help genconfig apply-config sync upgrade-k8s upgrade-talos
 
