@@ -7,3 +7,6 @@ resources:
   - metallb-l2advertisement.yaml
 
   - github.com/metallb/metallb/config/native?ref=v0.16.1
+
+patches:
+  - path: remove-namespace.yaml
