@@ -25,19 +25,8 @@ resource "talos_machine_bootstrap" "this" {
   node                 = data.talos_client_configuration.this.endpoints[0]
 }
 
-data "talos_cluster_health" "this" {
-  depends_on           = [talos_machine_configuration_apply.this, talos_machine_bootstrap.this]
-  client_configuration = data.talos_client_configuration.this.client_configuration
-  control_plane_nodes  = [for node in var.cluster.nodes : node.ipv4.address if node.type == "controlplane"]
-  worker_nodes         = [for node in var.cluster.nodes : node.ipv4.address if node.type == "worker"]
-  endpoints            = data.talos_client_configuration.this.endpoints
-  timeouts = {
-    read = "10m"
-  }
-}
-
 resource "talos_cluster_kubeconfig" "this" {
-  depends_on           = [talos_machine_bootstrap.this, data.talos_cluster_health.this]
+  depends_on           = [talos_machine_bootstrap.this]
   client_configuration = talos_machine_secrets.this.client_configuration
   node                 = data.talos_client_configuration.this.endpoints[0]
   endpoint             = data.talos_client_configuration.this.endpoints[0]
