@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argocd-repo-server
+spec:
+  template:
+    spec:
+      automountServiceAccountToken: true
+      volumes:
+        - configMap:
+            name: argocd-voodoobox-plugin
+          name: cmp-plugin
+      containers:
+        - name: asp
+          image: quay.io/utilitywarehouse/argocd-voodoobox-plugin:v0.5.1
+          imagePullPolicy: IfNotPresent
+          command: [/var/run/argocd/argocd-cmp-server]
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            runAsNonRoot: true
+            runAsUser: 999
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - mountPath: /var/run/argocd
+              name: var-files
+            - mountPath: /home/argocd/cmp-server/plugins
+              name: plugins
+            - mountPath: /tmp
+              name: tmp
+            - mountPath: /home/argocd/cmp-server/config/plugin.yaml
+              subPath: asp.yaml
+              name: cmp-plugin

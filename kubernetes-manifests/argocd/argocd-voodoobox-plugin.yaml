@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-voodoobox-plugin
+data:
+  asp.yaml: |
+    apiVersion: argoproj.io/v1alpha1
+    kind: ConfigManagementPlugin
+    metadata:
+      name: argocd-voodoobox-plugin
+    spec:
+      allowConcurrency: true
+      discover:
+        fileName: "*"
+      generate:
+        command:
+          - argocd-voodoobox-plugin
+          - generate
+        args:
+          - "--app-strongbox-secret-name=argocd-voodoobox-strongbox-keyring"
+      lockRepo: false

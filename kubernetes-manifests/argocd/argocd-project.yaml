@@ -11,6 +11,10 @@ spec:
   sourceRepos:
     - git@github.com:DTLP/homelab.git
 
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+
   sourceNamespaces:
     - argocd
     - certs
