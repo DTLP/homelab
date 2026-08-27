@@ -10,7 +10,8 @@
   ],
   "ignorePaths": [
     "archive/**",
-    "kubernetes-manifests/kube-system/cert-manager/upstream/**"
+    "kubernetes-manifests/kube-system/cert-manager/upstream/**",
+    "kubernetes-manifests/kube-system/cni/upstream/**"
   ],
   "kubernetes": {
     "managerFilePatterns": ["/^kubernetes-manifests/.+\\.yaml$/"]
@@ -60,6 +61,19 @@
       "depNameTemplate": "quay.io/jetstack/cert-manager-controller",
       "versioningTemplate": "semver",
       "commitMessageTopic": "cert-manager"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^kubernetes-manifests\\/kube-system\\/cni\\/Makefile$/"
+      ],
+      "matchStrings": [
+        "CALICO_VERSION\\s*:=\\s*v?(?<currentValue>\\d+\\.\\d+\\.\\d+)"
+      ],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "docker.io/calico/node",
+      "versioningTemplate": "semver",
+      "commitMessageTopic": "calico"
     },
     {
       "customType": "regex",
