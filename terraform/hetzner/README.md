@@ -30,3 +30,4 @@ Test email here https://internet.nl and here https://www.mail-tester.com
 - There are make targets available to save/restore backups and create/delete
 aliases quickly.
 - Certificates are managed by Let's Encrypt.
+- The server is monitored by [UptimeRobot](https://uptimerobot.com).
