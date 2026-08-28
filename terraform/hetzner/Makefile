@@ -16,14 +16,18 @@ PANGOLIN_TAR          := /tmp/pangolin_config.tar.gz
 .PHONY: mail-backup mail-restore mail-alias-create mail-alias-list mail-alias-delete pangolin-backup pangolin-restore
 
 mail-backup:
-	ssh -i ${SSH_KEY} ${SSH_USER}@$(MAIL_HOST) sudo tar -cvz ${CONFIG_REMOTE} > ${CONFIG_TAR}
-	ssh -i ${SSH_KEY} ${SSH_USER}@$(MAIL_HOST) sudo tar -cvz ${DATA_REMOTE} > ${DATA_TAR}
-	ssh -i ${SSH_KEY} ${SSH_USER}@$(MAIL_HOST) sudo tar -cvz ${STATE_REMOTE} > ${STATE_TAR}
+	ssh -i ${SSH_KEY} ${SSH_USER}@${MAIL_HOST} sudo systemctl stop mail
+	ssh -i ${SSH_KEY} ${SSH_USER}@${MAIL_HOST} sudo tar -cvz ${CONFIG_REMOTE} > ${CONFIG_TAR}
+	ssh -i ${SSH_KEY} ${SSH_USER}@${MAIL_HOST} sudo tar -cvz ${DATA_REMOTE} > ${DATA_TAR}
+	ssh -i ${SSH_KEY} ${SSH_USER}@${MAIL_HOST} sudo tar -cvz ${STATE_REMOTE} > ${STATE_TAR}
+	ssh -i ${SSH_KEY} ${SSH_USER}@${MAIL_HOST} sudo systemctl start mail
 
 mail-restore:
+	ssh -i ${SSH_KEY} ${SSH_USER}@${MAIL_HOST} sudo systemctl stop mail
 	cat $(CONFIG_TAR) | ssh -i ${SSH_KEY} ${SSH_USER}@${MAIL_HOST} sudo tar -xzf - -C /
 	cat $(DATA_TAR)   | ssh -i ${SSH_KEY} ${SSH_USER}@${MAIL_HOST} sudo tar -xzf - -C /
 	cat $(STATE_TAR)  | ssh -i ${SSH_KEY} ${SSH_USER}@${MAIL_HOST} sudo tar -xzf - -C /
+	ssh -i ${SSH_KEY} ${SSH_USER}@${MAIL_HOST} sudo systemctl start mail
 
 mail-alias-create:
 	@if [ "$(words $(MAKECMDGOALS))" -ne 3 ]; then \
