@@ -59,8 +59,7 @@
       ],
       "datasourceTemplate": "docker",
       "depNameTemplate": "quay.io/jetstack/cert-manager-controller",
-      "versioningTemplate": "semver",
-      "commitMessageTopic": "cert-manager"
+      "versioningTemplate": "semver"
     },
     {
       "customType": "regex",
@@ -72,8 +71,7 @@
       ],
       "datasourceTemplate": "docker",
       "depNameTemplate": "docker.io/calico/node",
-      "versioningTemplate": "semver",
-      "commitMessageTopic": "calico"
+      "versioningTemplate": "semver"
     },
     {
       "customType": "regex",
