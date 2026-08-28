@@ -16,6 +16,11 @@ metadata:
 apiVersion: v1
 kind: Namespace
 metadata:
+  name: git
+---
+apiVersion: v1
+kind: Namespace
+metadata:
   name: ingress-controller
 ---
 apiVersion: v1

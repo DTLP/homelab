@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: forgejo
+  labels:
+    app: forgejo
+spec:
+  serviceName: forgejo
+  replicas: 1
+  selector:
+    matchLabels:
+      app: forgejo
+  template:
+    metadata:
+      labels:
+        app: forgejo
+    spec:
+      containers:
+        - name: forgejo
+          image: codeberg.org/forgejo/forgejo:16.0.3-rootless
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: FORGEJO__server__DOMAIN
+              value: git.dtlp.cc
+            - name: FORGEJO__server__ROOT_URL
+              value: https://git.dtlp.cc/
+            - name: FORGEJO__server__SSH_DOMAIN
+              value: git.dtlp.cc
+            - name: FORGEJO__server__HTTP_PORT
+              value: "3000"
+            - name: FORGEJO__server__SSH_PORT
+              value: "22"
+            - name: FORGEJO__server__SSH_LISTEN_PORT
+              value: "2222"
+            - name: FORGEJO__server__DISABLE_SSH
+              value: "false"
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+            - name: ssh
+              containerPort: 2222
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/gitea
+          readinessProbe:
+            httpGet:
+              path: /api/healthz
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/healthz
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
+        storageClassName: nfs-client

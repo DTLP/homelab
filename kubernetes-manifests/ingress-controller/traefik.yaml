@@ -47,6 +47,8 @@ spec:
           containerPort: 80
         - name: web-secure
           containerPort: 443
+        - name: ssh
+          containerPort: 22
         - name: dashboard
           containerPort: 8080
         - name: metrics
@@ -61,6 +63,7 @@ spec:
           - "--entryPoints.web.http.redirections.entryPoint.priority=1000"
           - "--entryPoints.web-secure.address=:443"
           - "--entryPoints.web-secure.http.tls=true"
+          - "--entryPoints.ssh.address=:22"
           - "--metrics.prometheus=true"
           - "--metrics.prometheus.entryPoint=metrics"
           - "--entryPoints.metrics.address=:9100"

@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: git
+spec:
+  project: main
+  source:
+    repoURL: git@github.com:DTLP/homelab.git
+    targetRevision: main
+    path: kubernetes-manifests/git
+  destination:
+    name: in-cluster
+    namespace: git
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ApplyOutOfSyncOnly=true
+      - ServerSideApply=true

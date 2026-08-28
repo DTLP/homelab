@@ -19,6 +19,7 @@ spec:
     - argocd
     - certs
     - flux-system
+    - git
     - ingress-controller
     - kafka
     - kube-system
@@ -33,6 +34,8 @@ spec:
     - namespace: certs
       name: in-cluster
     - namespace: flux-system
+      name: in-cluster
+    - namespace: git
       name: in-cluster
     - namespace: ingress-controller
       name: in-cluster
