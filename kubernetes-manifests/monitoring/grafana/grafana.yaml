@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: grafana
   labels:
@@ -151,12 +151,6 @@ spec:
                     - path: namespace
                       fieldRef:
                         fieldPath: metadata.namespace
-  volumeClaimTemplates:
-    - metadata:
-        name: storage
-      spec:
-        accessModes: [ "ReadWriteOnce" ]
-        resources:
-          requests:
-            storage: 10Gi
-        storageClassName: nfs-client
+        - name: storage
+          persistentVolumeClaim:
+            claimName: grafana-storage
