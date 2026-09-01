@@ -1,0 +1,10 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "grafana": {
+      "type": "remote",
+      "url": "https://mcp-grafana.dtlp.cc/mcp",
+      "enabled": true
+    }
+  }
+}
