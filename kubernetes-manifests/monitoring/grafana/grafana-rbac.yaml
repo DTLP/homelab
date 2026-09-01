@@ -1,7 +1,8 @@
-# Scoped to let the grafana pod's terraform-applier-token sidecar create
-# and rotate the terraform-applier-grafana-token secret. "create" can't be
-# restricted by resourceNames, so it's granted namespace-wide;
-# get/update/patch are restricted to the one secret the sidecar manages.
+# Scoped to let the grafana pod's token-provisioning sidecar create and
+# rotate the terraform-applier-grafana-token and mcp-grafana-grafana-token
+# secrets. "create" can't be restricted by resourceNames, so it's granted
+# namespace-wide; get/update/patch are restricted to the secrets the
+# sidecar manages.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -12,7 +13,7 @@ rules:
     verbs: ["create"]
   - apiGroups: [""]
     resources: ["secrets"]
-    resourceNames: ["terraform-applier-grafana-token"]
+    resourceNames: ["terraform-applier-grafana-token", "mcp-grafana-grafana-token"]
     verbs: ["get", "update", "patch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1

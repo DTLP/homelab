@@ -1,20 +1,25 @@
 #!/bin/bash
 #
-# Runs alongside the grafana container as a sidecar. Ensures a
-# "terraform-applier" service account + API token exists and publishes the
-# token as the terraform-applier-grafana-token secret, which the
-# terraform-applier dashboards Module reads to manage dashboards.
+# Runs alongside the grafana container as a sidecar. Ensures a set of
+# Grafana service accounts + API tokens exist and publishes each token as
+# a kubernetes secret for the corresponding consumer to use:
+#
+#   - terraform-applier (Admin): manages dashboards via terraform-applier
+#   - mcp-grafana (Viewer): read-only access for the mcp-grafana server
 
 set -o nounset
 set -o pipefail
 
 readonly GRAFANA_URL="${GRAFANA_URL:-http://localhost:3000}"
-readonly GRAFANA_SERVICE_ACCOUNT_NAME='terraform-applier'
-readonly GRAFANA_SERVICE_ACCOUNT_ROLE='Admin'
-readonly GRAFANA_TOKEN_NAME='terraform-applier-token'
+
+# One entry per service account to provision. Fields, separated by '|':
+#   service account name | role | token name | k8s secret name
+readonly SERVICE_ACCOUNTS=(
+  'terraform-applier|Admin|terraform-applier-token|terraform-applier-grafana-token'
+  'mcp-grafana|Viewer|mcp-grafana-token|mcp-grafana-grafana-token'
+)
 
 readonly K8S_SA_DIR='/var/run/secrets/grafana-sidecar-sa'
-readonly K8S_SECRET_NAME='terraform-applier-grafana-token'
 
 readonly HEALTH_POLL_INTERVAL_SECONDS=2
 readonly HEALTH_POLL_TIMEOUT_SECONDS=300
@@ -146,9 +151,9 @@ wait_for_grafana() {
 }
 
 #######################################
-# Finds the terraform-applier service account, creating it if missing.
+# Finds a service account by name, creating it if missing.
 # Arguments:
-#   auth_header
+#   auth_header, sa_name, sa_role
 # Outputs:
 #   STDOUT: the service account id
 # Returns:
@@ -156,12 +161,14 @@ wait_for_grafana() {
 #######################################
 get_or_create_service_account() {
   local auth_header="$1"
+  local sa_name="$2"
+  local sa_role="$3"
   local body_file
   body_file="$(mktemp)"
 
   local status
   status="$(grafana_request GET \
-    "/api/serviceaccounts/search?query=${GRAFANA_SERVICE_ACCOUNT_NAME}" \
+    "/api/serviceaccounts/search?query=${sa_name}" \
     "${body_file}" "${auth_header}")"
   if [[ "${status}" != '200' ]]; then
     err "service account search failed: ${status} $(cat "${body_file}")"
@@ -170,7 +177,7 @@ get_or_create_service_account() {
   fi
 
   local account_id
-  account_id="$(jq -r --arg name "${GRAFANA_SERVICE_ACCOUNT_NAME}" \
+  account_id="$(jq -r --arg name "${sa_name}" \
     '.serviceAccounts[] | select(.name == $name) | .id' "${body_file}")"
   if [[ -n "${account_id}" ]]; then
     rm -f "${body_file}"
@@ -179,8 +186,8 @@ get_or_create_service_account() {
   fi
 
   local create_payload
-  create_payload="$(jq -n --arg name "${GRAFANA_SERVICE_ACCOUNT_NAME}" \
-    --arg role "${GRAFANA_SERVICE_ACCOUNT_ROLE}" \
+  create_payload="$(jq -n --arg name "${sa_name}" \
+    --arg role "${sa_role}" \
     '{name: $name, role: $role}')"
 
   status="$(grafana_request POST '/api/serviceaccounts' "${body_file}" \
@@ -201,7 +208,7 @@ get_or_create_service_account() {
 # one. Grafana never returns a token's value after creation, so the
 # existing set is always rotated clean rather than reused.
 # Arguments:
-#   auth_header, account_id
+#   auth_header, account_id, token_name
 # Outputs:
 #   STDOUT: the new token value
 # Returns:
@@ -210,6 +217,7 @@ get_or_create_service_account() {
 rotate_token() {
   local auth_header="$1"
   local account_id="$2"
+  local token_name="$3"
   local body_file
   body_file="$(mktemp)"
 
@@ -239,7 +247,7 @@ rotate_token() {
   done < <(jq -r '.[].id' "${body_file}")
 
   local create_payload
-  create_payload="$(jq -n --arg name "${GRAFANA_TOKEN_NAME}" '{name: $name}')"
+  create_payload="$(jq -n --arg name "${token_name}" '{name: $name}')"
 
   status="$(grafana_request POST "/api/serviceaccounts/${account_id}/tokens" \
     "${body_file}" "${auth_header}" "${create_payload}")"
@@ -254,25 +262,26 @@ rotate_token() {
 }
 
 #######################################
-# Creates or updates the terraform-applier-grafana-token secret via the
+# Creates or updates a kubernetes secret with the given token via the
 # Kubernetes API.
 # Arguments:
-#   token_value, api_server, auth_header, ca_cert, namespace
+#   token_value, secret_name, api_server, auth_header, ca_cert, namespace
 # Returns:
 #   1 on API failure
 #######################################
 publish_secret() {
   local token_value="$1"
-  local api_server="$2"
-  local auth_header="$3"
-  local ca_cert="$4"
-  local namespace="$5"
+  local secret_name="$2"
+  local api_server="$3"
+  local auth_header="$4"
+  local ca_cert="$5"
+  local namespace="$6"
 
   local encoded_token
   encoded_token="$(printf '%s' "${token_value}" | base64 | tr -d '\n')"
 
   local secret_payload
-  secret_payload="$(jq -n --arg name "${K8S_SECRET_NAME}" \
+  secret_payload="$(jq -n --arg name "${secret_name}" \
     --arg token "${encoded_token}" \
     '{apiVersion: "v1", kind: "Secret", metadata: {name: $name},
         type: "Opaque", data: {token: $token}}')"
@@ -285,7 +294,7 @@ publish_secret() {
   status="$(http_request POST "${secrets_url}" "${body_file}" \
     "${auth_header}" "${ca_cert}" "${secret_payload}")"
   if [[ "${status}" == '200' || "${status}" == '201' ]]; then
-    log "created secret ${K8S_SECRET_NAME}"
+    log "created secret ${secret_name}"
     rm -f "${body_file}"
     return 0
   fi
@@ -294,11 +303,11 @@ publish_secret() {
     local patch_payload
     patch_payload="$(jq -n --arg token "${encoded_token}" \
       '{data: {token: $token}}')"
-    status="$(http_request PATCH "${secrets_url}/${K8S_SECRET_NAME}" \
+    status="$(http_request PATCH "${secrets_url}/${secret_name}" \
       "${body_file}" "${auth_header}" "${ca_cert}" "${patch_payload}" \
       'application/merge-patch+json')"
     if [[ "${status}" == '200' ]]; then
-      log "updated secret ${K8S_SECRET_NAME}"
+      log "updated secret ${secret_name}"
       rm -f "${body_file}"
       return 0
     fi
@@ -310,8 +319,43 @@ publish_secret() {
 }
 
 #######################################
-# Runs one full provisioning pass: waits for grafana, rotates the
-# service account token, and publishes it as a k8s secret.
+# Provisions a single service account: waits for grafana, ensures the
+# account exists, rotates its token, and publishes it as a k8s secret.
+# Arguments:
+#   auth_header, api_server, ca_cert, namespace, sa_name, sa_role,
+#   token_name, secret_name
+# Returns:
+#   1 if any step failed
+#######################################
+provision_service_account() {
+  local auth_header="$1"
+  local api_server="$2"
+  local ca_cert="$3"
+  local namespace="$4"
+  local sa_name="$5"
+  local sa_role="$6"
+  local token_name="$7"
+  local secret_name="$8"
+
+  local account_id
+  account_id="$(get_or_create_service_account "${auth_header}" \
+    "${sa_name}" "${sa_role}")" || return 1
+
+  local token_value
+  token_value="$(rotate_token "${auth_header}" "${account_id}" \
+    "${token_name}")" || return 1
+
+  local k8s_token
+  k8s_token="$(cat "${K8S_SA_DIR}/token")"
+
+  publish_secret "${token_value}" "${secret_name}" "${api_server}" \
+    "Authorization: Bearer ${k8s_token}" "${ca_cert}" \
+    "${namespace}" || return 1
+}
+
+#######################################
+# Runs one full provisioning pass: waits for grafana, then provisions
+# every service account in SERVICE_ACCOUNTS.
 # Returns:
 #   1 if any step failed
 #######################################
@@ -321,21 +365,20 @@ provision_once() {
   local auth_header
   auth_header="$(grafana_auth_header)"
 
-  local account_id
-  account_id="$(get_or_create_service_account "${auth_header}")" || return 1
-
-  local token_value
-  token_value="$(rotate_token "${auth_header}" "${account_id}")" || return 1
-
-  local k8s_token k8s_namespace
-  k8s_token="$(cat "${K8S_SA_DIR}/token")"
+  local k8s_namespace api_server
   k8s_namespace="$(cat "${K8S_SA_DIR}/namespace")"
-  local api_server
   api_server="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"
 
-  publish_secret "${token_value}" "${api_server}" \
-    "Authorization: Bearer ${k8s_token}" "${K8S_SA_DIR}/ca.crt" \
-    "${k8s_namespace}" || return 1
+  local entry sa_name sa_role token_name secret_name
+  for entry in "${SERVICE_ACCOUNTS[@]}"; do
+    IFS='|' read -r sa_name sa_role token_name secret_name <<< "${entry}"
+    log "provisioning service account ${sa_name}"
+    if ! provision_service_account "${auth_header}" "${api_server}" \
+        "${K8S_SA_DIR}/ca.crt" "${k8s_namespace}" "${sa_name}" \
+        "${sa_role}" "${token_name}" "${secret_name}"; then
+      return 1
+    fi
+  done
 }
 
 #######################################

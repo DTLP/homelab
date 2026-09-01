@@ -1,0 +1,105 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mcp-grafana
+  labels:
+    app.kubernetes.io/name: mcp-grafana
+spec:
+  type: ClusterIP
+  ports:
+    - name: mcp
+      port: 8000
+      targetPort: mcp
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: mcp-grafana
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcp-grafana
+  labels:
+    app.kubernetes.io/name: mcp-grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mcp-grafana
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mcp-grafana
+    spec:
+      containers:
+        - name: mcp-grafana
+          image: "grafana/mcp-grafana:1.3.0"
+          imagePullPolicy: IfNotPresent
+          args:
+            - --transport=streamable-http
+            - --address=0.0.0.0:8000
+            - --endpoint-path=/mcp
+            - --enabled-tools=search,examples,datasource,prometheus,alerting,loki,dashboard,navigation
+            - --disable-write
+            - --max-loki-log-limit=100
+            - --log-level=info
+            - --allowed-hosts=mcp-grafana:8000,mcp-grafana,mcp-grafana.dtlp.cc,localhost,localhost:8000
+          env:
+            - name: GRAFANA_URL
+              value: http://grafana:3000
+            - name: GRAFANA_SERVICE_ACCOUNT_TOKEN_FILE
+              value: /var/run/secrets/grafana/token
+          ports:
+            - name: mcp
+              containerPort: 8000
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 999
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - name: grafana-token
+              mountPath: /var/run/secrets/grafana
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: mcp
+              scheme: HTTP
+              httpHeaders:
+                - name: Host
+                  value: mcp-grafana:8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: mcp
+              scheme: HTTP
+              httpHeaders:
+                - name: Host
+                  value: mcp-grafana:8000
+            initialDelaySeconds: 2
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+      volumes:
+        - name: grafana-token
+          secret:
+            secretName: mcp-grafana-grafana-token
