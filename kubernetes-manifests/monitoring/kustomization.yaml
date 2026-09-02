@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
   - argocd-app.yaml
   - alertmanager/
+  - etcd/
   - grafana/
   - kube-state-metrics/
   - kube-summary-exporter/

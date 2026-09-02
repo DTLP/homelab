@@ -1,0 +1,19 @@
+groups:
+  - name: etcd
+    rules:
+      - alert: EtcdDown
+        expr: up{job="etcd"} == 0
+        for: 5m
+        annotations:
+          summary: "etcd is down ({{ $labels.instance }})"
+          description: "Prometheus failed to scrape etcd for 5 minutes."
+          impact: "etcd is the cluster's control-plane data store; its loss can break the Kubernetes API and cluster operations."
+          action: "Check the control-plane node and the etcd system service (talosctl service etcd -n 192.168.0.30)."
+      - alert: EtcdNoLeader
+        expr: etcd_server_has_leader == 0
+        for: 5m
+        annotations:
+          summary: "etcd has no leader"
+          description: "The etcd cluster has no elected leader for 5 minutes."
+          impact: "Without a leader, etcd cannot serve writes; the control plane may be read-only or unavailable."
+          action: "Inspect etcd member health and connectivity between control-plane members."

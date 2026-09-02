@@ -15,6 +15,7 @@ configMapGenerator:
   - name: prometheus-rules
     files:
       - resources/kube-containers.yaml
+      - resources/kube-etcd.yaml
       - resources/kube-nodes.yaml
       - resources/kube-services.yaml
       - resources/kube-storage.yaml

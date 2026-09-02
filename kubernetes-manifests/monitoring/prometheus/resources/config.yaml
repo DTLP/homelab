@@ -93,6 +93,17 @@ scrape_configs:
   - job_name: 'kube-state-metrics'
     static_configs:
       - targets: ['kube-state-metrics:8080']
+  - job_name: 'etcd'
+    kubernetes_sd_configs:
+      - role: endpoints
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_endpoints_name]
+        regex: 'etcd'
+        action: keep
+      - source_labels: [__meta_kubernetes_namespace]
+        target_label: kubernetes_namespace
+      - source_labels: [__address__]
+        target_label: instance
   - job_name: 'kubelet'
     scheme: "https"
     tls_config:
