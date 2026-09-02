@@ -69,14 +69,102 @@ scrape_configs:
         - __meta_kubernetes_pod_container_name
         target_label: __path__
 
-  # Talos host/systemd service logs
+  # Talos host/systemd service logs. Each system service writes to its own
+  # /var/log/<service>.log file. Targets are listed explicitly (a single glob
+  # would prevent per-service labels: promtail relabels __path__ before the
+  # glob is expanded).
   - job_name: host-logs
     static_configs:
       - targets:
           - localhost
         labels:
           hostname: ${HOSTNAME}
-          __path__: /var/log/*.log
+          __path__: /var/log/apid.log
+          service_name: apid
+      - targets:
+          - localhost
+        labels:
+          hostname: ${HOSTNAME}
+          __path__: /var/log/auditd.log
+          service_name: auditd
+      - targets:
+          - localhost
+        labels:
+          hostname: ${HOSTNAME}
+          __path__: /var/log/containerd.log
+          service_name: containerd
+      - targets:
+          - localhost
+        labels:
+          hostname: ${HOSTNAME}
+          __path__: /var/log/controller-runtime.log
+          service_name: controller-runtime
+      - targets:
+          - localhost
+        labels:
+          hostname: ${HOSTNAME}
+          __path__: /var/log/cri.log
+          service_name: cri
+      - targets:
+          - localhost
+        labels:
+          hostname: ${HOSTNAME}
+          __path__: /var/log/dashboard.log
+          service_name: dashboard
+      - targets:
+          - localhost
+        labels:
+          hostname: ${HOSTNAME}
+          __path__: /var/log/dns-resolve-cache.log
+          service_name: dns-resolve-cache
+      - targets:
+          - localhost
+        labels:
+          hostname: ${HOSTNAME}
+          __path__: /var/log/early-startup.log
+          service_name: early-startup
+      - targets:
+          - localhost
+        labels:
+          hostname: ${HOSTNAME}
+          __path__: /var/log/etcd.log
+          service_name: etcd
+      - targets:
+          - localhost
+        labels:
+          hostname: ${HOSTNAME}
+          __path__: /var/log/kernel.log
+          service_name: kernel
+      - targets:
+          - localhost
+        labels:
+          hostname: ${HOSTNAME}
+          __path__: /var/log/kubelet.log
+          service_name: kubelet
+      - targets:
+          - localhost
+        labels:
+          hostname: ${HOSTNAME}
+          __path__: /var/log/machined.log
+          service_name: machined
+      - targets:
+          - localhost
+        labels:
+          hostname: ${HOSTNAME}
+          __path__: /var/log/syslogd.log
+          service_name: syslogd
+      - targets:
+          - localhost
+        labels:
+          hostname: ${HOSTNAME}
+          __path__: /var/log/trustd.log
+          service_name: trustd
+      - targets:
+          - localhost
+        labels:
+          hostname: ${HOSTNAME}
+          __path__: /var/log/udevd.log
+          service_name: udevd
 
 limits_config:
 
