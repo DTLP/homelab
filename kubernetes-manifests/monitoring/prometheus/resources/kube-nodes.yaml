@@ -1,4 +1,3 @@
-# PROMETHEUS RULES -- PRECOMMIT HOOK IDENTIFIER, DO NOT REMOVE
 groups:
   - name: kube-nodes
     rules:

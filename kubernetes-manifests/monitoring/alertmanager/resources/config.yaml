@@ -1,4 +1,3 @@
-# ALERTMANAGER CONFIG -- PRECOMMIT HOOK IDENTIFIER, DO NOT REMOVE
 global:
   resolve_timeout: 5m
 
