@@ -89,6 +89,18 @@ controlPlane:
   patches:
     - patches/pod-security.yaml
     - patches/user-namespaces.yaml
+    - patches/etcd-metrics.yaml
+  ingressFirewall:
+    defaultAction: accept
+    rules:
+      - name: etcd-metrics-ingress
+        portSelector:
+          ports:
+            - 2381
+          protocol: tcp
+        ingress:
+          - subnet: 10.244.0.0/16
+          - subnet: 192.168.0.0/24
   schematic:
     customization:
       systemExtensions:
