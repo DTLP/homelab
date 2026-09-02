@@ -48,8 +48,8 @@ resource "proxmox_virtual_environment_vm" "nfs_vm" {
   }
 
   memory {
-    dedicated = 4096
-    floating  = 4096
+    dedicated = 3072
+    floating  = 3072
   }
 
   network_device {
@@ -82,5 +82,14 @@ resource "proxmox_virtual_environment_vm" "nfs_vm" {
       password = var.root_password
       keys     = [var.ssh_public_key]
     }
+  }
+
+  # The cloud-init snippet is regenerated on every run (its content hash
+  # changes), which would otherwise force the whole VM to be recreated.
+  # Ignore user_data changes so memory updates are applied in place.
+  lifecycle {
+    ignore_changes = [
+      initialization[0].user_data_file_id,
+    ]
   }
 }
