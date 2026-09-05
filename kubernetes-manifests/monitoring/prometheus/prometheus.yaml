@@ -32,10 +32,10 @@ spec:
               protocol: TCP
           resources:
             requests:
-              cpu: 500m
-              memory: 500Mi
+              cpu: 50m
+              memory: 512Mi
             limits:
-              cpu: 1
+              cpu: 200m
               memory: 1Gi
           volumeMounts:
             - name: config
