@@ -5,3 +5,6 @@ resources:
   - rbac.yaml
 
   - github.com/utilitywarehouse/kube-summary-exporter//manifests/base?ref=v0.4.8
+
+patches:
+  - path: resources-patch.yaml
