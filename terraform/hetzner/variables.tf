@@ -18,7 +18,7 @@ variable "mailserver_hostname" {
 
 variable "docker_mailserver_version" {
   description = "Version tag of the docker-mailserver"
-  default     = "16.0.0"
+  default     = "16.0.1"
   type        = string
 }
 
