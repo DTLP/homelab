@@ -45,10 +45,10 @@ spec:
               value: https://grafana.dtlp.cc
           resources:
             requests:
-              cpu: 250m
-              memory: 250M
+              cpu: 50m
+              memory: 512Mi
             limits:
-              cpu: 500m
+              cpu: 200m
               memory: 1Gi
           volumeMounts:
             - name: config
