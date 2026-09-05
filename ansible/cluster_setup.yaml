@@ -16,16 +16,16 @@
     - name: Comment out Enterprise repo ceph.list
       lineinfile:
         path: /etc/apt/sources.list.d/ceph.list
-        regexp: '^'
-        line: '#'
+        regexp: '^(deb.*)$'
+        line: '#\1'
         backrefs: yes
       ignore_errors: yes
 
     - name: Comment out Enterprise repo in pve-enterprise.list
       lineinfile:
         path: /etc/apt/sources.list.d/pve-enterprise.list
-        regexp: '^'
-        line: '#'
+        regexp: '^(deb.*)$'
+        line: '#\1'
         backrefs: yes
       ignore_errors: yes
 
