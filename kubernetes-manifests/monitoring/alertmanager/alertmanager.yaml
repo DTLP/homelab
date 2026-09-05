@@ -17,6 +17,13 @@ spec:
         args:
           - "--config.file=/etc/alertmanager/config.yaml"
           - "--web.external-url=https://alertmanager.dtlp.cc"
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
         ports:
         - containerPort: 9093
         volumeMounts:
