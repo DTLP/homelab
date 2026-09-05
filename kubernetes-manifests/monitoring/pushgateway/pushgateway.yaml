@@ -21,6 +21,13 @@ spec:
             - name: metrics
               containerPort: 9091
               protocol: TCP
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
           livenessProbe:
             httpGet:
               path: /-/healthy
