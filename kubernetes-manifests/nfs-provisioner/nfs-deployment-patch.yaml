@@ -14,6 +14,13 @@ spec:
               value: 192.168.0.60
             - name: NFS_PATH
               value: /data
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
       volumes:
         - name: nfs-client-root
           nfs:
