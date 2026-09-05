@@ -1,5 +1,9 @@
 SHELL=/usr/bin/env bash
-NAMESPACE ?= default
+
+# Forward Proxmox provisioning targets to the ansible Makefile.
+.PHONY: start stop cluster nvme ssh reboot shutdown ubuntu upgrade
+start upgrade stop cluster nvme ssh reboot shutdown ubuntu:
+	$(MAKE) -C ansible $@
 
 hooks-install:
 	-rm .git/hooks/pre-commit
