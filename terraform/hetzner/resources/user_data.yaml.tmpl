@@ -161,6 +161,16 @@ runcmd:
           - ./config/letsencrypt:/letsencrypt
           - ./config/traefik/logs:/var/log/traefik
 
+      newt:
+        image: docker.io/fosrl/newt:1.16.0
+        container_name: newt
+        restart: unless-stopped
+        network_mode: host
+        environment:
+          - PANGOLIN_ENDPOINT=https://pangolin.dtlp.cc
+          - NEWT_ID=${newt_id}
+          - NEWT_SECRET=${newt_secret}
+
     networks:
       default:
         driver: bridge

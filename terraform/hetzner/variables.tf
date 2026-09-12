@@ -28,6 +28,18 @@ variable "pangolin_server_secret" {
   sensitive   = true
 }
 
+variable "newt_id" {
+  description = "Newt client ID for the Pangolin site running on this server"
+  type        = string
+  sensitive   = true
+}
+
+variable "newt_secret" {
+  description = "Newt client secret for the Pangolin site running on this server"
+  type        = string
+  sensitive   = true
+}
+
 variable "ssh_public_key" {
   description = "SSH Public Key for the mail server"
   type        = string

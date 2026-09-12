@@ -5,6 +5,8 @@ data "template_file" "cloud_init" {
     domain_name                  = var.domain_name
     mailserver_hostname          = var.mailserver_hostname
     pangolin_server_secret       = var.pangolin_server_secret
+    newt_id                      = var.newt_id
+    newt_secret                  = var.newt_secret
     traefik_config_b64           = base64encode(file("${path.module}/resources/traefik_config.yaml"))
     traefik_dynamic_config_b64   = base64encode(file("${path.module}/resources/traefik_dynamic_config.yaml"))
     wg_server_endpoint_port      = var.wg_server_endpoint_port
