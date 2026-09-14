@@ -211,3 +211,41 @@ runcmd:
         allow_raw_resources: true
     EOF
   - cd /opt/pangolin && docker compose up -d
+
+  # telegram docker-mailserver admin bot
+  - mkdir -p /opt/dms-admin-bot
+  - |
+    cat <<EOF > /opt/dms-admin-bot/docker-compose.yaml
+    name: dms-admin-bot
+    services:
+      docker-socket-proxy:
+        image: tecnativa/docker-socket-proxy:v0.5.0@sha256:1f5038b54f06c3e18422902cf00ba21803d1c97805aae032e5e6673d532d3459
+        container_name: docker-socket-proxy
+        restart: unless-stopped
+        privileged: true
+        environment:
+          CONTAINERS: "1"
+          EXEC: "1"
+          POST: "1"
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock:ro
+
+      dms-admin-bot:
+        image: ghcr.io/dtlp/dms-admin-bot:${dms_admin_bot_version}
+        container_name: dms-admin-bot
+        restart: unless-stopped
+        logging:
+          driver: json-file
+          options:
+            max-size: "10m"
+            max-file: "3"
+        depends_on:
+          - docker-socket-proxy
+        environment:
+          DOCKER_HOST: tcp://docker-socket-proxy:2375
+          BOT_TOKEN: ${telegram_bot_token}
+          BOT_USER_ID: ${telegram_bot_user_id}
+          MAIL_CONTAINER: mail
+          MAIL_DOMAIN: ${domain_name}
+    EOF
+  - cd /opt/dms-admin-bot && docker compose up -d

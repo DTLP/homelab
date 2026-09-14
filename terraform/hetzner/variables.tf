@@ -40,6 +40,23 @@ variable "newt_secret" {
   sensitive   = true
 }
 
+variable "telegram_bot_token" {
+  description = "Telegram bot token for the dms-admin-bot"
+  type        = string
+  sensitive   = true
+}
+
+variable "telegram_bot_user_id" {
+  description = "Telegram user id allowed to manage aliases via the dms-admin-bot"
+  type        = string
+}
+
+variable "dms_admin_bot_version" {
+  description = "Image tag of the dms-admin-bot"
+  default     = "latest"
+  type        = string
+}
+
 variable "ssh_public_key" {
   description = "SSH Public Key for the mail server"
   type        = string

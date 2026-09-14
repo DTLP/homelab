@@ -22,6 +22,14 @@ docker exec -ti mail setup alias add example_alias@dtlp.cc example_mailbox@dtlp.
 
 Test email here https://internet.nl and here https://www.mail-tester.com
 
+## Telegram alias bot
+
+The server also runs [dms-admin-bot](https://github.com/DTLP/dms-admin-bot)
+(image `ghcr.io/dtlp/dms-admin-bot`) behind a `docker-socket-proxy`, so aliases
+can be managed from Telegram. It needs `telegram_bot_token` and
+`telegram_bot_user_id` set in `terraform.tfvars`. The stack lives in
+`/opt/dms-admin-bot/docker-compose.yaml`.
+
 ## Notes
 
 - Wireguard tunnel uses `10.20.30.40` address for the `mail` server and

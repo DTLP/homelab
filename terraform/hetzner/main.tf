@@ -15,6 +15,9 @@ data "template_file" "cloud_init" {
     wg_server_private_key        = var.wg_server_private_key
     wg_client_public_key         = var.wg_client_public_key
     docker_mailserver_version    = var.docker_mailserver_version
+    telegram_bot_token           = var.telegram_bot_token
+    telegram_bot_user_id         = var.telegram_bot_user_id
+    dms_admin_bot_version        = var.dms_admin_bot_version
   }
 }
 
