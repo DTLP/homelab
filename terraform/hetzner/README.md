@@ -39,3 +39,27 @@ can be managed from Telegram. It needs `telegram_bot_token` and
 aliases quickly.
 - Certificates are managed by Let's Encrypt.
 - The server is monitored by [UptimeRobot](https://uptimerobot.com).
+
+## DANE / TLSA
+
+The `_25._tcp.<mailserver_hostname>.<domain_name>` TLSA record is published
+automatically. A certbot deploy hook,
+`/etc/letsencrypt/renewal-hooks/deploy/50-publish-tlsa`, recomputes the digests
+from `/etc/letsencrypt/live/` after every renewal and writes them to Cloudflare
+through the API. Set `cloudflare_api_token` in `terraform.tfvars` to a token with
+`Zone:DNS:Edit` on the zone; the hook reads it from
+`/etc/letsencrypt/tlsa.env` and stays inert while that file is absent.
+
+Two `3 1 1` records are published: one for the end-entity certificate and one
+for the CA that issued it. Only the end-entity digest changes on renewal, so
+the CA digest is what keeps the RRset matched in the window between a renewal
+and the next cache expiry. That also means this record needs no manual
+intervention, but it *is* email, so watch for renewal-hook failures:
+
+```bash
+# republish by hand after fixing a broken hook or rotating the token
+/etc/letsencrypt/renewal-hooks/deploy/50-publish-tlsa
+```
+
+`external-dns` does not manage this record; it only sources ingress and
+service records, so it will not recreate the RRset if it is deleted.

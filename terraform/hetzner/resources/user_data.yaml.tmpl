@@ -9,6 +9,19 @@ write_files:
   - path: /opt/pangolin/config/traefik/dynamic_config.yml
     encoding: b64
     content: ${traefik_dynamic_config_b64}
+  # Republishes the DANE TLSA records after every certbot renewal. Without it
+  # the RRset goes stale each time the certificate is reissued, because
+  # external-dns only sources ingress and service records.
+  - path: /etc/letsencrypt/renewal-hooks/deploy/50-publish-tlsa
+    encoding: b64
+    content: ${tlsa_publish_b64}
+  - path: /etc/letsencrypt/tlsa.env
+    permissions: "0600"
+    content: |
+      CF_API_TOKEN=${cloudflare_api_token}
+      CF_DNS_ZONE=${domain_name}
+      CF_TLSA_HOST=${mailserver_hostname}.${domain_name}
+      CF_TLSA_PORT=25
 runcmd:
   # disable SSH password authentication
   - sed -i 's/^#\?PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
@@ -32,11 +45,16 @@ runcmd:
   - systemctl start wg-quick@wg0
 
   # certificate
+  - chmod 0700 /etc/letsencrypt/tlsa.env
+  - chmod 0755 /etc/letsencrypt/renewal-hooks/deploy/50-publish-tlsa
   - docker run --rm -it \
       -v "/etc/letsencrypt/:/etc/letsencrypt/" \
       -v "/var/log/letsencrypt/:/var/log/letsencrypt/" \
       -p 80:80 \
       certbot/certbot certonly --standalone -d ${mailserver_hostname}.${domain_name}
+  # Publish the TLSA records for the certificate just issued, so DANE is
+  # correct from the first boot rather than only after the next renewal.
+  - /etc/letsencrypt/renewal-hooks/deploy/50-publish-tlsa
   - |
     echo "# run certbot renew every Sunday at 2am" >> /etc/crontab
   - |

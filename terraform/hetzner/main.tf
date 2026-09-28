@@ -7,8 +7,10 @@ data "template_file" "cloud_init" {
     pangolin_server_secret       = var.pangolin_server_secret
     newt_id                      = var.newt_id
     newt_secret                  = var.newt_secret
+    cloudflare_api_token         = var.cloudflare_api_token
     traefik_config_b64           = base64encode(file("${path.module}/resources/traefik_config.yaml"))
     traefik_dynamic_config_b64   = base64encode(file("${path.module}/resources/traefik_dynamic_config.yaml"))
+    tlsa_publish_b64             = base64encode(file("${path.module}/resources/tlsa_publish.sh"))
     wg_server_endpoint_port      = var.wg_server_endpoint_port
     wg_server_private_ip_address = var.wg_server_private_ip_address
     wg_client_private_ip_address = var.wg_client_private_ip_address

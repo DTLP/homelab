@@ -28,6 +28,15 @@ variable "pangolin_server_secret" {
   sensitive   = true
 }
 
+variable "cloudflare_api_token" {
+  description = <<-EOT
+    Cloudflare API token used to publish the DANE TLSA records for the mail
+    server. Needs Zone:DNS:Edit on the zone; DNS:Read alone is not enough.
+  EOT
+  type        = string
+  sensitive   = true
+}
+
 variable "newt_id" {
   description = "Newt client ID for the Pangolin site running on this server"
   type        = string
