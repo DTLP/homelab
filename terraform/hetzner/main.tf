@@ -11,6 +11,8 @@ data "template_file" "cloud_init" {
     traefik_config_b64           = base64encode(file("${path.module}/resources/traefik_config.yaml"))
     traefik_dynamic_config_b64   = base64encode(file("${path.module}/resources/traefik_dynamic_config.yaml"))
     tlsa_publish_b64             = base64encode(file("${path.module}/resources/tlsa_publish.sh"))
+    tlsa_check_b64               = base64encode(file("${path.module}/resources/tlsa_check.sh"))
+    dane_status_server_b64       = base64encode(file("${path.module}/resources/dane_status_server.py"))
     wg_server_endpoint_port      = var.wg_server_endpoint_port
     wg_server_private_ip_address = var.wg_server_private_ip_address
     wg_client_private_ip_address = var.wg_client_private_ip_address
@@ -124,6 +126,13 @@ resource "hcloud_firewall" "mail" {
     direction  = "in"
     protocol   = "tcp"
     port       = "993" # IMAP over SSL/TLS
+    source_ips = ["0.0.0.0/0", "::/0"]
+  }
+
+  rule {
+    direction  = "in"
+    protocol   = "tcp"
+    port       = "8082" # DANE TLSA status page for UptimeRobot
     source_ips = ["0.0.0.0/0", "::/0"]
   }
 

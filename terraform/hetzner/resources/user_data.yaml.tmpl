@@ -22,6 +22,17 @@ write_files:
       CF_DNS_ZONE=${domain_name}
       CF_TLSA_HOST=${mailserver_hostname}.${domain_name}
       CF_TLSA_PORT=25
+  # Verifies the published TLSA records still match the presented certificate
+  # every day, and serves a status page UptimeRobot can watch. Kept independent
+  # of Pangolin: it is a plain script plus a static file server on port 8082.
+  - path: /usr/local/bin/tlsa-check
+    encoding: b64
+    content: ${tlsa_check_b64}
+  # Serves the status file with an explicit text/html content type. The stock
+  # http.server would send application/octet-stream for an extensionless file.
+  - path: /usr/local/bin/dane-status-server
+    encoding: b64
+    content: ${dane_status_server_b64}
 runcmd:
   # disable SSH password authentication
   - sed -i 's/^#\?PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
@@ -63,6 +74,34 @@ runcmd:
       -v \"/var/log/letsencrypt/:/var/log/letsencrypt/\" \
       -p 80:80 \
       certbot/certbot renew --quiet --reuse-key" >> /etc/crontab
+  - systemctl restart cron
+
+  # DANE TLSA status page. Serves /opt/dane-status on port 8082 with a plain
+  # python http.server so UptimeRobot has a URL to keyword-check, and runs the
+  # check daily so the page reflects the current state.
+  - mkdir -p /opt/dane-status
+  - chmod 0755 /usr/local/bin/tlsa-check
+  - chmod 0755 /usr/local/bin/dane-status-server
+  - |
+    cat <<EOF > /etc/systemd/system/dane-status.service
+    [Unit]
+    Description=DANE TLSA status page
+    After=network.target
+
+    [Service]
+    ExecStart=/usr/bin/python3 /usr/local/bin/dane-status-server
+    Restart=on-failure
+
+    [Install]
+    WantedBy=multi-user.target
+    EOF
+  - systemctl daemon-reload
+  - systemctl enable dane-status
+  - systemctl start dane-status
+  - |
+    echo "# check DANE TLSA daily at 9am" >> /etc/crontab
+  - |
+    echo "0 9 * * * root /usr/local/bin/tlsa-check" >> /etc/crontab
   - systemctl restart cron
 
   # docker

@@ -63,3 +63,26 @@ intervention, but it *is* email, so watch for renewal-hook failures:
 
 `external-dns` does not manage this record; it only sources ingress and
 service records, so it will not recreate the RRset if it is deleted.
+
+## DANE status monitoring
+
+A daily check, `/usr/local/bin/tlsa-check`, verifies the published TLSA records
+still match the certificate the mail server presents (leaf and issuing CA),
+that the RRset is DNSSEC-validated, and that the certificate is more than 14
+days from expiry. On any failure it emails `postmaster@<domain>` and writes a
+`FAILED` status page; otherwise it writes `OK`.
+
+The status page is served by a plain `python3 -m http.server` systemd unit
+(`dane-status.service`) rooted at `/opt/dane-status` on port `8082`. It is
+deliberately independent of Pangolin and carries no digests or secrets.
+
+Monitor URL: `http://mail.dtlp.cc:8082/status`
+
+UptimeRobot: create a Keyword monitor for that URL with the keyword
+`dane-tlsa: OK` and an interval of 5 minutes. The page also records the last
+check time, so a stalled cron is caught by the next run and reported.
+
+```bash
+# run the check by hand
+/usr/local/bin/tlsa-check
+```
