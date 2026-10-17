@@ -5,6 +5,7 @@ packages:
   - docker-compose-v2
   - docker.io
   - gnupg
+  - nftables
   - openssl
   - psmisc
   - python3
@@ -135,6 +136,46 @@ write_files:
 
       [Install]
       WantedBy=timers.target
+  # Temporary mitigation for CVE-2026-98432 (IPv4 TCP use-after-free). It
+  # drops inbound TCP packets that carry IP options, which blocks the known
+  # trigger vector but does not fully prevent exploitation. Remove this once
+  # the fixed Ubuntu kernel (6.8.0-149.149 or later) is installed.
+  - path: /etc/cve-2026-98432.nft
+    permissions: "0644"
+    content: |
+      destroy table inet cve_2026_98432
+
+      table inet cve_2026_98432 {
+        chain input {
+          type filter hook input priority -310; policy accept;
+          ip protocol tcp ip hdrlength > 5 counter drop
+        }
+
+        # Cover DNATed traffic forwarded to containers as well as host services.
+        chain forward {
+          type filter hook forward priority -310; policy accept;
+          ip protocol tcp ip hdrlength > 5 counter drop
+        }
+      }
+  - path: /etc/sysctl.d/99-cve-2026-98432.conf
+    permissions: "0644"
+    content: |
+      # Mitigation for CVE-2026-98432: nothing on this host needs Multipath TCP.
+      net.mptcp.enabled = 0
+  - path: /etc/systemd/system/cve-2026-98432.service
+    permissions: "0644"
+    content: |
+      [Unit]
+      Description=Drop inbound IPv4 TCP packets with IP options (CVE-2026-98432)
+      After=network.target
+
+      [Service]
+      Type=oneshot
+      RemainAfterExit=yes
+      ExecStart=/usr/sbin/nft -f /etc/cve-2026-98432.nft
+
+      [Install]
+      WantedBy=multi-user.target
   - path: /usr/local/bin/email-backup
     encoding: b64
     content: ${email_backup_b64}
@@ -329,6 +370,12 @@ runcmd:
   - /usr/local/bin/docker-metadata-block
   - systemctl daemon-reload
   - systemctl enable docker-metadata-block.service
+
+  # temporary mitigation for CVE-2026-98432
+  - sysctl -q -p /etc/sysctl.d/99-cve-2026-98432.conf
+  - systemctl daemon-reload
+  - systemctl enable cve-2026-98432.service
+  - systemctl start cve-2026-98432.service
 
   # mail server
   - |
