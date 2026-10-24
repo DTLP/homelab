@@ -1,6 +1,6 @@
 api:
-  insecure: true
-  dashboard: true
+  insecure: false
+  dashboard: false
 
 providers:
   http:
@@ -13,7 +13,7 @@ experimental:
   plugins:
     badger:
       moduleName: "github.com/fosrl/badger"
-      version: "v1.5.0"
+      version: "v1.7.0"
 
 log:
   level: "INFO"
@@ -34,6 +34,8 @@ certificatesResolvers:
 entryPoints:
   web:
     address: ":80"
+    http:
+      aliasHeadersStrategy: delete
   websecure:
     address: ":443"
     transport:
@@ -47,6 +49,7 @@ entryPoints:
       encodedCharacters:
         allowEncodedSlash: true
         allowEncodedQuestionMark: true
+      aliasHeadersStrategy: delete
 
 serversTransport:
   insecureSkipVerify: true
