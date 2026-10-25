@@ -176,6 +176,16 @@ variable "wg_client_public_key" {
   type        = string
 }
 
+variable "wg_extra_peers" {
+  description = "Additional WireGuard peers for the admin VPN"
+  type = list(object({
+    name       = string
+    public_key = string
+    ip         = string
+  }))
+  default = []
+}
+
 variable "email_backup_password" {
   description = "Passphrase used to GPG-encrypt the daily email backup"
   type        = string

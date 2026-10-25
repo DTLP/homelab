@@ -241,6 +241,7 @@ runcmd:
     [Peer]
     PublicKey = ${wg_client_public_key}
     AllowedIPs = ${wg_client_private_ip_address}/32
+    ${wg_extra_peers}
     EOF
   - systemctl daemon-reload
   - systemctl start wg-quick@wg0

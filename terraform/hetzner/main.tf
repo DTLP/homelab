@@ -18,10 +18,19 @@ data "template_file" "cloud_init" {
     wg_client_private_ip_address = var.wg_client_private_ip_address
     wg_server_private_key        = var.wg_server_private_key
     wg_client_public_key         = var.wg_client_public_key
-    docker_mailserver_version    = var.docker_mailserver_version
-    telegram_bot_token           = var.telegram_bot_token
-    telegram_bot_user_id         = var.telegram_bot_user_id
-    dms_admin_bot_version        = var.dms_admin_bot_version
+    wg_extra_peers = join("\n", [
+      for p in var.wg_extra_peers : join("\n", [
+        "",
+        "    # ${p.name}",
+        "    [Peer]",
+        "    PublicKey = ${p.public_key}",
+        "    AllowedIPs = ${p.ip}/32",
+      ])
+    ])
+    docker_mailserver_version = var.docker_mailserver_version
+    telegram_bot_token        = var.telegram_bot_token
+    telegram_bot_user_id      = var.telegram_bot_user_id
+    dms_admin_bot_version     = var.dms_admin_bot_version
     ente_compose_b64 = base64encode(templatefile("${path.module}/resources/ente_compose.yaml.tmpl", {
       ente_db_password          = var.ente_db_password
       ente_s3_region            = var.ente_s3_region
