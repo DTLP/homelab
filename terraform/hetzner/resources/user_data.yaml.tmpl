@@ -329,7 +329,6 @@ runcmd:
     Requires=docker.service
 
     [Service]
-    PermissionsStartOnly=true
     Restart=on-failure
     ExecStartPre=/bin/sh -c "chmod 0600 /mail/config/postfix-accounts.cf 2>/dev/null || true"
     ExecStart=/usr/bin/docker run \
@@ -348,7 +347,6 @@ runcmd:
       -e ENABLE_MANAGESIEVE=1 \
       -e ENABLE_POSTGREY=0 \
       -e ENABLE_SPAMASSASSIN=1 \
-      -e DMS_DEBUG=0 \
       -e ONE_DIR=1 \
       -e SPAMASSASSIN_SPAM_TO_INBOX=1 \
       -e SSL_TYPE=letsencrypt \
@@ -358,7 +356,7 @@ runcmd:
       -v /mail/data:/var/mail:rw \
       -v /mail/state:/var/mail-state:rw \
       -v /mail/config/:/tmp/docker-mailserver:rw \
-      -v /etc/letsencrypt:/etc/letsencrypt:rw \
+      -v /etc/letsencrypt:/etc/letsencrypt:ro \
       -v /etc/localtime:/etc/localtime:ro \
       ghcr.io/docker-mailserver/docker-mailserver:${docker_mailserver_version}
     ExecStop=/usr/bin/docker stop mail
@@ -524,6 +522,17 @@ runcmd:
           MAIL_DOMAIN: ${domain_name}
     EOF
   - cd /opt/dms-admin-bot && docker compose up -d
+
+  # 2 GB swap file
+  - |
+    if ! swapon --show | grep -q '^/swapfile'; then
+      fallocate -l 2G /swapfile
+      chmod 0600 /swapfile
+      mkswap /swapfile
+      swapon /swapfile
+    fi
+  - |
+    grep -q '^/swapfile' /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab
 
   # Weekly reboot only if a kernel or other update asked for one. Enabled last
   # so the timer cannot fire in the middle of provisioning.
