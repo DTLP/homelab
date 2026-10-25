@@ -38,6 +38,8 @@ can be managed from Telegram. It needs `telegram_bot_token` and
 - There are make targets available to save/restore backups and create/delete
 aliases quickly.
 - Certificates are managed by Let's Encrypt.
+- Unattended-upgrades installs security updates only; the weekly timer reboots
+  when a reboot is required.
 - The server is monitored by [UptimeRobot](https://uptimerobot.com).
 
 ## Backups
