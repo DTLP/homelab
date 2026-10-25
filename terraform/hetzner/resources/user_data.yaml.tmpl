@@ -1,6 +1,8 @@
 #cloud-config
 packages:
+  - curl
   - docker.io
+  - unattended-upgrades
   - wireguard
 write_files:
   - path: /opt/pangolin/config/traefik/traefik_config.yml
@@ -33,6 +35,68 @@ write_files:
   - path: /usr/local/bin/dane-status-server
     encoding: b64
     content: ${dane_status_server_b64}
+  # Automatic security updates. unattended-upgrades never reboots on its own;
+  # the weekly timer below does that, and only when a reboot is pending.
+  - path: /etc/apt/apt.conf.d/20auto-upgrades
+    permissions: "0644"
+    content: |
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Unattended-Upgrade "1";
+  - path: /etc/apt/apt.conf.d/52mailserver-unattended-upgrades
+    permissions: "0644"
+    content: |
+      // Keep old kernels in the GRUB menu so a bad boot can be rolled back
+      // from the Hetzner console.
+      Unattended-Upgrade::Automatic-Reboot "false";
+      Unattended-Upgrade::Remove-Unused-Kernel-Packages "false";
+      Unattended-Upgrade::Remove-Unused-Dependencies "false";
+  # Rebooting is the only step that can take the server offline, so check for
+  # a half-finished dpkg run or a full disk first and report what is pending.
+  - path: /usr/local/bin/reboot-if-required
+    permissions: "0755"
+    content: |
+      #!/usr/bin/env bash
+      set -euo pipefail
+
+      if [[ ! -f /var/run/reboot-required ]]; then
+        exit 0
+      fi
+
+      if dpkg --audit | grep -q .; then
+        logger -t reboot-if-required "not rebooting: dpkg reports a broken package state"
+        exit 1
+      fi
+
+      if [[ $(df --output=pcent / | tail -1 | tr -dc '0-9') -ge 90 ]]; then
+        logger -t reboot-if-required "not rebooting: root filesystem is almost full"
+        exit 1
+      fi
+
+      pending=$(cat /var/run/reboot-required.pkgs 2>/dev/null || true)
+      logger -t reboot-if-required "rebooting for pending updates: $pending"
+      systemctl reboot
+  - path: /etc/systemd/system/reboot-if-required.service
+    permissions: "0644"
+    content: |
+      [Unit]
+      Description=Reboot the mail server if an update requires it
+      ConditionPathExists=/var/run/reboot-required
+
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/local/bin/reboot-if-required
+  - path: /etc/systemd/system/reboot-if-required.timer
+    permissions: "0644"
+    content: |
+      [Unit]
+      Description=Weekly check for a pending mail server reboot
+
+      [Timer]
+      OnCalendar=Sun *-*-* 08:00:00 Europe/London
+      Persistent=true
+
+      [Install]
+      WantedBy=timers.target
 runcmd:
   # disable SSH password authentication
   - sed -i 's/^#\?PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
@@ -306,3 +370,8 @@ runcmd:
           MAIL_DOMAIN: ${domain_name}
     EOF
   - cd /opt/dms-admin-bot && docker compose up -d
+
+  # Weekly reboot only if a kernel or other update asked for one. Enabled last
+  # so the timer cannot fire in the middle of provisioning.
+  - systemctl daemon-reload
+  - systemctl enable --now reboot-if-required.timer
