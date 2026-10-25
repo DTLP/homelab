@@ -2,6 +2,8 @@
 packages:
   - curl
   - docker.io
+  - gnupg
+  - rclone
   - unattended-upgrades
   - wireguard
 write_files:
@@ -104,6 +106,47 @@ write_files:
       [Timer]
       OnCalendar=Sun *-*-* 08:00:00 Europe/London
       Persistent=true
+
+      [Install]
+      WantedBy=timers.target
+  - path: /usr/local/bin/email-backup
+    encoding: b64
+    content: ${email_backup_b64}
+    permissions: "0755"
+  - path: /etc/email-backup/passphrase
+    encoding: b64
+    content: ${email_backup_password_b64}
+    permissions: "0600"
+  - path: /etc/email-backup/rclone.conf
+    encoding: b64
+    content: ${rclone_config_b64}
+    permissions: "0600"
+  - path: /etc/systemd/system/email-backup.service
+    permissions: "0644"
+    content: |
+      [Unit]
+      Description=Encrypted email backup to Dropbox
+      Wants=network-online.target
+      After=network-online.target
+
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/local/bin/email-backup
+      Environment=BACKUP_RETENTION_DAYS=${backup_retention_days}
+      Nice=10
+      IOSchedulingClass=best-effort
+      IOSchedulingPriority=7
+      TimeoutStartSec=1h
+  - path: /etc/systemd/system/email-backup.timer
+    permissions: "0644"
+    content: |
+      [Unit]
+      Description=Daily email backup to Dropbox
+
+      [Timer]
+      OnCalendar=*-*-* 03:30:00 Europe/London
+      Persistent=true
+      RandomizedDelaySec=15m
 
       [Install]
       WantedBy=timers.target
@@ -390,3 +433,10 @@ runcmd:
   - systemctl daemon-reload
   - systemctl enable --now reboot-if-required.timer
 
+  # Daily encrypted email backup to Dropbox
+  - mkdir -p /var/backups/email
+  - chmod 0700 /etc/email-backup /var/backups/email
+  - chmod 0600 /etc/email-backup/passphrase /etc/email-backup/rclone.conf
+  - chmod 0755 /usr/local/bin/email-backup
+  - systemctl daemon-reload
+  - systemctl enable --now email-backup.timer

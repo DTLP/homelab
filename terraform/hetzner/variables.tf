@@ -176,3 +176,20 @@ variable "wg_client_public_key" {
   type        = string
 }
 
+variable "email_backup_password" {
+  description = "Passphrase used to GPG-encrypt the daily email backup"
+  type        = string
+  sensitive   = true
+}
+
+variable "dropbox_token" {
+  description = "rclone Dropbox OAuth token, generated with 'rclone authorize \"dropbox\"'"
+  type        = string
+  sensitive   = true
+}
+
+variable "backup_retention_days" {
+  description = "Number of days to keep encrypted email backups locally and in Dropbox"
+  type        = number
+  default     = 7
+}

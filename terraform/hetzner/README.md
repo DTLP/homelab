@@ -40,6 +40,33 @@ aliases quickly.
 - Certificates are managed by Let's Encrypt.
 - The server is monitored by [UptimeRobot](https://uptimerobot.com).
 
+## Backups
+
+- `email-backup.timer` runs `/usr/local/bin/email-backup` daily at 03:30
+  Europe/London.
+- It stops `mail`, archives `/mail/config`, `/mail/data`, and `/mail/state` to
+  `/var/backups/email/YYYY-MM-DD.tar.gz.pgp`, and encrypts the archive with
+  GPG AES256.
+- It uploads the archive and its `.sha256` to `dropbox:email-backups` with
+  rclone, restarts `mail` even if the backup fails, and deletes archives older
+  than `backup_retention_days` (default 7).
+
+To restore, download the archive and decrypt it on the server:
+
+```bash
+rclone --config /etc/email-backup/rclone.conf \
+  copy dropbox:email-backups/YYYY-MM-DD.tar.gz.pgp /var/backups/email/
+systemctl stop mail
+gpg --decrypt /var/backups/email/YYYY-MM-DD.tar.gz.pgp | tar -xz -C /
+systemctl start mail
+```
+
+`make mail-backup` and `make mail-restore` are an alternative way to back up
+and restore the mail data to and from the local workstation over SSH.
+`mail-backup` pulls `/mail/config`, `/mail/data`, and `/mail/state` to `/tmp`,
+and `mail-restore` sends them back, stopping and restarting `mail` around each
+operation.
+
 ## DANE / TLSA
 
 The `_25._tcp.<mailserver_hostname>.<domain_name>` TLSA record is published
