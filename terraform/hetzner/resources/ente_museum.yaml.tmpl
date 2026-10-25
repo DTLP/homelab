@@ -1,0 +1,26 @@
+db:
+  host: postgres
+  port: 5432
+  name: ente_db
+  user: pguser
+  password: ${ente_db_password}
+
+s3:
+  are_local_buckets: false
+  use_path_style_urls: false
+  b2-eu-cen: # Cannot be renamed
+    key: ${ente_s3_access_key_id}
+    secret: ${ente_s3_secret_access_key}
+    endpoint: ${ente_s3_endpoint}
+    region: ${ente_s3_region}
+    bucket: ${ente_s3_bucket}
+
+key:
+  encryption: ${ente_key_encryption}
+  hash: ${ente_key_hash}
+
+jwt:
+  secret: ${ente_jwt_secret}
+
+internal:
+  admin: ${ente_internal_admin}

@@ -22,6 +22,27 @@ data "template_file" "cloud_init" {
     telegram_bot_token           = var.telegram_bot_token
     telegram_bot_user_id         = var.telegram_bot_user_id
     dms_admin_bot_version        = var.dms_admin_bot_version
+    ente_compose_b64 = base64encode(templatefile("${path.module}/resources/ente_compose.yaml.tmpl", {
+      ente_db_password          = var.ente_db_password
+      ente_s3_region            = var.ente_s3_region
+      ente_s3_endpoint          = var.ente_s3_endpoint
+      ente_s3_access_key_id     = var.ente_s3_access_key_id
+      ente_s3_secret_access_key = var.ente_s3_secret_access_key
+      ente_s3_bucket            = var.ente_s3_bucket
+      ente_s3_prefix            = var.ente_s3_prefix
+    }))
+    ente_museum_b64 = base64encode(templatefile("${path.module}/resources/ente_museum.yaml.tmpl", {
+      ente_db_password          = var.ente_db_password
+      ente_s3_region            = var.ente_s3_region
+      ente_s3_endpoint          = var.ente_s3_endpoint
+      ente_s3_access_key_id     = var.ente_s3_access_key_id
+      ente_s3_secret_access_key = var.ente_s3_secret_access_key
+      ente_s3_bucket            = var.ente_s3_bucket
+      ente_key_encryption       = var.ente_key_encryption
+      ente_key_hash             = var.ente_key_hash
+      ente_jwt_secret           = var.ente_jwt_secret
+      ente_internal_admin       = var.ente_internal_admin
+    }))
   }
 }
 

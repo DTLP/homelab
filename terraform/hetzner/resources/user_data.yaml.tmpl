@@ -11,6 +11,16 @@ write_files:
   - path: /opt/pangolin/config/traefik/dynamic_config.yml
     encoding: b64
     content: ${traefik_dynamic_config_b64}
+  # Ente Photos. Kept in the repo so the stack can be rebuilt from scratch;
+  # Postgres is backed up nightly to the S3 bucket in the compose file.
+  - path: /opt/ente/compose.yaml
+    encoding: b64
+    content: ${ente_compose_b64}
+    permissions: "0600"
+  - path: /opt/ente/museum.yaml
+    encoding: b64
+    content: ${ente_museum_b64}
+    permissions: "0600"
   # Republishes the DANE TLSA records after every certbot renewal. Without it
   # the RRset goes stale each time the certificate is reissued, because
   # external-dns only sources ingress and service records.
@@ -333,6 +343,10 @@ runcmd:
     EOF
   - cd /opt/pangolin && docker compose up -d
 
+  # ente photos
+  - mkdir -p /opt/ente/data
+  - cd /opt/ente && docker compose up -d
+
   # telegram docker-mailserver admin bot
   - mkdir -p /opt/dms-admin-bot
   - |
@@ -375,3 +389,4 @@ runcmd:
   # so the timer cannot fire in the middle of provisioning.
   - systemctl daemon-reload
   - systemctl enable --now reboot-if-required.timer
+

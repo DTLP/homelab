@@ -1,0 +1,61 @@
+name: my-ente
+services:
+  museum:
+    restart: unless-stopped
+    image: ghcr.io/ente-io/server
+    ports:
+      - 8080:8080 # API
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./museum.yaml:/museum.yaml:ro
+      - ./data:/data:ro
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/ping"]
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  web:
+    restart: unless-stopped
+    image: ghcr.io/ente-io/web
+    ports:
+      - 3000:3000 # Photos web app
+    environment:
+      ENTE_API_ORIGIN: http://10.20.30.40:8080
+
+  postgres:
+    restart: unless-stopped
+    image: postgres:15
+    environment:
+      POSTGRES_DB: ente_db
+      POSTGRES_USER: pguser
+      POSTGRES_PASSWORD: ${ente_db_password}
+    healthcheck:
+      test: pg_isready -q -d ente_db -U pguser
+      start_period: 40s
+      start_interval: 1s
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  backup:
+    restart: unless-stopped
+    image: eeshugerman/postgres-backup-s3:15
+    environment:
+      SCHEDULE: "@daily"
+      BACKUP_KEEP_DAYS: 30
+      S3_REGION: ${ente_s3_region}
+      S3_ENDPOINT: ${ente_s3_endpoint}
+      S3_ACCESS_KEY_ID: ${ente_s3_access_key_id}
+      S3_SECRET_ACCESS_KEY: ${ente_s3_secret_access_key}
+      S3_BUCKET: ${ente_s3_bucket}
+      S3_PREFIX: ${ente_s3_prefix}
+      POSTGRES_HOST: postgres
+      POSTGRES_DATABASE: ente_db
+      POSTGRES_USER: pguser
+      POSTGRES_PASSWORD: ${ente_db_password}
+
+volumes:
+  postgres-data:

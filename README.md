@@ -142,8 +142,9 @@ self-contained module with state stored remotely in HCP Terraform:
   kubeconfig.
 - [`terraform/proxmox/nfs`](terraform/proxmox/nfs) — the NFS storage VM.
 - [`terraform/grafana`](terraform/grafana) — Grafana dashboards.
-- [`terraform/hetzner`](terraform/hetzner) — a docker-mailserver VM on Hetzner
-  Cloud, reachable over a WireGuard tunnel.
+- [`terraform/hetzner`](terraform/hetzner) — a Hetzner Cloud VM running
+  docker-mailserver, Pangolin and Ente Photos, reachable over a WireGuard
+  tunnel.
 
 The Talos cluster runs **Calico** for pod networking. A fresh cluster is
 provisioned with the default Flannel CNI disabled by the

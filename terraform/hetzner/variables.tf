@@ -66,6 +66,71 @@ variable "dms_admin_bot_version" {
   type        = string
 }
 
+variable "ente_db_password" {
+  description = "Password for the Ente Postgres database"
+  type        = string
+  sensitive   = true
+}
+
+variable "ente_s3_region" {
+  description = "Region of the S3 bucket used by Ente for photo storage and backups"
+  default     = "auto"
+  type        = string
+}
+
+variable "ente_s3_endpoint" {
+  description = "S3 endpoint used by Ente for photo storage and backups"
+  type        = string
+  sensitive   = true
+}
+
+variable "ente_s3_access_key_id" {
+  description = "S3 access key ID used by Ente for photo storage and backups"
+  type        = string
+  sensitive   = true
+}
+
+variable "ente_s3_secret_access_key" {
+  description = "S3 secret access key used by Ente for photo storage and backups"
+  type        = string
+  sensitive   = true
+}
+
+variable "ente_s3_bucket" {
+  description = "S3 bucket used by Ente for photo storage and backups"
+  default     = "ente"
+  type        = string
+}
+
+variable "ente_s3_prefix" {
+  description = "S3 key prefix for the nightly Ente Postgres backups"
+  default     = "postgres_backups"
+  type        = string
+}
+
+variable "ente_key_encryption" {
+  description = "Ente museum encryption key"
+  type        = string
+  sensitive   = true
+}
+
+variable "ente_key_hash" {
+  description = "Ente museum hash key"
+  type        = string
+  sensitive   = true
+}
+
+variable "ente_jwt_secret" {
+  description = "Ente museum JWT secret"
+  type        = string
+  sensitive   = true
+}
+
+variable "ente_internal_admin" {
+  description = "Ente internal admin user id"
+  type        = string
+}
+
 variable "ssh_public_key" {
   description = "SSH Public Key for the mail server"
   type        = string
@@ -107,6 +172,7 @@ variable "wg_client_private_key" {
 }
 
 variable "wg_client_public_key" {
-  description = "The public key for the WireGuard client"
+  description = "Public key for the WireGuard client"
   type        = string
 }
+
