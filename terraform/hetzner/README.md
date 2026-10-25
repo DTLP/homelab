@@ -99,17 +99,23 @@ that the RRset is DNSSEC-validated, and that the certificate is more than 14
 days from expiry. On any failure it emails `postmaster@<domain>` and writes a
 `FAILED` status page; otherwise it writes `OK`.
 
-The status page is served by a plain `python3 -m http.server` systemd unit
-(`dane-status.service`) rooted at `/opt/dane-status` on port `8082`. It is
-deliberately independent of Pangolin and carries no digests or secrets.
+The status pages are served by a small Python HTTP server
+(`dane-status.service`) on port `8082`. It is deliberately independent of
+Pangolin and carries no digests or secrets.
 
-Monitor URL: `http://mail.dtlp.cc:8082/status`
+Monitor URLs:
 
-UptimeRobot: create a Keyword monitor for that URL with the keyword
-`dane-tlsa: OK` and an interval of 5 minutes. The page also records the last
-check time, so a stalled cron is caught by the next run and reported.
+- `http://mail.dtlp.cc:8082/status`
+- `http://mail.dtlp.cc:8082/disk`
+
+UptimeRobot: create a Keyword monitor for the first URL with the keyword
+`dane-tlsa: OK`, and a second for the disk URL with the keyword `disk: OK`, both
+at 5-minute intervals. `disk-check` runs every 5 minutes and marks the page
+`FAILED` at 80% usage. The pages also record the last check time, so a stalled
+cron is caught by the next run and reported.
 
 ```bash
-# run the check by hand
+# run the checks by hand
 /usr/local/bin/tlsa-check
+/usr/local/bin/disk-check
 ```

@@ -180,6 +180,37 @@ write_files:
 
       [Install]
       WantedBy=multi-user.target
+  - path: /etc/docker/daemon.json
+    permissions: "0644"
+    content: |
+      {
+        "log-driver": "json-file",
+        "log-opts": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      }
+  - path: /etc/systemd/journald.conf.d/99-size.conf
+    permissions: "0644"
+    content: |
+      [Journal]
+      SystemMaxUse=200M
+      SystemMaxFileSize=50M
+      RuntimeMaxUse=50M
+  - path: /usr/local/bin/disk-check
+    permissions: "0755"
+    content: |
+      #!/usr/bin/env bash
+      set -euo pipefail
+
+      usage=$(df --output=pcent / | tail -n1 | tr -dc '0-9')
+      if ((usage >= 80)); then
+        status="FAILED"
+      else
+        status="OK"
+      fi
+      printf '%s disk: %s (%s%%)\n' "$(date -Is)" "$status" "$usage" \
+        > /opt/dane-status/disk
 runcmd:
   # disable SSH password authentication
   - sed -i 's/^#\?PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
@@ -261,7 +292,13 @@ runcmd:
     echo "# check DANE TLSA daily at 9am" >> /etc/crontab
   - |
     echo "0 9 * * * root /usr/local/bin/tlsa-check" >> /etc/crontab
+  - |
+    echo "*/5 * * * * root /usr/local/bin/disk-check" >> /etc/crontab
   - systemctl restart cron
+  - /usr/local/bin/disk-check
+
+  # apply journald size cap
+  - systemctl restart systemd-journald
 
   # block container access to the Hetzner metadata service
   - /usr/local/bin/docker-metadata-block
@@ -282,6 +319,7 @@ runcmd:
     ExecStart=/usr/bin/docker run \
       --rm \
       --name mail \
+      -e MAILBOX_LIMIT_MB=5120 \
       --hostname ${mailserver_hostname}.${domain_name} \
       --dns=1.1.1.1 \
       --dns=1.0.0.1 \
