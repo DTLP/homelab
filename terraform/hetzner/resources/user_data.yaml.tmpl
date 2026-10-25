@@ -150,6 +150,32 @@ write_files:
 
       [Install]
       WantedBy=timers.target
+  - path: /usr/local/bin/docker-metadata-block
+    permissions: "0755"
+    content: |
+      #!/bin/sh
+      set -eu
+      iptables -C OUTPUT -d 169.254.169.254/32 -j DROP 2>/dev/null \
+        || iptables -I OUTPUT -d 169.254.169.254/32 -j DROP
+      if iptables -S DOCKER-USER >/dev/null 2>&1; then
+        iptables -C DOCKER-USER -d 169.254.169.254/32 -j DROP 2>/dev/null \
+          || iptables -I DOCKER-USER -d 169.254.169.254/32 -j DROP
+      fi
+  - path: /etc/systemd/system/docker-metadata-block.service
+    permissions: "0644"
+    content: |
+      [Unit]
+      Description=Block container access to the Hetzner metadata service
+      After=docker.service
+      Requires=docker.service
+
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/local/bin/docker-metadata-block
+      RemainAfterExit=yes
+
+      [Install]
+      WantedBy=multi-user.target
 runcmd:
   # disable SSH password authentication
   - sed -i 's/^#\?PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
@@ -224,6 +250,11 @@ runcmd:
   # docker
   - systemctl start docker
   - systemctl enable docker
+
+  # block container access to the Hetzner metadata service
+  - /usr/local/bin/docker-metadata-block
+  - systemctl daemon-reload
+  - systemctl enable docker-metadata-block.service
 
   # mail server
   - |
