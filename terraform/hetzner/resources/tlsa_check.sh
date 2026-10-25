@@ -79,6 +79,7 @@ record_name="_25._tcp.${MAIL_HOST}"
 # third field, and inserts a space in the middle of that hex once it is long
 # enough. The hex is therefore reassembled from fields four onwards, and any
 # continuation line is appended, so either rendering produces one digest.
+# Records with any other usage/selector/matching type are ignored.
 #
 # Deliberately not "+dnssec": that would make dig also print the RRSIG, whose
 # text then runs onto the end of the preceding record's digest.
@@ -86,14 +87,15 @@ tlsa_digests() {
   dig "@${RESOLVER}" +short TLSA "${record_name}" |
     awk '
       /^[0-9]+ [0-9]+ [0-9]+ / {
-        if (seen) print digest
+        if (seen && want) print digest
+        want = ($1 == 3 && $2 == 1 && $3 == 1)
         digest = ""
         for (i = 4; i <= NF; i++) digest = digest $i
         seen = 1
         next
       }
-      { gsub(/[ \t]/, ""); digest = digest $0 }
-      END { if (seen) print digest }
+      { if (seen && want) { gsub(/[ \t]/, ""); digest = digest $0 } }
+      END { if (seen && want) print digest }
     ' |
     tr '[:lower:]' '[:upper:]'
 }
@@ -108,11 +110,11 @@ extract_cert() {
   ' "$2"
 }
 
-# SHA-256 of the DER encoding of a PEM file. Selector 1 hashes the whole
-# certificate, so the DER form is what gets digested. The pipeline is kept in
-# binary form rather than through a shell variable, which cannot hold NULs.
-digest_cert() {
-  openssl x509 -in "$1" -outform DER 2>/dev/null |
+# SHA-256 of the SubjectPublicKeyInfo (SPKI) of a PEM certificate. Selector 1
+# hashes the public key, not the whole certificate.
+digest_spki() {
+  openssl x509 -in "$1" -pubkey -noout 2>/dev/null |
+    openssl pkey -pubin -outform DER 2>/dev/null |
     openssl dgst -sha256 -hex 2>/dev/null |
     sed 's/^.*= //' |
     tr '[:lower:]' '[:upper:]'
@@ -155,28 +157,13 @@ leaf_digest=""
 if ! openssl x509 -in "${workdir}/leaf.pem" -noout >/dev/null 2>&1; then
   fail "could not read the end-entity certificate from the chain on port 25"
 else
-  leaf_digest="$(digest_cert "${workdir}/leaf.pem")"
+  leaf_digest="$(digest_spki "${workdir}/leaf.pem")"
 
-  # DANE-EE is only satisfied when the end-entity certificate itself matches.
-  # A match on a CA higher up the chain is a weaker, different condition.
+  # DANE-EE selector 1 matches the end-entity certificate's public key.
   if printf '%s\n' "${published}" | grep -qxF "${leaf_digest}"; then
-    warn "end-entity certificate matches a published TLSA record."
+    warn "end-entity public key matches a published TLSA record."
   else
-    fail "end-entity certificate ${leaf_digest} matches no published TLSA record"
-  fi
-
-  extract_cert 1 "${workdir}/chain.pem" >"${workdir}/ca.pem"
-  ca_digest=""
-  if openssl x509 -in "${workdir}/ca.pem" -noout >/dev/null 2>&1; then
-    ca_digest="$(digest_cert "${workdir}/ca.pem")"
-    if printf '%s\n' "${published}" | grep -qxF "${ca_digest}"; then
-      warn "issuing CA also matches a published TLSA record."
-    else
-      fail "issuing CA matches no published TLSA record, so the '3 1 1'"\
-" pair is incomplete and a renewal has no gap-free rollover"
-    fi
-  else
-    fail "could not read the issuing CA from the chain on port 25"
+    fail "end-entity public key ${leaf_digest} matches no published TLSA record"
   fi
 
   not_after="$(openssl x509 -in "${workdir}/leaf.pem" -noout -enddate |

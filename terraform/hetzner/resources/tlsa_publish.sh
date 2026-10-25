@@ -1,14 +1,11 @@
 #!/bin/sh
 #
-# Publishes the "3 1 1" TLSA records for the mail server after a certbot
+# Publishes the "3 1 1" TLSA record for the mail server after a certbot
 # renewal.
 #
-# Usage 3 (DANE-EE) with selector 1 (full certificate) hashes the whole
-# certificate rather than its public key, so a record keeps matching across a
-# key rollover. The "3 1 1" methodology publishes the issuing CA alongside
-# the end-entity certificate; the CA digest is stable for the lifetime of the
-# intermediate, so a sending MTA that validates the freshly issued leaf still
-# matches a digest published before the renewal happened.
+# Usage 3 (DANE-EE) with selector 1 (SPKI) and matching type 1 (SHA-256)
+# pins the end-entity certificate's public key. Certbot renews with
+# --reuse-key, so the public key and digest stay stable across renewals.
 #
 # certbot runs this from /etc/letsencrypt/renewal-hooks/deploy/ with
 # RENEWED_LINEAGE pointing at the lineage that was just renewed.
@@ -33,41 +30,24 @@ set +a
 : "${CF_TLSA_PORT:?CF_TLSA_PORT is not set in ${CONFIG}}"
 
 readonly LINEAGE="${RENEWED_LINEAGE:-/etc/letsencrypt/live/${CF_TLSA_HOST}}"
-readonly WORKDIR="$(mktemp -d)"
-trap 'rm -rf "${WORKDIR}"' EXIT
 
-# Selector 1 hashes the certificate, not just the public key, so digest the
-# DER encoding. RFC 6698 section 2.1.1 requires upper case hex.
-digest_cert() {
-  openssl x509 -in "$1" -outform DER |
+# Selector 1 hashes the SubjectPublicKeyInfo (SPKI), not the whole
+# certificate. RFC 6698 section 2.1.1 requires upper case hex.
+digest_spki() {
+  openssl x509 -in "$1" -pubkey -noout |
+    openssl pkey -pubin -outform DER |
     openssl dgst -sha256 -hex |
     sed 's/^.*= //' |
     tr '[:lower:]' '[:upper:]'
 }
 
-# The first certificate in chain.pem is the CA that issued the leaf. Note that
-# fullchain.pem cannot be used here: it leads with the end-entity certificate,
-# so its first entry is the leaf again rather than its issuer.
-awk '/BEGIN CERTIFICATE/{n++} n==1' "${LINEAGE}/chain.pem" >"${WORKDIR}/ca.pem"
+leaf_digest="$(digest_spki "${LINEAGE}/cert.pem")"
 
-leaf_digest="$(digest_cert "${LINEAGE}/cert.pem")"
-ca_digest="$(digest_cert "${WORKDIR}/ca.pem")"
-
-# Publishing the leaf digest twice would silently drop the CA end of the "3 1 1"
-# pair, which is the half that keeps a rollover gap-free. Fail loudly instead.
-if [ "${leaf_digest}" = "${ca_digest}" ]; then
-  echo "${LINEAGE}: leaf and issuing CA hashes are identical, refusing to" \
-    "publish an incomplete TLSA RRset" >&2
-  exit 1
-fi
-
-# Each digest stays in its own RRset member, so the Cloudflare API models the
-# pair as two records that share a name. Existing records are updated in place
-# rather than deleted and recreated, which keeps the RRset resolvable
-# throughout the rollover instead of briefly answering with no TLSA at all.
-# A missing RRset on a signed zone makes senders treat delivery as a
-# temporary failure, so the gap is worth avoiding.
-python3 - "${leaf_digest}" "${ca_digest}" <<'PYTHON'
+# The record is updated in place rather than deleted and recreated, which
+# keeps the RRset resolvable throughout the rollover instead of briefly
+# answering with no TLSA at all. A missing RRset on a signed zone makes
+# senders treat delivery as a temporary failure, so the gap is worth avoiding.
+python3 - "${leaf_digest}" <<'PYTHON'
 import json
 import os
 import sys

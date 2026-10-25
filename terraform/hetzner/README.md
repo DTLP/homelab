@@ -77,11 +77,11 @@ through the API. Set `cloudflare_api_token` in `terraform.tfvars` to a token wit
 `Zone:DNS:Edit` on the zone; the hook reads it from
 `/etc/letsencrypt/tlsa.env` and stays inert while that file is absent.
 
-Two `3 1 1` records are published: one for the end-entity certificate and one
-for the CA that issued it. Only the end-entity digest changes on renewal, so
-the CA digest is what keeps the RRset matched in the window between a renewal
-and the next cache expiry. That also means this record needs no manual
-intervention, but it *is* email, so watch for renewal-hook failures:
+One `3 1 1` record is published: usage 3 (DANE-EE), selector 1 (SPKI), and
+SHA-256. It pins the end-entity certificate's public key. Certbot renews with
+`--reuse-key`, so the key and digest stay stable across renewals. That means
+this record needs no manual intervention, but it *is* email, so watch for
+renewal-hook failures:
 
 ```bash
 # republish by hand after fixing a broken hook or rotating the token
