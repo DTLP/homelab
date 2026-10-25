@@ -6,6 +6,7 @@ packages:
   - docker.io
   - gnupg
   - openssl
+  - psmisc
   - python3
   - rclone
   - unattended-upgrades
@@ -76,6 +77,17 @@ write_files:
 
       if [[ ! -f /var/run/reboot-required ]]; then
         exit 0
+      fi
+
+      if fuser -s /var/lib/dpkg/lock-frontend /var/lib/dpkg/lock \
+        /var/lib/apt/lists/lock 2>/dev/null; then
+        logger -t reboot-if-required "not rebooting: apt/dpkg is busy"
+        exit 1
+      fi
+
+      if systemctl is-active --quiet apt-daily-upgrade.service; then
+        logger -t reboot-if-required "not rebooting: apt-daily-upgrade is running"
+        exit 1
       fi
 
       if dpkg --audit | grep -q .; then
