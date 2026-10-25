@@ -243,6 +243,8 @@ runcmd:
     AllowedIPs = ${wg_client_private_ip_address}/32
     ${wg_extra_peers}
     EOF
+  - chmod 0700 /etc/wireguard
+  - chmod 0600 /etc/wireguard/wg0.conf
   - systemctl daemon-reload
   - systemctl start wg-quick@wg0
 
@@ -329,6 +331,7 @@ runcmd:
     [Service]
     PermissionsStartOnly=true
     Restart=on-failure
+    ExecStartPre=/bin/sh -c "chmod 0600 /mail/config/postfix-accounts.cf 2>/dev/null || true"
     ExecStart=/usr/bin/docker run \
       --rm \
       --name mail \

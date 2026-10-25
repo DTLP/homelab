@@ -38,6 +38,8 @@ restart_mail() {
 }
 trap restart_mail EXIT
 
+chmod 0600 /mail/config/postfix-accounts.cf 2>/dev/null || true
+
 systemctl stop mail
 tar -cz "${PATHS[@]}" \
   | gpg --batch --yes --symmetric --cipher-algo AES256 \
