@@ -332,7 +332,7 @@ runcmd:
     ExecStart=/usr/bin/docker run \
       --rm \
       --name mail \
-      -e MAILBOX_LIMIT_MB=5120 \
+      -e POSTFIX_MAILBOX_SIZE_LIMIT=5368709120 \
       --hostname ${mailserver_hostname}.${domain_name} \
       --dns=1.1.1.1 \
       --dns=1.0.0.1 \
