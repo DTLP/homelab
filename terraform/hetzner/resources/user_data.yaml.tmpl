@@ -1,8 +1,12 @@
 #cloud-config
 packages:
+  - bind9-dnsutils
   - curl
+  - docker-compose-v2
   - docker.io
   - gnupg
+  - openssl
+  - python3
   - rclone
   - unattended-upgrades
   - wireguard
@@ -198,14 +202,26 @@ runcmd:
   - systemctl daemon-reload
   - systemctl start wg-quick@wg0
 
+  # docker
+  - systemctl start docker
+  - systemctl enable docker
+
   # certificate
   - chmod 0700 /etc/letsencrypt/tlsa.env
   - chmod 0755 /etc/letsencrypt/renewal-hooks/deploy/50-publish-tlsa
-  - docker run --rm -it \
+  - |
+    docker run --rm \
       -v "/etc/letsencrypt/:/etc/letsencrypt/" \
       -v "/var/log/letsencrypt/:/var/log/letsencrypt/" \
       -p 80:80 \
-      certbot/certbot certonly --standalone -d ${mailserver_hostname}.${domain_name}
+      certbot/certbot certonly --standalone \
+        --non-interactive --agree-tos \
+        --email postmaster@${domain_name} \
+        --keep-until-expiring \
+        -d ${mailserver_hostname}.${domain_name}
+  - |
+    test -f "/etc/letsencrypt/live/${mailserver_hostname}.${domain_name}/fullchain.pem" \
+      || { echo "certbot failed to issue a certificate" >&2; exit 1; }
   # Publish the TLSA records for the certificate just issued, so DANE is
   # correct from the first boot rather than only after the next renewal.
   - /etc/letsencrypt/renewal-hooks/deploy/50-publish-tlsa
@@ -247,10 +263,6 @@ runcmd:
     echo "0 9 * * * root /usr/local/bin/tlsa-check" >> /etc/crontab
   - systemctl restart cron
 
-  # docker
-  - systemctl start docker
-  - systemctl enable docker
-
   # block container access to the Hetzner metadata service
   - /usr/local/bin/docker-metadata-block
   - systemctl daemon-reload
@@ -269,7 +281,7 @@ runcmd:
     Restart=on-failure
     ExecStart=/usr/bin/docker run \
       --rm \
-      --name mail
+      --name mail \
       --hostname ${mailserver_hostname}.${domain_name} \
       --dns=1.1.1.1 \
       --dns=1.0.0.1 \
