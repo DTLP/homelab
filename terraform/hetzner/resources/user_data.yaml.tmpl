@@ -460,7 +460,7 @@ runcmd:
         restart: unless-stopped
         network_mode: host
         environment:
-          - PANGOLIN_ENDPOINT=https://pangolin.dtlp.cc
+          - PANGOLIN_ENDPOINT=https://pangolin.${domain_name}
           - NEWT_ID=${newt_id}
           - NEWT_SECRET=${newt_secret}
 
@@ -476,22 +476,22 @@ runcmd:
 
     gerbil:
         start_port: 51820
-        base_endpoint: "pangolin.dtlp.cc"
+        base_endpoint: "wg.${domain_name}"
 
     app:
-        dashboard_url: "https://pangolin.dtlp.cc"
+        dashboard_url: "https://pangolin.${domain_name}"
         log_level: "info"
         telemetry:
             anonymous_usage: true
 
     domains:
         domain1:
-            base_domain: "dtlp.cc"
+            base_domain: "${domain_name}"
 
     server:
         secret: ${pangolin_server_secret}
         cors:
-            origins: ["https://pangolin.dtlp.cc"]
+            origins: ["https://pangolin.${domain_name}"]
             methods: ["GET", "POST", "PUT", "DELETE", "PATCH"]
             allowed_headers: ["X-CSRF-Token", "Content-Type"]
             credentials: false

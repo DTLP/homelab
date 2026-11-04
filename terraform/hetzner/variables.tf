@@ -6,7 +6,7 @@ variable "hcloud_token" {
 
 variable "domain_name" {
   description = "The domain name for the email server, e.g., example.com."
-  default     = "dtlp.cc"
+  default     = "example.com"
   type        = string
 }
 
@@ -144,13 +144,13 @@ variable "wg_server_endpoint_port" {
 
 variable "wg_server_private_ip_address" {
   description = "Private IP address assigned to the WireGuard server interface"
-  default     = "10.20.30.40"
+  default     = "10.0.0.40"
   type        = string
 }
 
 variable "wg_client_private_ip_address" {
   description = "Private IP address assigned to the WireGuard client interface"
-  default     = "10.20.30.41"
+  default     = "10.0.0.41"
   type        = string
 }
 

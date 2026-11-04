@@ -1,5 +1,8 @@
 # docker-mailserver on Hetzner
 
+> This is a sanitized reference copy. The live deployment is kept in a private
+> repository. Replace the example values before applying.
+
 [Docker Mailserver Documentation](https://docker-mailserver.github.io/docker-mailserver/latest/introduction/)
 
 ## Initial setup
@@ -15,8 +18,8 @@ docker exec -ti mail setup config dkim
 6. Enable DNSSEC and DANE/TLSA
 7. Create a mailbox and alias
 ```bash
-docker exec -ti mail setup email add example_mailbox@dtlp.cc
-docker exec -ti mail setup alias add example_alias@dtlp.cc example_mailbox@dtlp.cc
+docker exec -ti mail setup email add example_mailbox@example.com
+docker exec -ti mail setup alias add example_alias@example.com example_mailbox@example.com
 ```
 8. Connect to the mailbox using port `993` for IMAP and `465` for SMTP.
 
@@ -32,8 +35,8 @@ can be managed from Telegram. It needs `telegram_bot_token` and
 
 ## Notes
 
-- Wireguard tunnel uses `10.20.30.40` address for the `mail` server and
-`10.20.30.41` for the client machine.
+- Wireguard tunnel uses `10.0.0.40` address for the `mail` server and
+`10.0.0.41` for the client machine.
 - SSH is only available via VPN.
 - There are make targets available to save/restore backups and create/delete
 aliases quickly.
@@ -107,8 +110,8 @@ Pangolin and carries no digests or secrets.
 
 Monitor URLs:
 
-- `http://mail.dtlp.cc:8082/status`
-- `http://mail.dtlp.cc:8082/disk`
+- `http://mail.example.com:8082/status`
+- `http://mail.example.com:8082/disk`
 
 UptimeRobot: create a Keyword monitor for the first URL with the keyword
 `dane-tlsa: OK`, and a second for the disk URL with the keyword `disk: OK`, both

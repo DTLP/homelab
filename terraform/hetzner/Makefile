@@ -1,6 +1,6 @@
-MAIL_HOST := 10.20.30.40
+MAIL_HOST := 10.0.0.40
 SSH_USER := root
-SSH_KEY := ~/.ssh/hetzner
+SSH_KEY := ~/.ssh/id_ed25519
 
 CONFIG_REMOTE := /mail/config
 DATA_REMOTE   := /mail/data
@@ -36,7 +36,7 @@ mail-alias-create:
 	fi
 	@alias_name=$(word 2,$(MAKECMDGOALS)); \
 	mailbox=$(word 3,$(MAKECMDGOALS)); \
-	ssh -i ${SSH_KEY} ${SSH_USER}@${MAIL_HOST} docker exec mail setup alias add $$alias_name@dtlp.cc $$mailbox@dtlp.cc
+	ssh -i ${SSH_KEY} ${SSH_USER}@${MAIL_HOST} docker exec mail setup alias add $$alias_name@example.com $$mailbox@example.com
 
 mail-alias-list:
 	ssh -i ${SSH_KEY} ${SSH_USER}@${MAIL_HOST} docker exec mail setup alias list
@@ -48,7 +48,7 @@ mail-alias-delete:
 	fi
 	@alias_name=$(word 2,$(MAKECMDGOALS)); \
 	mailbox=$(word 3,$(MAKECMDGOALS)); \
-	ssh -i ${SSH_KEY} ${SSH_USER}@${MAIL_HOST} docker exec mail setup alias del $$alias_name@dtlp.cc $$mailbox@dtlp.cc
+	ssh -i ${SSH_KEY} ${SSH_USER}@${MAIL_HOST} docker exec mail setup alias del $$alias_name@example.com $$mailbox@example.com
 
 pangolin-backup:
 	ssh -i ${SSH_KEY} ${SSH_USER}@${MAIL_HOST} sudo tar -cvz ${PANGOLIN_CONFIG_REMOTE} > ${PANGOLIN_TAR}

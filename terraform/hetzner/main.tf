@@ -7,7 +7,7 @@ locals {
     newt_secret                  = var.newt_secret
     cloudflare_api_token         = var.cloudflare_api_token
     traefik_config_b64           = base64encode(file("${path.module}/resources/traefik_config.yaml"))
-    traefik_dynamic_config_b64   = base64encode(file("${path.module}/resources/traefik_dynamic_config.yaml"))
+    traefik_dynamic_config_b64   = base64encode(templatefile("${path.module}/resources/traefik_dynamic_config.yaml", { domain_name = var.domain_name }))
     tlsa_publish_b64             = base64encode(file("${path.module}/resources/tlsa_publish.sh"))
     tlsa_check_b64               = base64encode(file("${path.module}/resources/tlsa_check.sh"))
     dane_status_server_b64       = base64encode(file("${path.module}/resources/dane_status_server.py"))
@@ -73,14 +73,14 @@ resource "hcloud_ssh_key" "mail" {
 
 resource "hcloud_network" "mail" {
   name     = "mail"
-  ip_range = "10.20.0.0/16"
+  ip_range = "10.0.0.0/16"
 }
 
 resource "hcloud_network_subnet" "mail" {
   type         = "cloud"
   network_id   = hcloud_network.mail.id
   network_zone = "eu-central"
-  ip_range     = "10.20.30.0/24"
+  ip_range     = "10.0.0.0/24"
 }
 
 resource "hcloud_primary_ip" "mail" {
@@ -107,7 +107,7 @@ resource "hcloud_server" "mail" {
 
   network {
     network_id = hcloud_network.mail.id
-    ip         = "10.20.30.40"
+    ip         = "10.0.0.40"
   }
 
   depends_on = [

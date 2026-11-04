@@ -50,7 +50,7 @@ readonly MIN_VALID_DAYS=14
 
 # Served over HTTP for the external monitor to fetch. A tiny systemd unit runs
 # a static file server on port 8082 rooted at STATUS_DIR, so the monitor URL
-# is http://mail.dtlp.cc:8082/status. No container or reverse proxy involved.
+# is http://mail.example.com:8082/status. No container or reverse proxy involved.
 readonly STATUS_DIR="/opt/dane-status"
 readonly STATUS_FILE="${STATUS_DIR}/status"
 

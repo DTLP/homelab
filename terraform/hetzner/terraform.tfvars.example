@@ -1,0 +1,39 @@
+# Copy this file to terraform.tfvars and fill in real values.
+# Do not commit terraform.tfvars.
+hcloud_token = "CHANGE_ME"
+domain_name  = "example.com"
+
+pangolin_server_secret = "CHANGE_ME"
+cloudflare_api_token   = "CHANGE_ME"
+newt_id                = "CHANGE_ME"
+newt_secret            = "CHANGE_ME"
+
+telegram_bot_token   = "CHANGE_ME"
+telegram_bot_user_id = "CHANGE_ME"
+
+ente_db_password          = "CHANGE_ME"
+ente_s3_endpoint          = "https://CHANGE_ME.r2.cloudflarestorage.com"
+ente_s3_access_key_id     = "CHANGE_ME"
+ente_s3_secret_access_key = "CHANGE_ME"
+ente_key_encryption       = "CHANGE_ME"
+ente_key_hash             = "CHANGE_ME"
+ente_jwt_secret           = "CHANGE_ME"
+ente_internal_admin       = "admin@example.com"
+
+ssh_public_key = "ssh-ed25519 AAAA... you@example.com"
+
+wg_server_private_key        = "CHANGE_ME"
+wg_server_public_key         = "CHANGE_ME"
+wg_client_private_key        = "CHANGE_ME"
+wg_client_public_key         = "CHANGE_ME"
+# wg_extra_peers = [
+#   {
+#     name       = "laptop"
+#     public_key = "CHANGE_ME"
+#     ip         = "10.0.0.42"
+#   },
+# ]
+wg_extra_peers = []
+
+email_backup_password = "CHANGE_ME"
+dropbox_token         = "CHANGE_ME"
