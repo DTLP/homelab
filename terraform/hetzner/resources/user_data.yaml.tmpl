@@ -399,7 +399,7 @@ runcmd:
     name: pangolin
     services:
       pangolin:
-        image: docker.io/fosrl/pangolin:1.25.3
+        image: docker.io/fosrl/pangolin:1.26.0
         container_name: pangolin
         restart: unless-stopped
         deploy:
@@ -417,7 +417,7 @@ runcmd:
           retries: 15
 
       gerbil:
-        image: docker.io/fosrl/gerbil:1.5.2
+        image: docker.io/fosrl/gerbil:1.6.0
         container_name: gerbil
         restart: unless-stopped
         depends_on:
@@ -440,7 +440,7 @@ runcmd:
           - 8081:8081
 
       traefik:
-        image: docker.io/traefik:v3.7.16
+        image: docker.io/traefik:v3.7.17
         container_name: traefik
         restart: unless-stopped
         network_mode: service:gerbil
