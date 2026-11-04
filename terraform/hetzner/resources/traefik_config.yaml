@@ -27,7 +27,7 @@ certificatesResolvers:
   letsencrypt:
     acme:
       tlsChallenge: {}
-      email: "dmitry.lapo@hotmail.com"
+      email: "postmaster@dtlp.cc"
       storage: "/letsencrypt/acme.json"
       caServer: "https://acme-v02.api.letsencrypt.org/directory"
 
