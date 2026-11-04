@@ -1,9 +1,26 @@
-# docker-mailserver on Hetzner
+# Hetzner VPS: mail, Pangolin, and self-hosted apps
 
 > This is a sanitized reference copy. The live deployment is kept in a private
 > repository. Replace the example values before applying.
 
-[Docker Mailserver Documentation](https://docker-mailserver.github.io/docker-mailserver/latest/introduction/)
+This Terraform project provisions a single Hetzner Cloud VPS (Debian 13 in
+`nbg1`) and configures it with cloud-init. The server runs:
+
+- **[Pangolin](https://pangolin.net/)**: a self-hosted reverse proxy made up of
+  Traefik, Gerbil, and Newt. It publishes internal apps such as
+  [Ente Photos](https://ente.io/) on public HTTPS URLs under your domain, so
+  they are reachable from everyday devices like a laptop or phone.
+- **[Docker Mailserver](https://docker-mailserver.github.io/docker-mailserver/latest/introduction/)**
+  with IMAP (`993`), SMTP (`465`/`25`), DKIM, and DANE/TLSA, plus a Telegram
+  alias bot. The mail ports are exposed directly rather than through Pangolin.
+- **A WireGuard admin tunnel** (`wg0`, UDP `51821`). Administrative access,
+  including SSH, is only allowed over this VPN (`10.0.0.40` for the server,
+  `10.0.0.41` for the client). Copy `secrets/wg_client.conf` to your machine and
+  bring up the tunnel before connecting.
+
+Run `terraform apply` to create the network, firewall, public IP, and server;
+the generated `secrets/user_data.yaml` and `secrets/wg_client.conf` contain the
+rendered cloud-init config and VPN client config.
 
 ## Initial setup
 
