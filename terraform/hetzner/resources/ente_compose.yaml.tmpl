@@ -2,7 +2,7 @@ name: my-ente
 services:
   museum:
     restart: unless-stopped
-    image: ghcr.io/ente-io/server
+    image: ghcr.io/ente/server
     ports:
       - 8080:8080 # API
     depends_on:
@@ -17,14 +17,6 @@ services:
       timeout: 5s
       retries: 3
       start_period: 5s
-
-  web:
-    restart: unless-stopped
-    image: ghcr.io/ente-io/web
-    ports:
-      - 3000:3000 # Photos web app
-    environment:
-      ENTE_API_ORIGIN: http://10.20.30.40:8080
 
   postgres:
     restart: unless-stopped

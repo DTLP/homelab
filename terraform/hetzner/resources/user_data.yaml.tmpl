@@ -1,11 +1,16 @@
 #cloud-config
+hostname: debian
+package_update: true
 packages:
   - bind9-dnsutils
+  - cron
   - curl
-  - docker-compose-v2
+  - docker-cli
+  - docker-compose
   - docker.io
   - gnupg
-  - nftables
+  - iptables
+  - needrestart
   - openssl
   - psmisc
   - python3
@@ -69,15 +74,17 @@ write_files:
       Unattended-Upgrade::Remove-Unused-Kernel-Packages "false";
       Unattended-Upgrade::Remove-Unused-Dependencies "false";
 
-      // Only install security updates. The default list also includes
-      // Ubuntu:noble, which would install all stable updates, so clear it
-      // first.
-      #clear Unattended-Upgrade::Allowed-Origins;
-      Unattended-Upgrade::Allowed-Origins {
-          "${distro_id}:${distro_codename}-security";
-          "${distro_id}ESMApps:${distro_codename}-apps-security";
-          "${distro_id}ESM:${distro_codename}-infra-security";
+      // Only install security updates. Debian's default list includes all
+      // stable updates, so clear it and add only the security archive.
+      #clear Unattended-Upgrade::Origins-Pattern;
+      Unattended-Upgrade::Origins-Pattern {
+          "origin=Debian,codename=$${distro_codename}-security,label=Debian-Security";
       };
+  - path: /etc/ssh/sshd_config.d/99-mail.conf
+    permissions: "0644"
+    content: |
+      PasswordAuthentication no
+      PermitRootLogin prohibit-password
   # Rebooting is the only step that can take the server offline, so check for
   # a half-finished dpkg run or a full disk first and report what is pending.
   - path: /usr/local/bin/reboot-if-required
@@ -86,7 +93,9 @@ write_files:
       #!/usr/bin/env bash
       set -euo pipefail
 
-      if [[ ! -f /var/run/reboot-required ]]; then
+      # Debian has no /var/run/reboot-required; ask needrestart whether a new
+      # kernel is installed. KSTA 2 is an ABI upgrade and 3 a version upgrade.
+      if ! needrestart -b -r l 2>/dev/null | grep -Eq '^NEEDRESTART-KSTA: [23]$'; then
         exit 0
       fi
 
@@ -111,15 +120,13 @@ write_files:
         exit 1
       fi
 
-      pending=$(cat /var/run/reboot-required.pkgs 2>/dev/null || true)
-      logger -t reboot-if-required "rebooting for pending updates: $pending"
+      logger -t reboot-if-required "rebooting for a pending kernel update"
       systemctl reboot
   - path: /etc/systemd/system/reboot-if-required.service
     permissions: "0644"
     content: |
       [Unit]
       Description=Reboot the mail server if an update requires it
-      ConditionPathExists=/var/run/reboot-required
 
       [Service]
       Type=oneshot
@@ -136,46 +143,6 @@ write_files:
 
       [Install]
       WantedBy=timers.target
-  # Temporary mitigation for CVE-2026-98432 (IPv4 TCP use-after-free). It
-  # drops inbound TCP packets that carry IP options, which blocks the known
-  # trigger vector but does not fully prevent exploitation. Remove this once
-  # the fixed Ubuntu kernel (6.8.0-149.149 or later) is installed.
-  - path: /etc/cve-2026-98432.nft
-    permissions: "0644"
-    content: |
-      destroy table inet cve_2026_98432
-
-      table inet cve_2026_98432 {
-        chain input {
-          type filter hook input priority -310; policy accept;
-          ip protocol tcp ip hdrlength > 5 counter drop
-        }
-
-        # Cover DNATed traffic forwarded to containers as well as host services.
-        chain forward {
-          type filter hook forward priority -310; policy accept;
-          ip protocol tcp ip hdrlength > 5 counter drop
-        }
-      }
-  - path: /etc/sysctl.d/99-cve-2026-98432.conf
-    permissions: "0644"
-    content: |
-      # Mitigation for CVE-2026-98432: nothing on this host needs Multipath TCP.
-      net.mptcp.enabled = 0
-  - path: /etc/systemd/system/cve-2026-98432.service
-    permissions: "0644"
-    content: |
-      [Unit]
-      Description=Drop inbound IPv4 TCP packets with IP options (CVE-2026-98432)
-      After=network.target
-
-      [Service]
-      Type=oneshot
-      RemainAfterExit=yes
-      ExecStart=/usr/sbin/nft -f /etc/cve-2026-98432.nft
-
-      [Install]
-      WantedBy=multi-user.target
   - path: /usr/local/bin/email-backup
     encoding: b64
     content: ${email_backup_b64}
@@ -275,8 +242,15 @@ write_files:
       printf '%s disk: %s (%s%%)\n' "$(date -Is)" "$status" "$usage" \
         > /opt/dane-status/disk
 runcmd:
-  # disable SSH password authentication
-  - sed -i 's/^#\?PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+  # Debian's cloud image can ship an older kernel. Upgrade all packages,
+  # including the kernel, before continuing with the stack.
+  - |
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update
+    apt-get -y -o Dpkg::Options::=--force-confold \
+      -o Dpkg::Options::=--force-confdef full-upgrade
+
+  # SSH hardening lives in /etc/ssh/sshd_config.d/99-mail.conf.
   - systemctl restart ssh
 
   # wireguard vpn
@@ -302,7 +276,6 @@ runcmd:
   # docker
   - systemctl start docker
   - systemctl enable docker
-
   # certificate
   - chmod 0700 /etc/letsencrypt/tlsa.env
   - chmod 0755 /etc/letsencrypt/renewal-hooks/deploy/50-publish-tlsa
@@ -370,12 +343,6 @@ runcmd:
   - /usr/local/bin/docker-metadata-block
   - systemctl daemon-reload
   - systemctl enable docker-metadata-block.service
-
-  # temporary mitigation for CVE-2026-98432
-  - sysctl -q -p /etc/sysctl.d/99-cve-2026-98432.conf
-  - systemctl daemon-reload
-  - systemctl enable cve-2026-98432.service
-  - systemctl start cve-2026-98432.service
 
   # mail server
   - |
@@ -488,7 +455,7 @@ runcmd:
           - ./config/traefik/logs:/var/log/traefik
 
       newt:
-        image: docker.io/fosrl/newt:1.19.0
+        image: docker.io/fosrl/newt:1.20.0
         container_name: newt
         restart: unless-stopped
         network_mode: host
@@ -528,7 +495,8 @@ runcmd:
             methods: ["GET", "POST", "PUT", "DELETE", "PATCH"]
             allowed_headers: ["X-CSRF-Token", "Content-Type"]
             credentials: false
-        maxmind_db_path: "./config/GeoLite2-Country.mmdb"
+        # Optional: place GeoLite2-Country.mmdb in ./config and set
+        # maxmind_db_path when country geolocation is needed.
 
     flags:
         require_email_verification: false
@@ -602,3 +570,11 @@ runcmd:
   - chmod 0755 /usr/local/bin/email-backup
   - systemctl daemon-reload
   - systemctl enable --now email-backup.timer
+
+  # Reboot into the fixed kernel before the operator relies on the host.
+  - |
+    if needrestart -b -r l 2>/dev/null | grep -Eq '^NEEDRESTART-KSTA: [23]$'; then
+      logger -t cloud-init "rebooting for the updated kernel"
+      sync
+      systemctl reboot
+    fi

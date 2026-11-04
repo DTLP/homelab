@@ -11,10 +11,10 @@
       <img src="docs/images/ansible_dark.svg" width="40" height="40" title="Ansible"/>
     </picture>
   </a>
-  <a href="https://ubuntu.com/download" target="_blank">
+  <a href="https://www.debian.org/download" target="_blank">
     <picture>
-      <source srcset="docs/images/ubuntu_light.svg" media="(prefers-color-scheme: dark)">
-      <img src="docs/images/ubuntu_dark.svg" width="40" height="40" title="Ubuntu"/>
+      <source srcset="docs/images/debian_light.svg" media="(prefers-color-scheme: dark)">
+      <img src="docs/images/debian_dark.svg" height="40" alt="Debian" title="Debian"/>
     </picture>
   </a>
   <a href="https://www.talos.dev" target="_blank">

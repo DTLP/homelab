@@ -1,7 +1,5 @@
-data "template_file" "cloud_init" {
-  template = file("./resources/user_data.yaml.tmpl")
-
-  vars = {
+locals {
+  cloud_init = templatefile("${path.module}/resources/user_data.yaml.tmpl", {
     domain_name                  = var.domain_name
     mailserver_hostname          = var.mailserver_hostname
     pangolin_server_secret       = var.pangolin_server_secret
@@ -60,11 +58,11 @@ data "template_file" "cloud_init" {
       "type = dropbox",
       "token = ${replace(replace(trimspace(var.dropbox_token), "\r", ""), "\n", "")}",
     ]))
-  }
+  })
 }
 
 resource "local_sensitive_file" "cloud_init" {
-  content  = data.template_file.cloud_init.rendered
+  content  = local.cloud_init
   filename = "./secrets/user_data.yaml"
 }
 
@@ -93,13 +91,13 @@ resource "hcloud_primary_ip" "mail" {
 }
 
 resource "hcloud_server" "mail" {
-  name        = "mail"
+  name        = "debian"
   location    = "nbg1" # DE Nuremberg 1
-  server_type = "cx22" # 2 vCPU, 4GB RAM, 40GB SSD, € 0.006/h
-  image       = "ubuntu-24.04"
+  server_type = "cx23" # 2 vCPU, 4GB RAM, 40GB SSD, € 0.0088/h
+  image       = "debian-13"
 
   ssh_keys  = [hcloud_ssh_key.mail.id]
-  user_data = local_sensitive_file.cloud_init.content
+  user_data = local.cloud_init
 
   public_net {
     ipv4_enabled = true
@@ -118,7 +116,10 @@ resource "hcloud_server" "mail" {
 
   lifecycle {
     ignore_changes = [
-      user_data
+      user_data,
+      ssh_keys,
+      network,
+      public_net,
     ]
   }
 }
