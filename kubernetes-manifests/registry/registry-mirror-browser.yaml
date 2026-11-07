@@ -52,7 +52,7 @@ spec:
             - name: DOCKER_REGISTRY_URL
               value: http://registry-cache-proxy.registry.svc.cluster.local:8081
             - name: PUBLIC_REGISTRY_URL
-              value: registry.dtlp.cc
+              value: registry-mirror.dtlp.cc
             - name: ENABLE_DELETE_IMAGES
               value: "true"
             - name: TZ
