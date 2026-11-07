@@ -1,7 +1,7 @@
 INVENTORY = inventory.ini
 
 .PHONY: start
-start: cluster ssh nvme ubuntu
+start: cluster ssh nvme ubuntu nic
 
 .PHONY: stop
 stop: shutdown
@@ -10,6 +10,11 @@ stop: shutdown
 cluster:
 	@echo "Running cluster setup playbook..."
 	ansible-playbook -i $(INVENTORY) cluster_setup.yaml $(ARGS)
+
+.PHONY: nic
+nic:
+	@echo "Running NIC tuning playbook..."
+	ansible-playbook -i $(INVENTORY) nic_tuning.yaml $(ARGS)
 
 .PHONY: nvme
 nvme:

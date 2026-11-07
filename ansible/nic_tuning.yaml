@@ -1,0 +1,48 @@
+---
+- name: Disable NIC offloads to work around e1000e hardware hangs
+  hosts: pve_nodes
+  become: yes
+
+  vars:
+    nic_interface: eno1
+    nic_offloads: "tso off gso off gro off"
+
+  tasks:
+    - name: Install ethtool
+      apt:
+        name: ethtool
+        state: present
+
+    - name: Disable offloads on {{ nic_interface }}
+      command: /usr/sbin/ethtool -K {{ nic_interface }} {{ nic_offloads }}
+      changed_when: false
+
+    - name: Persist offload settings across reboots
+      copy:
+        dest: /etc/systemd/system/nic-offloads.service
+        mode: "0644"
+        content: |
+          [Unit]
+          Description=Disable NIC offloads to work around e1000e hardware hangs
+          After=network-online.target
+          Wants=network-online.target
+
+          [Service]
+          Type=oneshot
+          RemainAfterExit=yes
+          ExecStart=/usr/sbin/ethtool -K {{ nic_interface }} {{ nic_offloads }}
+
+          [Install]
+          WantedBy=multi-user.target
+      register: nic_offloads_unit
+
+    - name: Reload systemd
+      systemd:
+        daemon_reload: yes
+      when: nic_offloads_unit.changed
+
+    - name: Enable and start the offload unit
+      systemd:
+        name: nic-offloads.service
+        enabled: yes
+        state: started
