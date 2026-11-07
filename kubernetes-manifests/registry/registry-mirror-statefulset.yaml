@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: registry-mirror
+  labels:
+    app: registry-mirror
+spec:
+  serviceName: registry-mirror
+  replicas: 1
+  selector:
+    matchLabels:
+      app: registry-mirror
+  template:
+    metadata:
+      labels:
+        app: registry-mirror
+    spec:
+      containers:
+        - name: registry
+          image: registry:2.8.3
+          ports:
+            - containerPort: 5000
+          env:
+            - name: REGISTRY_PROXY_REMOTEURL
+              value: https://registry-1.docker.io
+            - name: REGISTRY_STORAGE_DELETE_ENABLED
+              value: "true"
+          resources:
+            requests:
+              cpu: 10m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - name: storage
+              mountPath: /var/lib/registry
+        - name: cache-proxy
+          image: python:3.12-alpine
+          command:
+            - python
+            - /app/registry-cache-proxy.py
+          ports:
+            - name: cache-proxy
+              containerPort: 8081
+          env:
+            - name: REGISTRY_STORAGE_ROOT
+              value: /var/lib/registry/docker/registry/v2
+            - name: REGISTRY_UPSTREAM_URL
+              value: http://127.0.0.1:5000
+          readinessProbe:
+            tcpSocket:
+              port: cache-proxy
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: cache-proxy
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - name: storage
+              mountPath: /var/lib/registry
+              readOnly: true
+            - name: cache-proxy
+              mountPath: /app
+              readOnly: true
+      volumes:
+        - name: cache-proxy
+          configMap:
+            name: registry-cache-proxy
+  volumeClaimTemplates:
+    - metadata:
+        name: storage
+        labels:
+          app.kubernetes.io/name: registry-mirror
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 50Gi
+        storageClassName: nfs-client

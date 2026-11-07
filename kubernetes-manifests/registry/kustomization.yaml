@@ -4,14 +4,21 @@ kind: Kustomization
 namespace: registry
 
 resources:
-  - registry-cache-proxy-service.yaml
   - argocd-app.yaml
   - network-policies.yaml
+  - registry-browser-auth.yaml
+  - registry-browser-ingress.yaml
+  - registry-browser.yaml
+  - registry-cache-proxy-service.yaml
+  - registry-ingress.yaml
   - registry-mirror-browser-ingress.yaml
   - registry-mirror-browser.yaml
-  - registry-ingress.yaml
+  - registry-mirror-ingress.yaml
+  - registry-mirror-service.yaml
+  - registry-mirror-statefulset.yaml
   - registry-service.yaml
   - registry-statefulset.yaml
+
 configMapGenerator:
   - name: registry-cache-proxy
     files:
