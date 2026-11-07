@@ -68,9 +68,6 @@ services:
       - name: "Terraform Applier"
         logo: "https://raw.githubusercontent.com/DTLP/homelab/refs/heads/main/docs/images/terraform_light.svg"
         url: "https://terraform-applier.dtlp.cc"
-      - name: "Registry Mirror"
-        icon: "fas fa-box"
-        url: "https://registry-mirror-browser.dtlp.cc"
   - name: "Monitoring"
     logo: "https://raw.githubusercontent.com/DTLP/homelab/refs/heads/main/docs/images/heartbeat_light.svg"
     items:
@@ -101,6 +98,12 @@ services:
         url: "https://excalidraw.dtlp.cc"
       - name: "IT Tools"
         url: "https://it-tools.dtlp.cc"
+      - name: "Registry Browser"
+        icon: "fas fa-box-open"
+        url: "https://registry-browser.dtlp.cc"
+      - name: "Registry Mirror Browser"
+        icon: "fas fa-box"
+        url: "https://registry-mirror-browser.dtlp.cc"
   - name: "Proxmox"
     logo: "https://raw.githubusercontent.com/DTLP/homelab/refs/heads/main/docs/images/proxmox_light.svg"
     items:
