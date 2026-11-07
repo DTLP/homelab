@@ -15,6 +15,8 @@ spec:
       labels:
         app: registry-mirror
     spec:
+      imagePullSecrets:
+        - name: registry-pull
       containers:
         - name: registry
           image: registry:2.8.3
@@ -42,10 +44,7 @@ spec:
             - name: storage
               mountPath: /var/lib/registry
         - name: cache-proxy
-          image: python:3.12-alpine
-          command:
-            - python
-            - /app/registry-cache-proxy.py
+          image: registry.dtlp.cc/library/registry-cache-proxy:0.1.0
           ports:
             - name: cache-proxy
               containerPort: 8081
@@ -73,19 +72,15 @@ spec:
             allowPrivilegeEscalation: false
             capabilities:
               drop: ["ALL"]
+            runAsUser: 65534
+            runAsGroup: 65534
+            runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
           volumeMounts:
             - name: storage
               mountPath: /var/lib/registry
               readOnly: true
-            - name: cache-proxy
-              mountPath: /app
-              readOnly: true
-      volumes:
-        - name: cache-proxy
-          configMap:
-            name: registry-cache-proxy
   volumeClaimTemplates:
     - metadata:
         name: storage
