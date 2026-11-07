@@ -46,6 +46,11 @@ metadata:
 apiVersion: v1
 kind: Namespace
 metadata:
+  name: registry
+---
+apiVersion: v1
+kind: Namespace
+metadata:
   name: sandbox
 ---
 apiVersion: v1

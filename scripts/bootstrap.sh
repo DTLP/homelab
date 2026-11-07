@@ -54,6 +54,7 @@ apply "$MANIFESTS/kube-system"
 # (default-deny with the known flows), so no workload starts unprotected.
 apply "$MANIFESTS/monitoring"
 apply "$MANIFESTS/nfs-provisioner"
+apply "$MANIFESTS/registry"
 apply "$MANIFESTS/sandbox"
 
 echo "==> Bootstrap complete."

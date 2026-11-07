@@ -90,6 +90,7 @@ controlPlane:
     - patches/pod-security.yaml
     - patches/user-namespaces.yaml
     - patches/etcd-metrics.yaml
+    - patches/registry-mirror.yaml
   ingressFirewall:
     defaultAction: accept
     rules:
@@ -110,6 +111,7 @@ controlPlane:
 worker:
   patches:
     - patches/user-namespaces.yaml
+    - patches/registry-mirror.yaml
   schematic:
     customization:
       systemExtensions:

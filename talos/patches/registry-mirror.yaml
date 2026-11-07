@@ -1,0 +1,12 @@
+machine:
+  network:
+    extraHostEntries:
+      - ip: 192.168.0.50
+        aliases:
+          - registry.dtlp.cc
+  registries:
+    mirrors:
+      docker.io:
+        endpoints:
+          - https://registry.dtlp.cc
+          - https://registry-1.docker.io

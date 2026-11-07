@@ -26,6 +26,7 @@ spec:
     - metallb-system
     - monitoring
     - nfs-provisioner
+    - registry
     - terraform-applier
 
   destinations:
@@ -48,6 +49,8 @@ spec:
     - namespace: monitoring
       name: in-cluster
     - namespace: nfs-provisioner
+      name: in-cluster
+    - namespace: registry
       name: in-cluster
     - namespace: terraform-applier
       name: in-cluster
