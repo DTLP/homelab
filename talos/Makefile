@@ -46,6 +46,8 @@ upgrade-k8s:
 	DRY=$$([ -n "$(DRY_RUN)" ] && echo --dry-run || true) && \
 	talosctl upgrade-k8s --to $$KUBERNETES_VERSION -n 192.168.0.30 $$DRY
 
+# The control-plane node is not drained because Kyverno is pinned there and
+# its PDB blocks eviction.
 upgrade-talos:
 	@TALOS_VERSION=$$(grep '^TALOS_VERSION' $(TALENV) | cut -d ':' -f2 | tr -d ' ') && \
 	for node in $(NODES); do \
@@ -53,7 +55,20 @@ upgrade-talos:
 		if [ "$$current" = "$$TALOS_VERSION" ]; then \
 			echo "skipping node $$node. already on $$TALOS_VERSION"; \
 		else \
-			echo "upgrading node $$node to $$TALOS_VERSION"; \
-			talosctl upgrade --drain-timeout=10m -n $$node --image ghcr.io/siderolabs/installer:$$TALOS_VERSION; \
+			image=$$(talosctl -n $$node get machineconfig -o yaml 2>/dev/null | awk '/image: .*installer/ {print $$2; exit}'); \
+			image=$${image%:*}; \
+			if [ -z "$$image" ]; then echo "could not determine installer image for $$node"; exit 1; fi; \
+			drain="--drain-timeout=10m"; \
+			if [ "$$node" = "192.168.0.30" ]; then drain="--drain=false"; fi; \
+			echo "upgrading node $$node to $$TALOS_VERSION using $$image:$$TALOS_VERSION"; \
+			talosctl upgrade --wait=false $$drain -n $$node --image "$$image:$$TALOS_VERSION" & upgrade_pid=$$!; \
+			echo "waiting for $$node to reboot into $$TALOS_VERSION"; \
+			deadline=$$(($$(date +%s) + 600)); \
+			until talosctl version --short -n $$node 2>/dev/null | grep -q "Tag:.*$$TALOS_VERSION"; do \
+				if [ $$(date +%s) -ge $$deadline ]; then echo "timed out waiting for $$node"; kill $$upgrade_pid 2>/dev/null; exit 1; fi; \
+				sleep 5; \
+			done; \
+			kill $$upgrade_pid 2>/dev/null; wait $$upgrade_pid 2>/dev/null; \
 		fi; \
 	done
+	@for host in $(HOSTS); do kubectl uncordon $$host >/dev/null 2>&1 || true; done
