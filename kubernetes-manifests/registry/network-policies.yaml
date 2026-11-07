@@ -12,5 +12,9 @@ spec:
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: ingress-controller
+    - from:
+        - podSelector:
+            matchLabels:
+              app: registry-mirror-browser
   egress:
     - {}
