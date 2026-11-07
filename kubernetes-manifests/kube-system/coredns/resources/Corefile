@@ -14,7 +14,8 @@
         fallthrough in-addr.arpa ip6.arpa
         ttl 30
     }
-    forward . 1.1.1.1 1.0.0.1 {
+    forward . tls://1.1.1.1 tls://1.0.0.1 {
+       tls_servername cloudflare-dns.com
        max_concurrent 1000
     }
     cache 30 {
