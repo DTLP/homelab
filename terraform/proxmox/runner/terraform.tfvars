@@ -1,9 +1,13 @@
-pve = {
-  nodes    = ["pve1", "pve2", "pve3", "pve4", "pve5"]
-  endpoint = "https://192.168.0.21:8006/api2/json"
-  ssh = {
-    username         = "root"
-    private_key_file = "../secrets/id_ed25519"
-  }
-  insecure = true
-}
+-----BEGIN AGE ENCRYPTED FILE-----
+YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBsZ3FjK0JlQnA1RDFnendw
+eGhhYWh5aUZiM0paRkhNWncySXhUa2kzaEZvCk9XZ3h2WURRMXU3bE9WbU9Vc29U
+dEFTSDBDeG5hcWZjUHlabWJWdEErcVUKLS0tICtzTlVicit0RDNJZkRiMDQ3YjhL
+QjdWTGJnR1FMYndaQWxDdVVjQUxMbWcKyAtTASdKkGWNr39/iFXwnJ/eOVIZxuoT
+gdlnK/v0BT4es5XUd3ezBc7+9JTNgKaigKZX13HIHsBaCogXz7pUPyiRcdm7LmqW
+CC3X2wr1l7nqU1nTpCPBEJnsmcHKwwHG9I1twAy79SrII5xv4M02snrMzauGRIZ0
+KEOGHHon3Lu4dMAXtVDoJ35ILqL8UlIyU9ztQY3QXloXvNNwlIO/VEAji3+ituNq
+73y3cHPUnyA8m6xlmaedpMY/r5Kh8BA0H5+rVcbfBWI1k/VCbE8fnrD3W+Kxd3Lo
+e6V3VvApDZ3+SlodlbMJEry5ZTxOQB4/wBx3FkNfBlB7+ypx0xILVYtu6MyKCPM1
+mEgCTXlfo8i/ZH6obdxWWScNVtOpWkoIAyQlr4bC/mrCS8slDwVxbQ9YYNL5xQU4
+bC8FuO0=
+-----END AGE ENCRYPTED FILE-----

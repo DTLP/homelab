@@ -36,8 +36,10 @@ resource "proxmox_virtual_environment_vm" "runner" {
   node_name = "pve1"
   on_boot   = true
 
+  # Disabled: the Terraform provider blocks VM creation until the guest agent
+  # answers, which adds a long wait and fails if cloud-init is slow.
   agent {
-    enabled = true
+    enabled = false
   }
 
   clone {

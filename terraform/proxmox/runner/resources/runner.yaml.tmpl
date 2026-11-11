@@ -6,6 +6,16 @@ packages:
   - ca-certificates
   - curl
   - docker.io
+  - qemu-guest-agent
+
+# The PVE user account settings are ignored when a custom user-data file is
+# used, so the login user has to be defined here.
+users:
+  - name: root
+    lock_passwd: true
+    ssh_authorized_keys:
+      - ${admin_ssh_key}
+disable_root: false
 
 write_files:
   # Resolve Forgejo through the LAN instead of hairpinning via Cloudflare.
