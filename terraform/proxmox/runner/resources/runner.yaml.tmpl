@@ -1,0 +1,43 @@
+#cloud-config
+
+manage_etc_hosts: false
+package_update: true
+packages:
+  - ca-certificates
+  - curl
+  - docker.io
+
+write_files:
+  # Resolve Forgejo through the LAN instead of hairpinning via Cloudflare.
+  - path: /etc/hosts
+    append: true
+    content: |
+      192.168.0.50 ${forgejo_host}
+
+  - path: /etc/systemd/system/forgejo-runner.service
+    permissions: "0644"
+    content: |
+      [Unit]
+      Description=Forgejo Actions runner
+      After=docker.service network-online.target
+      Wants=network-online.target
+      Requires=docker.service
+
+      [Service]
+      WorkingDirectory=/var/lib/forgejo-runner
+      ExecStart=/usr/local/bin/forgejo-runner daemon
+      Restart=always
+      RestartSec=5s
+
+      [Install]
+      WantedBy=multi-user.target
+
+runcmd:
+  - hostnamectl set-hostname ${hostname}
+  - systemctl enable --now docker
+  - curl -fsSL -o /usr/local/bin/forgejo-runner https://code.forgejo.org/forgejo/runner/releases/download/v${runner_version}/forgejo-runner-${runner_version}-linux-amd64
+  - chmod 0755 /usr/local/bin/forgejo-runner
+  - mkdir -p /var/lib/forgejo-runner
+  - cd /var/lib/forgejo-runner && /usr/local/bin/forgejo-runner register --no-interactive --instance ${forgejo_url} --token ${runner_token} --name ${hostname} --labels "${runner_labels}"
+  - systemctl daemon-reload
+  - systemctl enable --now forgejo-runner
