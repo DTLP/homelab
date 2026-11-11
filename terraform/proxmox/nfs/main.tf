@@ -42,14 +42,14 @@ resource "proxmox_virtual_environment_vm" "nfs_vm" {
     full         = true
   }
   cpu {
-    cores   = 3
+    cores   = 2
     sockets = 1
     type    = "host"
   }
 
   memory {
-    dedicated = 3072
-    floating  = 3072
+    dedicated = 2048
+    floating  = 1024
   }
 
   network_device {
