@@ -284,7 +284,7 @@ runcmd:
       -v "/etc/letsencrypt/:/etc/letsencrypt/" \
       -v "/var/log/letsencrypt/:/var/log/letsencrypt/" \
       -p 80:80 \
-      certbot/certbot certonly --standalone \
+      certbot/certbot:v5.10.0 certonly --standalone \
         --non-interactive --agree-tos \
         --email postmaster@${domain_name} \
         --keep-until-expiring \
@@ -302,7 +302,7 @@ runcmd:
       -v \"/etc/letsencrypt/:/etc/letsencrypt/\" \
       -v \"/var/log/letsencrypt/:/var/log/letsencrypt/\" \
       -p 80:80 \
-      certbot/certbot renew --quiet --reuse-key" >> /etc/crontab
+      certbot/certbot:v5.10.0 renew --quiet --reuse-key" >> /etc/crontab
   - systemctl restart cron
 
   # DANE TLSA status page. Serves /opt/dane-status on port 8082 with a plain
