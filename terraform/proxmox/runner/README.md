@@ -17,17 +17,23 @@ run in Docker containers, with `ubuntu-latest` mapping to
 
 ## First apply
 
-The registration token is a secret and is not stored in the repository. Create
-one in Forgejo under **Site Administration → Actions → Runners**, then:
+Create a registration token in Forgejo under **Site Administration → Actions →
+Runners** and put it in `terraform.tfvars`:
+
+```hcl
+runner_token = "<token>"
+```
+
+That file is filtered through strongbox, so the committed copy is encrypted
+with the recipients in `terraform/proxmox/.strongbox_recipient`. Then:
 
 ```
-export TF_VAR_runner_token=<token>
 terraform init
 terraform apply
 ```
 
 The rendered cloud-init file under `cloud-init-config/` contains the token, so
-it is written with mode 0600 and should not be committed.
+it is written with mode 0600 and is gitignored.
 
 To change the runner's labels or version, override `runner_labels` or
 `runner_version` in `terraform.tfvars`. Labels are only read at registration
