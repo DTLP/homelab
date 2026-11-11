@@ -89,6 +89,7 @@ controlPlane:
   patches:
     - patches/pod-security.yaml
     - patches/user-namespaces.yaml
+    - patches/user-namespaces-apiserver.yaml
     - patches/etcd-metrics.yaml
     - patches/registry-mirror.yaml
   ingressFirewall:
