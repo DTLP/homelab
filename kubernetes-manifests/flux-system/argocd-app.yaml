@@ -11,6 +11,13 @@ spec:
   destination:
     name: in-cluster
     namespace: flux-system
+  ignoreDifferences:
+    # 1000m and 1 are the same quantity, but the API server keeps the form it
+    # was given, so the upstream manifests always look different.
+    - group: apps
+      kind: Deployment
+      jqPathExpressions:
+        - .spec.template.spec.containers[].resources.limits.cpu
   syncPolicy:
     automated:
       prune: true
