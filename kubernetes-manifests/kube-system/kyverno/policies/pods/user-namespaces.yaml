@@ -43,6 +43,12 @@ spec:
           resource.Get("v1", "persistentvolumeclaims", object.metadata.namespace, v.persistentVolumeClaim.claimName)
             .?spec.storageClassName.orValue(null) == "nfs-client"
         )
+    # Exclude pods with direct NFS volumes.
+    - name: exclude-pods-with-direct-nfs-volumes
+      expression: >-
+        !object.spec.?volumes.orValue([]).exists(v,
+          has(v.nfs)
+        )
 
   mutations:
     - patchType: ApplyConfiguration
