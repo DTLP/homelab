@@ -8,6 +8,8 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   description: main project
+  orphanedResources:
+    warn: true
   sourceRepos:
     - git@github.com:DTLP/homelab.git
 
