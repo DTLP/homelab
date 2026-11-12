@@ -11,6 +11,11 @@ spec:
   destination:
     name: in-cluster
     namespace: argocd
+  ignoreDifferences:
+    - group: apps
+      kind: StatefulSet
+      jqPathExpressions:
+        - .spec.volumeClaimTemplates
   syncPolicy:
     syncOptions:
       - ApplyOutOfSyncOnly=true
