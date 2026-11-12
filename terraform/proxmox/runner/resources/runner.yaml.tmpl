@@ -6,6 +6,7 @@ packages:
   - ca-certificates
   - curl
   - docker.io
+  - nodejs
   - qemu-guest-agent
 
 # The PVE user account settings are ignored when a custom user-data file is
@@ -18,11 +19,13 @@ users:
 disable_root: false
 
 write_files:
-  # Resolve Forgejo through the LAN instead of hairpinning via Cloudflare.
+  # Resolve Forgejo and the registry through the LAN instead of hairpinning
+  # via Cloudflare.
   - path: /etc/hosts
     append: true
     content: |
       192.168.0.50 ${forgejo_host}
+      192.168.0.50 registry.dtlp.cc
 
   - path: /etc/systemd/system/forgejo-runner.service
     permissions: "0644"

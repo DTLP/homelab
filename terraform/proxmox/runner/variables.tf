@@ -40,5 +40,5 @@ variable "runner_name" {
 
 variable "runner_labels" {
   type    = string
-  default = "ubuntu-latest:docker://node:22-bookworm"
+  default = "ubuntu-latest:docker://node:22-bookworm,host:host"
 }
