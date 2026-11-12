@@ -11,6 +11,7 @@ resources:
   - https://raw.githubusercontent.com/argoproj/argo-cd/v3.5.1/manifests/install.yaml
 
 patches:
+  - path: argocd-cm-patch.yaml
   - path: argocd-cmd-params-cm-patch.yaml
   - path: argocd-server-svc-patch.yaml
   - path: argocd-repo-server-patch.yaml
