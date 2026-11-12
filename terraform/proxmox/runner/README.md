@@ -38,3 +38,18 @@ it is written with mode 0600 and is gitignored.
 To change the runner's labels or version, override `runner_labels` or
 `runner_version` in `terraform.tfvars`. Labels are only read at registration
 time, so changing them means re-registering the runner on the VM.
+
+## Updating the user-data
+
+`proxmox_virtual_environment_file` does not detect changes to the rendered
+cloud-init file, even with `checksum` set, and the VM only reads user-data on
+first boot. A user-data change therefore needs both resources replaced:
+
+```
+terraform apply \
+  -replace=proxmox_virtual_environment_file.runner \
+  -replace=proxmox_virtual_environment_vm.runner
+```
+
+The VM comes back with a new SSH host key and a new runner registration, so
+remove the old runner and host key afterwards.
