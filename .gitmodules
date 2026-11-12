@@ -1,0 +1,3 @@
+[submodule "kubernetes-manifests/registry/resources/registry-cache-proxy"]
+	path = kubernetes-manifests/registry/resources/registry-cache-proxy
+	url = https://git.dtlp.cc/dtlp/registry-cache-proxy.git
