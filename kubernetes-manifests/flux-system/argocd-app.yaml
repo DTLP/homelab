@@ -17,4 +17,3 @@ spec:
       selfHeal: true
     syncOptions:
       - ApplyOutOfSyncOnly=true
-      - ServerSideApply=true
