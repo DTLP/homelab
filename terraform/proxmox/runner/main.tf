@@ -1,9 +1,13 @@
+locals {
+  admin_ssh_key = file("../secrets/id_ed25519.pub")
+}
+
 data "template_file" "runner" {
   template = file("./resources/runner.yaml.tmpl")
 
   vars = {
     hostname       = var.runner_name
-    admin_ssh_key  = var.ssh_public_key
+    admin_ssh_key  = local.admin_ssh_key
     forgejo_url    = var.forgejo_url
     forgejo_host   = replace(replace(var.forgejo_url, "https://", ""), "http://", "")
     runner_token   = var.runner_token
@@ -26,7 +30,8 @@ resource "proxmox_virtual_environment_file" "runner" {
   content_type = "snippets"
 
   source_file {
-    path = local_file.runner.filename
+    path     = local_file.runner.filename
+    checksum = filesha256(local_file.runner.filename)
   }
 }
 
@@ -87,7 +92,7 @@ resource "proxmox_virtual_environment_vm" "runner" {
 
     user_account {
       username = "root"
-      keys     = [var.ssh_public_key]
+      keys     = [local.admin_ssh_key]
     }
   }
 

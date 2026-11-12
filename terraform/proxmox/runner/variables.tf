@@ -11,11 +11,6 @@ variable "pve" {
   })
 }
 
-variable "ssh_public_key" {
-  type    = string
-  default = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBjvENWo/NJ0+qQSGIffxcAJmtZE4K03JzB59xC1mtGQ root@pve"
-}
-
 variable "runner_token" {
   type        = string
   description = "Forgejo Actions registration token."
