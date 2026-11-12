@@ -9,3 +9,13 @@ resources:
 
   - git-repos.yaml
   - network-policies.yaml
+
+patches:
+  - target:
+      group: apps
+      kind: Deployment
+      name: (kustomize|source)-controller
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: "500m"
