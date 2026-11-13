@@ -2,32 +2,44 @@
 - name: Setup Proxmox Cluster
   hosts: pve_nodes
   become: true
+  any_errors_fatal: true
   vars:
+    # The initial connection falls back to the root password until ssh_setup.yaml
+    # has installed the SSH keys. pvecm prompts for the same password when a
+    # node joins, so the password stays available to the play as well.
     root_password: "{{ lookup('file', 'secrets/root_password') }}"
     ansible_ssh_pass: "{{ root_password }}"
 
   tasks:
+    - name: Check whether the node already belongs to a cluster
+      stat:
+        path: /etc/pve/corosync.conf
+      register: corosync_conf
+
     - name: Setup cluster on main node
-      shell: "pvecm create {{ cluster_name }}"
-      when: ansible_host == main_node_ip
-      register: create_cluster_result
-      changed_when: "'already exists' not in create_cluster_result.stderr"
+      command: pvecm create {{ cluster_name }}
+      when:
+        - ansible_host == main_node_ip
+        - not corosync_conf.stat.exists
 
-    - name: Comment out Enterprise repo ceph.list
+    - name: Look for Enterprise repository files
+      stat:
+        path: "{{ item }}"
+      loop:
+        - /etc/apt/sources.list.d/ceph.list
+        - /etc/apt/sources.list.d/pve-enterprise.list
+      register: enterprise_repos
+
+    - name: Comment out Enterprise repositories
       lineinfile:
-        path: /etc/apt/sources.list.d/ceph.list
-        regexp: '^(deb.*)$'
+        path: "{{ item.item }}"
+        regexp: '^(deb(?!.*download\.proxmox\.com).*)$'
         line: '#\1'
         backrefs: yes
-      ignore_errors: yes
-
-    - name: Comment out Enterprise repo in pve-enterprise.list
-      lineinfile:
-        path: /etc/apt/sources.list.d/pve-enterprise.list
-        regexp: '^(deb.*)$'
-        line: '#\1'
-        backrefs: yes
-      ignore_errors: yes
+      loop: "{{ enterprise_repos.results }}"
+      loop_control:
+        label: "{{ item.item }}"
+      when: item.stat.exists
 
     - name: Add the community repo to pve-enterprise.list
       lineinfile:
@@ -44,7 +56,9 @@
       apt:
         name: python3-pexpect
         state: present
-      when: ansible_host != main_node_ip
+      when:
+        - ansible_host != main_node_ip
+        - not corosync_conf.stat.exists
 
     - name: Join other nodes to the cluster using root password
       expect:
@@ -52,12 +66,12 @@
         responses:
           (?m)^Please enter superuser .* password for .*: "{{ root_password }}"
           (?m)^Are you sure you want to continue connecting: "yes"
-      when: ansible_host != main_node_ip
-      register: join_cluster_result
-      changed_when: "'already exists' not in join_cluster_result.stdout"
+      when:
+        - ansible_host != main_node_ip
+        - not corosync_conf.stat.exists
 
     - name: Display cluster status
-      shell: "pvecm status"
+      command: pvecm status
       register: cluster_status
       changed_when: false
 

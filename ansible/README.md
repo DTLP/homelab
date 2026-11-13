@@ -22,6 +22,30 @@ Note: You can limit a playbook run to one node.
 make nvme ARGS="--limit pve4"
 ```
 
+## Safety
+
+`make start` checks the playbook syntax before it runs anything.
+
+`make dry-run` runs the same playbooks with `--check --diff`, so you can see
+what would change without changing a node. It still connects to the nodes: the
+read-only probes and `synchronize` run, while tasks that create or modify state
+are skipped. A dry run therefore catches templating, condition, and device
+mistakes, but it cannot prove that a skipped command would succeed.
+
+Run a changed playbook against one node first before rolling it out:
+
+```
+make nvme ARGS="--limit pve4"
+```
+
+`nvme_setup.yaml` is safe to re-run. It checks the whole device and the
+partition for an existing filesystem, only creates a filesystem when the
+partition is empty, and refuses to partition a device or reformat a partition
+that already holds one. The mount task is idempotent, so an existing mount is
+left alone. The Proxmox cluster playbook skips cluster creation and joining
+when the node already has `/etc/pve/corosync.conf`, and only comments out
+Enterprise repositories in files that exist.
+
 ## TODO:
 - ~Proxmox Cluster~
 - ~SSH config~

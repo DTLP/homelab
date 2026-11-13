@@ -2,41 +2,150 @@
 - name: Setup NVMe drives
   hosts: pve_nodes
   become: yes
+  any_errors_fatal: true
+
+  vars:
+    nvme_device: /dev/nvme0n1
+    nvme_partition: "{{ nvme_device }}p1"
+    nvme_mount_point: /mnt/pve/nvme
+    nvme_filesystem: ext4
+    nvme_marker: "# {mark} ANSIBLE MANAGED BLOCK nvme"
 
   tasks:
-    - name: Create a partition
-      command: /sbin/sgdisk -n1 -t1:8300 /dev/nvme0n1
+    - name: Check for the NVMe device
+      stat:
+        path: "{{ nvme_device }}"
+      register: nvme_device_stat
 
-    - name: Create f filesystem
-      command: /sbin/mkfs -t ext4 /dev/nvme0n1p1
+    - name: Fail when the NVMe device is missing
+      fail:
+        msg: "{{ nvme_device }} does not exist on {{ inventory_hostname }}"
+      when: not nvme_device_stat.stat.exists
 
-    - name: Read the storage configuration file
-      command: cat /etc/pve/storage.cfg
-      register: storage_content
+    - name: Read the filesystem type on the whole device
+      command: blkid -p -s TYPE -o value {{ nvme_device }}
+      register: nvme_device_type
+      changed_when: false
+      failed_when: false
+      check_mode: false
 
-    - name: Get the UUID of the NVMe partition
-      command: blkid -s UUID -o value /dev/nvme0n1p1
+    - name: Fail when the whole device could not be probed
+      fail:
+        msg: >-
+          blkid could not probe {{ nvme_device }}
+          (rc={{ nvme_device_type.rc }}): {{ nvme_device_type.stderr | trim }}
+      when: >-
+        nvme_device_type.rc not in [0, 2]
+        or (nvme_device_type.rc == 2 and nvme_device_type.stderr | trim | length > 0)
+
+    - name: Refuse to partition a device that holds a filesystem
+      fail:
+        msg: >-
+          {{ nvme_device }} already holds a
+          {{ nvme_device_type.stdout | trim }} filesystem. Refusing to
+          partition it. Remove the filesystem by hand if that is really
+          intended.
+      when:
+        - nvme_device_type.rc == 0
+        - nvme_device_type.stdout | trim | length > 0
+
+    - name: Check for the NVMe partition
+      stat:
+        path: "{{ nvme_partition }}"
+      register: nvme_partition_stat
+
+    - name: Create the partition
+      command: sgdisk -n1 -t1:8300 {{ nvme_device }}
+      when: not nvme_partition_stat.stat.exists
+
+    - name: Re-read the partition table
+      command: partprobe {{ nvme_device }}
+      when: not nvme_partition_stat.stat.exists
+
+    - name: Read the current filesystem type on the partition
+      command: blkid -p -s TYPE -o value {{ nvme_partition }}
+      register: nvme_filesystem_type
+      changed_when: false
+      failed_when: false
+      check_mode: false
+
+    - name: Fail when the partition could not be probed
+      fail:
+        msg: >-
+          blkid could not probe {{ nvme_partition }}
+          (rc={{ nvme_filesystem_type.rc }}):
+          {{ nvme_filesystem_type.stderr | trim }}
+      when: >-
+        nvme_filesystem_type.rc not in [0, 2]
+        or (nvme_filesystem_type.rc == 2 and nvme_filesystem_type.stderr | trim | length > 0)
+
+    - name: Refuse to overwrite an unexpected filesystem
+      fail:
+        msg: >-
+          {{ nvme_partition }} does not hold an {{ nvme_filesystem }}
+          filesystem. blkid reported
+          '{{ nvme_filesystem_type.stdout | trim }}'. Refusing to reformat it.
+          Remove the partition by hand if that is really intended.
+      when:
+        - nvme_filesystem_type.rc == 0
+        - nvme_filesystem_type.stdout | trim != nvme_filesystem
+
+    - name: Create the filesystem
+      command: mkfs -t {{ nvme_filesystem }} {{ nvme_partition }}
+      when:
+        - nvme_filesystem_type.rc == 2
+        - nvme_filesystem_type.stderr | trim | length == 0
+
+    - name: Get the UUID of the partition
+      command: blkid -p -s UUID -o value {{ nvme_partition }}
       register: nvme_uuid
+      changed_when: false
+      failed_when: false
+
+    - name: Fail when the partition has no filesystem UUID
+      fail:
+        msg: >-
+          Could not read a filesystem UUID from {{ nvme_partition }}
+          (rc={{ nvme_uuid.rc }})
+      when:
+        - not ansible_check_mode
+        - nvme_uuid.stdout | trim | length == 0
 
     - name: Mount the partition
       mount:
-        path: /mnt/pve/nvme
-        src: "UUID={{ nvme_uuid.stdout }}"
-        fstype: ext4
+        path: "{{ nvme_mount_point }}"
+        src: "UUID={{ nvme_uuid.stdout | trim }}"
+        fstype: "{{ nvme_filesystem }}"
         opts: defaults
         dump: "0"
         passno: "2"
         state: mounted
+      when: not ansible_check_mode
+
+    - name: Read the storage configuration file
+      slurp:
+        src: /etc/pve/storage.cfg
+      register: storage_content
+      run_once: true
+
+    - name: Remove the legacy NVMe storage block
+      replace:
+        path: /etc/pve/storage.cfg
+        regexp: '^dir: nvme\r?\n(?:[ \t]+.*\r?\n)*'
+        replace: ''
+      run_once: true
+      when:
+        - "'dir: nvme' in (storage_content.content | b64decode)"
+        - (nvme_marker | replace('{mark}', 'BEGIN')) not in (storage_content.content | b64decode)
 
     - name: Add NVMe storage configuration
       blockinfile:
         path: /etc/pve/storage.cfg
         block: |
           dir: nvme
-                path /mnt/pve/nvme
+                path {{ nvme_mount_point }}
                 content images,iso,backup,rootdir,vztmpl,snippets
                 is_mountpoint 1
-                nodes {{ play_hosts | join(', ') }}
-        marker: ""
+                nodes {{ groups['pve_nodes'] | join(', ') }}
+        marker: "{{ nvme_marker }}"
       run_once: true
-      when: "'dir: nvme' not in storage_content.stdout"

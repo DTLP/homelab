@@ -1,7 +1,18 @@
 INVENTORY = inventory.ini
+START_PLAYBOOKS = cluster_setup.yaml ssh_setup.yaml nvme_setup.yaml ubuntu_image.yaml nic_tuning.yaml
+
+.PHONY: check
+check:
+	@echo "Checking playbook syntax..."
+	ansible-playbook -i $(INVENTORY) --syntax-check $(START_PLAYBOOKS)
+
+.PHONY: dry-run
+dry-run: check
+	@echo "Running the start playbooks in check mode..."
+	ansible-playbook -i $(INVENTORY) --check --diff $(START_PLAYBOOKS) $(ARGS)
 
 .PHONY: start
-start: cluster ssh nvme ubuntu nic
+start: check cluster ssh nvme ubuntu nic
 
 .PHONY: stop
 stop: shutdown
