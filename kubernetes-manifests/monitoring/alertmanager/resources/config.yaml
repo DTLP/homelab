@@ -14,8 +14,13 @@ route:
 receivers:
 - name: 'slack'
   slack_configs:
-  - channel: alerts
-    api_url_file: /etc/secrets/slack
+  - channel: '#alerts'
+    api_url: 'https://slack.com/api/chat.postMessage'
+    http_config:
+      authorization:
+        type: Bearer
+        credentials_file: /etc/secrets/slack
     title: '{{ template "title" . }}'
-    text: '{{ template "body" . }}'
+    message_text: '{{ template "body" . }}'
     send_resolved: true
+    update_message: true
