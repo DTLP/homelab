@@ -1,4 +1,6 @@
-namespace: nfs-provisioner
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
 resources:
   - argocd-app.yaml
   - github.com/kubernetes-sigs/nfs-subdir-external-provisioner//deploy

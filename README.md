@@ -114,8 +114,17 @@ The Proxmox cluster hosts the following virtual machines:
 | NFS server    | 1     | Ubuntu | Persistent storage for the cluster |
 
 - Talos version and Kubernetes version are pinned in [`talos/talenv.yaml`](talos/talenv.yaml) and templated via [Talhelper](https://github.com/budimanjojo/talhelper).
-- A single control plane node (`master-0`) serves as the API endpoint.
+- A single control plane node (`master-0`) serves as the API endpoint. Three
+  control planes with a VIP were more than this hardware can carry, so a single
+  node is a deliberate tradeoff.
 - The NFS VM serves cluster PVCs through `nfs-client`, the default `StorageClass`.
+
+### Data and recovery
+
+The NFS VM holds every PersistentVolume and is a single point of failure. It is
+not backed up. The data on those volumes (metrics, logs, dashboard state, Kafka
+topics) is disposable. Configuration and secrets live in Git, so recovery means
+rebuilding the cluster from this repository, not restoring a backup.
 
 ## How it's managed
 
@@ -149,17 +158,21 @@ self-contained module with state stored remotely in HCP Terraform:
 The Talos cluster runs **Calico** for pod networking. A fresh cluster is
 provisioned with the default Flannel CNI disabled by the
 [`cni-none-patch`](terraform/proxmox/k8s/resources/cni-none-patch.yaml) applied
-to every node, so `terraform apply` never installs Flannel. Calico and all other
-workloads are then installed from `kubernetes-manifests/` by
+to every node, so `terraform apply` never installs Flannel. Calico and the
+platform services are then installed from `kubernetes-manifests/` by
 [`scripts/bootstrap.sh`](scripts/bootstrap.sh):
 
 ```
-make bootstrap   # install Calico, MetalLB, cert-manager, ingress, apps, policies
+make bootstrap   # install the platform, ArgoCD, Flux, and the workloads
 ```
 
-The script applies Calico first (pod networking and policy enforcement must
-exist before any workload starts) and the NetworkPolicies last, so no workload
-runs unprotected.
+The script applies the manifests in dependency order: Calico, the namespaces,
+the platform services, ingress and certificates, ArgoCD, Flux, and finally the
+workloads. ArgoCD and Flux are installed by the script, so a fresh cluster needs
+no manual steps before GitOps takes over.
+
+See [Delivery model](#delivery-model) for how each controller is used after
+bootstrap.
 
 ### Kubernetes manifests
 
@@ -171,16 +184,29 @@ with Kustomize and version-pinned per directory. Infrastructure deployed today:
 - **Monitoring** — Prometheus, Grafana, Alertmanager, Loki, Promtail,
   kube-state-metrics, node-exporter, pushgateway, pve-exporter
 - **Storage** — NFS client provisioner
+- **Registry** — a pull-through cache for `docker.io`. Images from `quay.io`
+  and `ghcr.io` pull directly.
 - **Experiments** — Kafka, and a `sandbox/` namespace for play apps (Homer,
   Excalidraw, IT-Tools, asciip)
 
-GitOps delivery is split by concern:
+### Delivery model
 
-- **terraform-applier** applies the Terraform workspaces (e.g. the Grafana
-  dashboards module) on a schedule.
-- **Flux** is being trialed for application manifests, currently managing the
-  `sandbox` namespace.
-- **ArgoCD** is installed but currently manages only its own manifests.
+Delivery is split by what each tool owns:
+
+- **ArgoCD** is the main tool for Kubernetes resources. Each directory under
+  `kubernetes-manifests/` carries an `Application`, and ArgoCD reconciles every
+  namespace with server-side apply and automated prune and self-heal.
+- **terraform-applier** owns the Terraform workspaces, such as the Grafana
+  dashboards module, and applies them on a schedule.
+- **Flux** manages only the `sandbox` namespace. It is a deliberate exception to
+  ArgoCD, kept to preserve hands-on experience with an alternative controller.
+
+Kustomizations do not set `namespace`. The namespace comes from the ArgoCD
+Application destination, and `scripts/bootstrap.sh` passes `-n` when it applies
+a directory directly.
+
+This is a lab, so the split is chosen for learning value as much as for
+convenience.
 
 ### Secrets
 
@@ -191,11 +217,17 @@ only ever contains encrypted blobs. A pre-commit hook
 ([`scripts/pre-commit`](scripts/pre-commit)) refuses to stage an unencrypted
 secret.
 
+A fresh clone needs [Strongbox](https://github.com/uw-labs/strongbox) installed
+and the `filter.strongbox` clean and smudge commands configured in Git, plus the
+age identity. Without them, checkout and commit fail. The identity is kept in a
+password manager and is not in the repository.
+
 ### Keeping things fresh
 
-- [Renovate](https://github.com/renovatebot/renovate) watches Kubernetes
-  images, Kustomize bases, Terraform providers, GitHub Actions and custom
-  version pins, and opens dependency PRs automatically.
+- [Renovate](https://github.com/renovatebot/renovate) is configured but
+  currently disabled (`"enabled": false` in [`renovate.json`](renovate.json))
+  to stop the PR noise. The configuration is kept in place so it can be
+  re-enabled.
 - A CI workflow ([`.github/workflows/manifest-diff.yaml`](.github/workflows/manifest-diff.yaml))
   renders Kustomize diffs of changed manifests on every pull request.
 

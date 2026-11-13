@@ -42,15 +42,25 @@ flowchart TB
     P5 --> NFS
 ```
 
+The single control plane is a deliberate tradeoff. Three control planes with a
+VIP were tried and removed because the hardware could not carry them. The lab is
+too small to justify the extra nodes.
+
 ## Ingress and TLS
 
-All external traffic arrives as `*.dtlp.cc`, resolves through Cloudflare to the
-Traefik LoadBalancer, and is terminated with a wildcard TLS certificate issued
-via cert-manager DNS-01.
+The `*.dtlp.cc` zone is served by Cloudflare, but the records resolve to the
+private MetalLB address. Nothing is port-forwarded, so every UI and API is
+reachable only from the LAN. TLS is terminated at Traefik with a wildcard
+certificate issued via cert-manager DNS-01.
+
+`external-dns` watches `Ingress` and `Service` resources and upserts their
+records in the Cloudflare zone. Every ingress sets the target annotation
+`private-ingress.dtlp.cc`, so the records point at that name, which resolves to
+the private MetalLB address.
 
 ```mermaid
 flowchart LR
-    User["You / Browser"] -->|"*.dtlp.cc"| CF["Cloudflare DNS<br/>dtlp.cc"]
+    User["LAN client"] -->|"*.dtlp.cc"| CF["Cloudflare DNS<br/>dtlp.cc"]
 
     CF -->|"A record → private-ingress.dtlp.cc"| TraefikLB["MetalLB 192.168.0.50<br/>(only LoadBalancer service)"]
 
@@ -120,6 +130,13 @@ flowchart LR
     PVC["PVCs<br/>Prometheus, Grafana, Loki, Kafka, ..."] --> SC
 ```
 
+## Data and recovery
+
+All PersistentVolumes live on the `nfs-0` VM, which is a single point of
+failure. The data is disposable: metrics, logs, dashboard state, and Kafka topics
+are not backed up. Configuration and secrets are in Git, so recovery means
+rebuilding the cluster from this repository.
+
 ## GitOps and provisioning
 
 Infrastructure is bootstrapped and kept in sync from this repository.
@@ -147,11 +164,34 @@ flowchart LR
     Argo --> Cluster
     Flux --> Cluster
 
-    Renovate["Renovate"] -.->|dependency PRs| Repo
+    Renovate["Renovate<br/>(disabled)"] -.->|dependency PRs| Repo
     TerraformApplier["terraform-applier<br/>Grafana dashboards"] -.-> TF
 
     Cluster["Talos Kubernetes cluster"]
 ```
+
+## Delivery model
+
+Delivery is split by what each tool owns:
+
+- **ArgoCD** is the main tool for Kubernetes resources. Every directory under
+  `kubernetes-manifests/` carries an `Application`, and the `main` AppProject
+  covers every workload namespace. ArgoCD reconciles with server-side apply,
+  automated prune, and self-heal.
+- **terraform-applier** owns the Terraform workspaces, such as the Grafana
+  dashboards module, and applies them on a schedule. It is intentionally not
+  fully automatic.
+- **Flux** manages only the `sandbox` namespace. It is a deliberate exception to
+  ArgoCD, kept to preserve hands-on experience with a second controller.
+
+`scripts/bootstrap.sh` installs the platform in dependency order, including
+ArgoCD and Flux. A fresh cluster needs no manual steps before GitOps takes over.
+
+The Kustomizations do not set `namespace`. The namespace comes from the ArgoCD
+Application destination; `scripts/bootstrap.sh` passes `-n` when it applies a
+directory directly.
+
+Renovate is configured but disabled to stop PR noise.
 
 ## Key services
 
@@ -169,6 +209,7 @@ flowchart LR
 | nfs-provisioner                     | nfs-provisioner    | NFS-backed default StorageClass                        |
 | Kafka + kafka-ui                    | kafka              | Streaming / message broker                             |
 | terraform-applier                   | terraform-applier  | Runs Terraform modules in-cluster (Grafana dashboards) |
+| registry                            | registry           | Pull-through cache and mirror for `docker.io`          |
 
 ## Provisioning
 
@@ -181,5 +222,6 @@ flowchart LR
 - **Talhelper** (`talos/`) generates the Talos machine configs from
   `talconfig.yaml` and the strongbox-encrypted `talsecret.yaml`.
 - **ArgoCD** watches the repository's `kubernetes-manifests/` and applies each
-  namespace's kustomization (server-side apply); **Flux** manages the sandbox
-  namespace. Renovate opens dependency update PRs.
+  namespace's kustomization with server-side apply. **Flux** manages only the
+  sandbox namespace.
+- **Renovate** is configured but disabled to stop PR noise.

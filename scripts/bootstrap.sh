@@ -4,9 +4,10 @@
 #
 # A fresh `terraform apply` brings the cluster up with the Talos-managed
 # Flannel CNI disabled (see terraform/proxmox/k8s/resources/cni-none-patch.yaml).
-# This script then installs the platform manifests, starting with Calico so
-# pod networking is in place before any workload starts. Each application
-# namespace ships its own NetworkPolicy, so no workload runs unprotected.
+# This script then installs the platform manifests in dependency order,
+# including ArgoCD and Flux, so a fresh cluster needs no manual steps before
+# GitOps takes over. Each application namespace ships its own NetworkPolicy;
+# the defaults are still permissive and are being tightened.
 #
 # Usage:
 #   ./scripts/bootstrap.sh            # use the default kubeconfig context
@@ -22,39 +23,61 @@ fi
 
 apply() {
   local dir="$1"
-  echo "==> kubectl apply -k $dir"
-  "${KUBECTL[@]}" apply -k "$dir"
+  shift
+  echo "==> kubectl apply -k $dir $*"
+  "${KUBECTL[@]}" apply -k "$dir" "$@"
+}
+
+apply_file() {
+  local file="$1"
+  shift
+  echo "==> kubectl apply -f $file"
+  "${KUBECTL[@]}" apply "$@" -f "$file"
 }
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 MANIFESTS="$ROOT/kubernetes-manifests"
 
-# Calico first: pod networking and policy enforcement must exist before any
-# other workload is scheduled.
-apply "$MANIFESTS/kube-system/cni"
+# 1. Pod networking and policy enforcement must exist before any workload is
+# scheduled.
+apply "$MANIFESTS/kube-system/cni" -n kube-system
 
-# Platform services that the rest of the stack depends on.
-apply "$MANIFESTS/metallb-system"
-apply "$MANIFESTS/kube-system/cert-manager"
-apply "$MANIFESTS/kube-system/external-dns"
-apply "$MANIFESTS/kube-system/metrics-server"
-apply "$MANIFESTS/kube-system/coredns"
+# 2. Create every namespace before applying anything namespaced.
+apply_file "$MANIFESTS/kube-system/namespaces.yaml"
 
-# The ingress controller is the entry point for everything else.
-apply "$MANIFESTS/ingress-controller"
+# 3. Platform services that the rest of the stack depends on.
+apply "$MANIFESTS/metallb-system" -n metallb-system
+apply "$MANIFESTS/kube-system/cert-manager" -n kube-system
+apply "$MANIFESTS/kube-system/external-dns" -n kube-system
+apply "$MANIFESTS/kube-system/metrics-server" -n kube-system
+apply "$MANIFESTS/kube-system/coredns" -n kube-system
 
-# Certificates for the ingress routes.
-apply "$MANIFESTS/certs"
+# 4. Ingress and the wildcard certificate.
+apply "$MANIFESTS/ingress-controller" -n ingress-controller
+apply "$MANIFESTS/certs" -n certs
 
-# kube-system NetworkPolicies (kube-dns, metrics-server, apiserver flows).
-# Applied after the system services exist so the allow rules line up.
-apply "$MANIFESTS/kube-system"
+# 5. Policy and RBAC controllers.
+apply "$MANIFESTS/kube-system/kyverno" -n kube-system
+apply "$MANIFESTS/kube-system/terraform-applier" -n kube-system
 
-# Application workloads. Each namespace ships its own NetworkPolicy
-# (default-deny with the known flows), so no workload starts unprotected.
-apply "$MANIFESTS/monitoring"
-apply "$MANIFESTS/nfs-provisioner"
-apply "$MANIFESTS/registry"
-apply "$MANIFESTS/sandbox"
+# 6. ArgoCD. It must exist before any directory with an Application object is
+# applied, because those objects need its Application CRD.
+apply "$MANIFESTS/argocd" -n argocd
+
+# 7. Flux. It must exist before the sandbox Kustomization is applied.
+apply "$MANIFESTS/flux-system" -n flux-system
+
+# 8. Workloads. Each directory creates its Application object as well, so
+# ArgoCD takes over reconciliation after the first apply.
+apply "$MANIFESTS/monitoring" -n monitoring
+apply "$MANIFESTS/nfs-provisioner" -n nfs-provisioner
+apply "$MANIFESTS/registry" -n registry
+apply "$MANIFESTS/git" -n git
+apply "$MANIFESTS/kafka" -n kafka
+apply "$MANIFESTS/sandbox" -n sandbox
+
+# 9. The kube-system Application and NetworkPolicies.
+apply_file "$MANIFESTS/kube-system/argocd-app.yaml" -n kube-system
+apply_file "$MANIFESTS/kube-system/network-policies.yaml" -n kube-system
 
 echo "==> Bootstrap complete."
