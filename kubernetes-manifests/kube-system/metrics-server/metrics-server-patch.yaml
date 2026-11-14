@@ -26,3 +26,10 @@ spec:
         - --kubelet-use-node-status-port
         - --metric-resolution=15s
         - --kubelet-insecure-tls # allow the metrics-server to skip certificate verification
+        resources:
+          requests:
+            cpu: 10m
+            memory: 48Mi
+          limits:
+            cpu: 50m
+            memory: 96Mi
