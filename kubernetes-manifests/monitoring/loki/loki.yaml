@@ -31,11 +31,11 @@ spec:
               protocol: TCP
           resources:
             requests:
-              cpu: 50m
-              memory: 512Mi
+              cpu: 20m
+              memory: 208Mi
             limits:
-              cpu: 200m
-              memory: 1Gi
+              cpu: 50m
+              memory: 416Mi
           volumeMounts:
             - name: tmp
               mountPath: /tmp
