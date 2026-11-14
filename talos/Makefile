@@ -46,8 +46,9 @@ upgrade-k8s:
 	DRY=$$([ -n "$(DRY_RUN)" ] && echo --dry-run || true) && \
 	talosctl upgrade-k8s --to $$KUBERNETES_VERSION -n 192.168.0.30 $$DRY
 
-# The control-plane node is not drained because Kyverno is pinned there and
-# its PDB blocks eviction.
+# master-0 runs only static control-plane pods and DaemonSets, so draining it
+# would evict nothing. Skip the drain and accept the control-plane downtime
+# during the reboot.
 upgrade-talos:
 	@TALOS_VERSION=$$(grep '^TALOS_VERSION' $(TALENV) | cut -d ':' -f2 | tr -d ' ') && \
 	for node in $(NODES); do \
