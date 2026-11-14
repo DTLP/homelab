@@ -43,11 +43,11 @@ spec:
               protocol: TCP
           resources:
             requests:
-              cpu: 50m
-              memory: 512Mi
+              cpu: 10m
+              memory: 176Mi
             limits:
-              cpu: 200m
-              memory: 512Mi
+              cpu: 100m
+              memory: 320Mi
           volumeMounts:
             - name: data
               mountPath: /var/lib/gitea
