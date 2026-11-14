@@ -10,7 +10,7 @@ spec:
         - name: kyverno
           resources:
             limits:
-              cpu: 50m
+              cpu: 200m
               memory: 288Mi
             requests:
               cpu: 10m
