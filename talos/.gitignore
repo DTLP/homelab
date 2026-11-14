@@ -1,3 +1,7 @@
+# talhelper genconfig output. This covers talosconfig and the generated
+# per-node machine configs (homelab-*.yaml).
 _out/
 clusterconfig/
+
+# Generated when applying a machine config to a single node.
 machineconfig.yaml
