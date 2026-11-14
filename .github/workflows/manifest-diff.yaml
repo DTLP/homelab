@@ -166,9 +166,12 @@ jobs:
             truncated_diff_output+="\nk8s objects: $add to add, $destroy to destroy"
             truncated_diff_output+="\n$change changed hunks"
 
-            echo "diff<<EOF" >> "$GITHUB_OUTPUT"
-            echo -e "$truncated_diff_output" >> "$GITHUB_OUTPUT"
-            echo "EOF" >> "$GITHUB_OUTPUT"
+            delimiter="EOF_$(openssl rand -hex 16)"
+            {
+              echo "diff<<$delimiter"
+              echo -e "$truncated_diff_output"
+              echo "$delimiter"
+            } >> "$GITHUB_OUTPUT"
           else
             echo "diff=" >> "$GITHUB_OUTPUT"
           fi
