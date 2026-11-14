@@ -5,6 +5,12 @@
 I used to use this to roll out my Ubuntu k8s nodes in Proxmox. This is archived
 as I have moved on to using Talos for k8s nodes.
 
+## Placeholder secrets
+
+The files under `secrets/` and the values in `terraform.tfvars` are dummy
+placeholders. They are not real credentials and cannot be used to access
+anything.
+
 ## Prerequisites
 - Terraform v1.9.2
 - telmate/proxmox v3.0.1-rc1
