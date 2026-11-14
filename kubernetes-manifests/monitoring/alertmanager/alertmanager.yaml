@@ -3,6 +3,10 @@ kind: Deployment
 metadata:
   name: alertmanager
 spec:
+  # A single replica owns the notification log on the RWO volume, so never run
+  # two pods against it during a rollout.
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: alertmanager
@@ -16,6 +20,10 @@ spec:
         image: prom/alertmanager:v0.34.0
         args:
           - "--config.file=/etc/alertmanager/config.yaml"
+          # Snapshot the notification log often, otherwise a restart can
+          # resend alerts that were already notified.
+          - "--data.maintenance-interval=1m"
+          - "--storage.path=/alertmanager"
           - "--web.external-url=https://alertmanager.dtlp.cc"
         resources:
           requests:
@@ -36,6 +44,8 @@ spec:
         - name: slack
           mountPath: /etc/secrets/slack
           subPath: slack
+        - name: data
+          mountPath: /alertmanager
       volumes:
       - name: config
         configMap:
@@ -46,3 +56,6 @@ spec:
       - name: slack
         secret:
           secretName: slack
+      - name: data
+        persistentVolumeClaim:
+          claimName: alertmanager-data

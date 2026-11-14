@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
   - alertmanager.yaml
   - alertmanager-ingress.yaml
+  - alertmanager-pvc.yaml
   - alertmanager-service.yaml
 
 configMapGenerator:
