@@ -20,7 +20,12 @@ receivers:
       authorization:
         type: Bearer
         credentials_file: /etc/secrets/slack
-    title: '{{ template "title" . }}'
-    message_text: '{{ template "body" . }}'
+    # Slack renders the top-level text (message_text) above the attachment and
+    # the attachment title below it. Keep the summary in the top-level text so
+    # the title stays at the top of the message, and leave the attachment title
+    # empty. The body remains in the attachment text below the title.
+    title: '{{ "" }}'
+    message_text: '{{ template "headline" . }}'
+    text: '{{ template "body" . }}'
     send_resolved: true
     update_message: true
