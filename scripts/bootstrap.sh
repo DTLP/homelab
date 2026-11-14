@@ -6,8 +6,8 @@
 # Flannel CNI disabled (see terraform/proxmox/k8s/resources/cni-none-patch.yaml).
 # This script then installs the platform manifests in dependency order,
 # including ArgoCD and Flux, so a fresh cluster needs no manual steps before
-# GitOps takes over. Each application namespace ships its own NetworkPolicy;
-# the defaults are still permissive and are being tightened.
+# GitOps takes over. Each namespace ships a default-deny NetworkPolicy with
+# explicit allows for DNS, the API server, monitoring, and ingress.
 #
 # Usage:
 #   ./scripts/bootstrap.sh            # use the default kubeconfig context
@@ -61,8 +61,11 @@ apply "$MANIFESTS/kube-system/kyverno" -n kube-system
 apply "$MANIFESTS/kube-system/terraform-applier" -n kube-system
 
 # 6. ArgoCD. It must exist before any directory with an Application object is
-# applied, because those objects need its Application CRD.
-apply "$MANIFESTS/argocd" -n argocd
+# applied, because those objects need its Application CRD. Its CRDs are larger
+# than the client-side apply annotation limit, so use server-side apply. When
+# migrating an existing cluster from client-side apply, add --force-conflicts
+# once to take over the fields.
+apply "$MANIFESTS/argocd" -n argocd --server-side
 
 # 7. Flux. It must exist before the sandbox Kustomization is applied.
 apply "$MANIFESTS/flux-system" -n flux-system
@@ -71,6 +74,7 @@ apply "$MANIFESTS/flux-system" -n flux-system
 # ArgoCD takes over reconciliation after the first apply.
 apply "$MANIFESTS/monitoring" -n monitoring
 apply "$MANIFESTS/nfs-provisioner" -n nfs-provisioner
+apply "$MANIFESTS/terraform-applier" -n terraform-applier
 apply "$MANIFESTS/registry" -n registry
 apply "$MANIFESTS/git" -n git
 apply "$MANIFESTS/kafka" -n kafka
