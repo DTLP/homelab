@@ -5,6 +5,7 @@ resources:
   - argocd-app.yaml
   - metallb-addresspool.yaml
   - metallb-l2advertisement.yaml
+  - network-policies.yaml
 
   - github.com/metallb/metallb/config/native?ref=v0.16.1
 

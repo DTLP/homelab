@@ -1,3 +1,5 @@
+# kube-system keeps unrestricted egress: DNS, the CNI, and the control-plane
+# components all need broad access. Ingress is restricted below.
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -6,20 +8,27 @@ spec:
   podSelector: {}
   policyTypes:
     - Ingress
-    - Egress
   ingress:
     - from:
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: kube-system
+    - from:
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: monitoring
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: ingress-controller
-  egress:
-    - {}
+      ports:
+        - protocol: TCP
+          port: 7979
+        - protocol: TCP
+          port: 8000
+        - protocol: TCP
+          port: 9153
+        - protocol: TCP
+          port: 9402
+    - from:
+        - ipBlock:
+            cidr: 192.168.0.30/32
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -46,16 +55,4 @@ spec:
     - Ingress
   ingress:
     - {}
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-apiserver-to-kube-system
-spec:
-  podSelector: {}
-  policyTypes:
-    - Ingress
-  ingress:
-    - from:
-        - ipBlock:
-            cidr: 192.168.0.30/32
+

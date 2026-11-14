@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
   - argocd-app.yaml
+  - network-policies.yaml
   - tf-applier-ingress.yaml
 
   - github.com/utilitywarehouse/terraform-applier//manifests/base/namespaced?ref=v2.6.2

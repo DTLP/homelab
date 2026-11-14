@@ -193,6 +193,20 @@ directory directly.
 
 Renovate is configured but disabled to stop PR noise.
 
+## Network policies
+
+Every workload namespace starts with a `default` NetworkPolicy that denies all
+ingress and egress, plus explicit allows for DNS, monitoring, and the flows the
+workload needs. The API server is allowed where a workload talks to it. The API
+rules assume the single control plane at 192.168.0.30.
+
+Two namespaces are intentionally different:
+
+- The `default` namespace has no NetworkPolicy. It is a scratch space for
+  testing, so networking there is unrestricted on purpose.
+- `kube-system` restricts ingress but keeps unrestricted egress, because DNS,
+  the CNI, and the control-plane components need broad access.
+
 ## Key services
 
 | Service                             | Namespace          | Purpose                                                |

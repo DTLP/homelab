@@ -5,6 +5,7 @@ resources:
   - argocd-app.yaml
   - kafka.yaml
   - kafka-ui.yaml
+  - network-policies.yaml
   - producer.yaml
   - consumer.yaml
 
