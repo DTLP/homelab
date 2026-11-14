@@ -19,6 +19,27 @@ patches:
       - op: replace
         path: /spec/template/spec/containers/0/resources/limits/cpu
         value: "500m"
+  - target:
+      group: apps
+      kind: Deployment
+      name: kustomize-controller
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: kustomize-controller
+      spec:
+        template:
+          spec:
+            containers:
+              - name: manager
+                resources:
+                  requests:
+                    cpu: 10m
+                    memory: 112Mi
+                  limits:
+                    cpu: 50m
+                    memory: 224Mi
   # The upstream Flux policy bundle allows all egress and allows scraping from
   # every namespace. Remove those so the namespace policies in this directory
   # are the only ones in effect.
