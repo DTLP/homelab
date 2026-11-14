@@ -79,7 +79,17 @@ jobs:
             pr_out="pr_build/$(echo $dir | tr '/' '_')"
             base_out="base_build/$(echo $dir | tr '/' '_')"
             kustomize build "$dir" > "$pr_out.yaml"
-            kustomize build "base_ref/$dir" > "$base_out.yaml"
+
+            # New directories or new kustomizations have no base to build
+            # against. Leave the base output empty so the diff shows the whole
+            # manifest as an addition.
+            if [[ -f "base_ref/$dir/kustomization.yaml" || \
+                  -f "base_ref/$dir/kustomization.yml" || \
+                  -f "base_ref/$dir/Kustomization" ]]; then
+              kustomize build "base_ref/$dir" > "$base_out.yaml"
+            else
+              : > "$base_out.yaml"
+            fi
           done <<< "${{ steps.dirs.outputs.dirs }}"
 
       - name: Sanitize secrets
