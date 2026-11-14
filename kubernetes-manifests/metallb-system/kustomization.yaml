@@ -11,3 +11,4 @@ resources:
 
 patches:
   - path: remove-namespace.yaml
+  - path: resources-patch.yaml
