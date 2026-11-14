@@ -29,7 +29,7 @@ spec:
               cpu: 10m
               memory: 64Mi
             limits:
-              cpu: "1"
+              cpu: "2"
               memory: 128Mi
         - name: asp
           resources:
@@ -37,7 +37,7 @@ spec:
               cpu: 10m
               memory: 32Mi
             limits:
-              cpu: "1"
+              cpu: "2"
               memory: 80Mi
 ---
 apiVersion: apps/v1
