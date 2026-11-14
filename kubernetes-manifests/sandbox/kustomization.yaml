@@ -6,7 +6,6 @@ resources:
   # - excalidraw/
   - homer/
   # - it-tools/
-  # - popeye/
 
   - fluxcd.yaml
   - network-policies.yaml
