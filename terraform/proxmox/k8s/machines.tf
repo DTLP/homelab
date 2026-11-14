@@ -21,6 +21,7 @@ resource "proxmox_virtual_environment_vm" "this" {
 
   agent {
     enabled = true
+    timeout = "2m"
   }
 
   network_device {
