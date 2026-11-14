@@ -17,3 +17,10 @@ spec:
               value: "Never"
             - name: CALICO_IPV4POOL_CIDR
               value: "10.244.0.0/16"
+          resources:
+            requests:
+              cpu: 40m
+              memory: 112Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
