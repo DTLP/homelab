@@ -45,11 +45,11 @@ spec:
               value: https://grafana.dtlp.cc
           resources:
             requests:
-              cpu: 50m
-              memory: 512Mi
+              cpu: 20m
+              memory: 384Mi
             limits:
               cpu: 200m
-              memory: 1Gi
+              memory: 768Mi
           volumeMounts:
             - name: config
               mountPath: "/etc/grafana/grafana.ini"
@@ -96,11 +96,11 @@ spec:
                   key: admin-password
           resources:
             requests:
-              cpu: 0m
-              memory: 32Mi
+              cpu: 10m
+              memory: 16Mi
             limits:
-              cpu: 100m
-              memory: 64Mi
+              cpu: 50m
+              memory: 32Mi
           securityContext:
             allowPrivilegeEscalation: false
             privileged: false
