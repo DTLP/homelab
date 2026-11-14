@@ -74,6 +74,7 @@ patches:
       kind: NetworkPolicy
       metadata:
         name: argocd-applicationset-controller-network-policy
+  - path: resources-patch.yaml
 
 secretGenerator:
   - files:
