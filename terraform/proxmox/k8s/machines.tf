@@ -22,6 +22,11 @@ resource "proxmox_virtual_environment_vm" "this" {
     floating  = each.value.floating
   }
 
+  # The Talos images include the qemu-guest-agent system extension, which waits
+  # for /dev/virtio-ports/org.qemu.guest_agent.0 during boot. Keep this enabled:
+  # disabling it makes every node reboot every ~70 minutes because the boot
+  # sequence times out waiting for the missing port. Changes take effect on the
+  # next cold start.
   agent {
     enabled = true
     timeout = "2m"
