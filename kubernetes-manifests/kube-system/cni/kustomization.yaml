@@ -6,3 +6,4 @@ resources:
 
 patches:
   - path: calico-node-patch.yaml
+  - path: calico-kube-controllers-patch.yaml
