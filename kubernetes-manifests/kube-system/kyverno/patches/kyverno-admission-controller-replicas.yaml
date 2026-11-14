@@ -4,6 +4,6 @@ metadata:
   name: kyverno-admission-controller
   namespace: kyverno
 spec:
-  # Two replicas with required pod anti-affinity so one stays available while
-  # the other is disrupted or its node is drained.
-  replicas: 2
+  # One replica matches the single control-plane node. Additional replicas
+  # would still be pinned to the same node, so they add no node-level HA.
+  replicas: 1
