@@ -11,7 +11,7 @@ resources:
 patches:
   - path: patches/remove-namespace.yaml
   - path: patches/kyverno-admission-controller-args.yaml
-  - path: patches/kyverno-admission-controller-master-schedule.yaml
+  - path: patches/kyverno-admission-controller-schedule.yaml
   - path: patches/kyverno-admission-controller-replicas.yaml
   - path: patches/kyverno-admission-controller-resources.yaml
   - path: patches/kyverno-background-controller-args.yaml
