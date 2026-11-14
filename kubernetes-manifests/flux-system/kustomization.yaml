@@ -19,3 +19,24 @@ patches:
       - op: replace
         path: /spec/template/spec/containers/0/resources/limits/cpu
         value: "500m"
+  # The upstream Flux policy bundle allows all egress and allows scraping from
+  # every namespace. Remove those so the namespace policies in this directory
+  # are the only ones in effect.
+  - target:
+      kind: NetworkPolicy
+      name: allow-egress
+    patch: |-
+      $patch: delete
+      apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: allow-egress
+  - target:
+      kind: NetworkPolicy
+      name: allow-scraping
+    patch: |-
+      $patch: delete
+      apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: allow-scraping

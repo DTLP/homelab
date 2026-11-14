@@ -17,6 +17,63 @@ patches:
   - path: argocd-server-svc-patch.yaml
   - path: argocd-repo-server-patch.yaml
   - path: disable-components-patch.yaml
+  # The upstream policies allow ingress from every namespace. Remove them and
+  # rely on network-policies.yaml. A rename upstream makes the build fail,
+  # which is intentional: review the new policy before letting it through.
+  - target:
+      kind: NetworkPolicy
+      name: argocd-server-network-policy
+    patch: |-
+      $patch: delete
+      apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: argocd-server-network-policy
+  - target:
+      kind: NetworkPolicy
+      name: argocd-repo-server-network-policy
+    patch: |-
+      $patch: delete
+      apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: argocd-repo-server-network-policy
+  - target:
+      kind: NetworkPolicy
+      name: argocd-application-controller-network-policy
+    patch: |-
+      $patch: delete
+      apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: argocd-application-controller-network-policy
+  - target:
+      kind: NetworkPolicy
+      name: argocd-notifications-controller-network-policy
+    patch: |-
+      $patch: delete
+      apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: argocd-notifications-controller-network-policy
+  - target:
+      kind: NetworkPolicy
+      name: argocd-dex-server-network-policy
+    patch: |-
+      $patch: delete
+      apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: argocd-dex-server-network-policy
+  - target:
+      kind: NetworkPolicy
+      name: argocd-applicationset-controller-network-policy
+    patch: |-
+      $patch: delete
+      apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: argocd-applicationset-controller-network-policy
 
 secretGenerator:
   - files:
