@@ -4,4 +4,6 @@ metadata:
   name: kyverno-admission-controller
   namespace: kyverno
 spec:
-  replicas: 3 # the recommended replica counts for HA is at least 3: https://kyverno.io/docs/high-availability/
+  # One replica matches the single control-plane node. Additional replicas
+  # would still be pinned to the same node, so they add no node-level HA.
+  replicas: 1
