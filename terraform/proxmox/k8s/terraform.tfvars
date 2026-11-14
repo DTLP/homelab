@@ -20,10 +20,11 @@ cluster = {
   kube_api_endpoint = "192.168.0.30"
   nodes = {
     master-0 = {
-      host   = "pve1"
-      cores  = 4
-      memory = 5120
-      type   = "controlplane"
+      host     = "pve1"
+      cores    = 4
+      memory   = 5120
+      floating = 4096
+      type     = "controlplane"
       ipv4 = {
         address = "192.168.0.30"
       }
