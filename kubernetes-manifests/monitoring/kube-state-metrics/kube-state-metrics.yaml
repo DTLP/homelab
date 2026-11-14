@@ -30,10 +30,10 @@ spec:
         resources:
           requests:
             cpu: 10m
-            memory: 64Mi
+            memory: 32Mi
           limits:
-            cpu: 100m
-            memory: 128Mi
+            cpu: 50m
+            memory: 80Mi
         livenessProbe:
           failureThreshold: 3
           httpGet:
