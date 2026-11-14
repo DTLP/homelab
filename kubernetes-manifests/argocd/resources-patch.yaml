@@ -30,7 +30,7 @@ spec:
               memory: 64Mi
             limits:
               cpu: "2"
-              memory: 128Mi
+              memory: 512Mi
         - name: asp
           resources:
             requests:
@@ -38,7 +38,7 @@ spec:
               memory: 32Mi
             limits:
               cpu: "2"
-              memory: 80Mi
+              memory: 512Mi
 ---
 apiVersion: apps/v1
 kind: Deployment
