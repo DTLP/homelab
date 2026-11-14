@@ -17,6 +17,17 @@ resource "talos_machine_configuration_apply" "this" {
   client_configuration        = talos_machine_secrets.this.client_configuration
   machine_configuration_input = file("../../../talos/clusterconfig/homelab-${each.key}.yaml")
   node                        = each.value.ipv4.address
+
+  # Talos config changes are applied with talosctl, not Terraform. Ignore
+  # drift after the bootstrap apply so a config regeneration does not trigger
+  # a cluster-wide re-apply. The initial create still applies the config.
+  lifecycle {
+    ignore_changes = [
+      machine_configuration,
+      machine_configuration_hash,
+      machine_configuration_input,
+    ]
+  }
 }
 
 resource "talos_machine_bootstrap" "this" {
