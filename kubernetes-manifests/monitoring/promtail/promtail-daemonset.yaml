@@ -50,6 +50,13 @@ spec:
             - name: http-metrics
               containerPort: 3101
               protocol: TCP
+          resources:
+            requests:
+              cpu: 20m
+              memory: 160Mi
+            limits:
+              cpu: 50m
+              memory: 224Mi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
