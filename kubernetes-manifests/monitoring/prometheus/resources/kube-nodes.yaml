@@ -41,3 +41,10 @@ groups:
           description: "The node has been in NotReady state for the last 10 minutes."
           impact: "A NotReady node can lead to service disruptions and unavailability of workloads scheduled on it."
           action: "Check the node's status using `kubectl describe node {{ $labels.node }}`. Investigate the cause of the NotReady state."
+      - alert: NodeRestartingOften
+        expr: changes(node_boot_time_seconds[3h]) > 1
+        annotations:
+          summary: "Node {{ $labels.instance }} is restarting repeatedly"
+          description: "{{ $labels.instance }} has rebooted more than once in the last 3 hours."
+          impact: "Workloads are repeatedly interrupted and control-plane stability is at risk."
+          action: "Check the boot history in `/var/log/kernel.log` and `/var/log/kernel.log.1`, for example with `talosctl -n <node> read /var/log/kernel.log`. Look for `boot sequence: failed` and for a service stuck in `Waiting` during startup."
