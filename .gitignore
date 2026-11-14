@@ -1,2 +1,7 @@
 .terraform/
 .terraform.tfstate.lock.info
+*.tfstate
+*.tfstate.*
+*.tfvars
+kubeconfig
+talosconfig
