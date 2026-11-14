@@ -10,6 +10,13 @@ spec:
           type: RuntimeDefault
       containers:
         - name: redis
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 50m
+              memory: 32Mi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
