@@ -83,3 +83,13 @@ patches:
     target:
       kind: CustomResourceDefinition
       name: policies.kyverno.io
+  # The upstream manifests hardcode namespace "kyverno". `kubectl apply -n`
+  # does not override an explicit namespace, so patch every namespaced resource.
+  # Extend this list if an upstream upgrade adds a new namespaced kind.
+  - target:
+      kind: "(Deployment|StatefulSet|DaemonSet|Job|CronJob|Service|ServiceAccount|ConfigMap|Secret|Role|RoleBinding|PodDisruptionBudget|PolicyException|ServiceMonitor|HorizontalPodAutoscaler|NetworkPolicy)"
+      name: ".*"
+    patch: |-
+      - op: add
+        path: /metadata/namespace
+        value: kube-system

@@ -9,3 +9,13 @@ resources:
 patches:
   - path: nfs-deployment-patch.yaml
   - path: nfs-storageclass-patch.yaml
+  # The upstream base hardcodes namespace "default". `kubectl apply -n` does
+  # not override an explicit namespace, so patch every namespaced resource.
+  # Extend this list if an upstream upgrade adds a new namespaced kind.
+  - target:
+      kind: "(Application|Deployment|StatefulSet|DaemonSet|Job|CronJob|Service|ServiceAccount|ConfigMap|Secret|Role|RoleBinding|PodDisruptionBudget|PolicyException|ServiceMonitor|HorizontalPodAutoscaler|NetworkPolicy)"
+      name: ".*"
+    patch: |-
+      - op: add
+        path: /metadata/namespace
+        value: nfs-provisioner
