@@ -29,28 +29,31 @@ cluster = {
       }
     }
     worker-0 = {
-      host   = "pve2"
-      cores  = 4
-      memory = 6825
-      type   = "worker"
+      host     = "pve2"
+      cores    = 4
+      memory   = 6825
+      floating = 5120
+      type     = "worker"
       ipv4 = {
         address = "192.168.0.40"
       }
     }
     worker-1 = {
-      host   = "pve3"
-      cores  = 4
-      memory = 6825
-      type   = "worker"
+      host     = "pve3"
+      cores    = 4
+      memory   = 6825
+      floating = 5120
+      type     = "worker"
       ipv4 = {
         address = "192.168.0.41"
       }
     }
     worker-2 = {
-      host   = "pve4"
-      cores  = 4
-      memory = 6825
-      type   = "worker"
+      host     = "pve4"
+      cores    = 4
+      memory   = 6825
+      floating = 5120
+      type     = "worker"
       ipv4 = {
         address = "192.168.0.42"
       }

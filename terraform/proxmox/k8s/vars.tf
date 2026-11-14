@@ -23,10 +23,11 @@ variable "cluster" {
     })
     kube_api_endpoint = string
     nodes = map(object({
-      host   = string
-      cores  = number
-      memory = number
-      type   = string
+      host     = string
+      cores    = number
+      memory   = number
+      floating = optional(number)
+      type     = string
       ipv4 = object({
         address = string
       })

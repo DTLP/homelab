@@ -1,12 +1,12 @@
 resource "proxmox_virtual_environment_vm" "this" {
-  for_each    = var.cluster.nodes
-  name        = each.key
-  description = "Managed by Terraform"
-  tags        = ["terraform"]
-  node_name   = each.value.host
-  migrate     = true
+  for_each        = var.cluster.nodes
+  name            = each.key
+  description     = "Managed by Terraform"
+  tags            = ["terraform"]
+  node_name       = each.value.host
+  migrate         = true
   timeout_migrate = 7200
-  on_boot     = true
+  on_boot         = true
 
   cpu {
     cores = each.value.cores
@@ -15,8 +15,11 @@ resource "proxmox_virtual_environment_vm" "this" {
 
   }
 
+  # Ballooning lets the host reclaim memory the guest is not using. A fixed
+  # allocation holds the full amount on the host even while the VM is idle.
   memory {
     dedicated = each.value.memory
+    floating  = each.value.floating
   }
 
   agent {
