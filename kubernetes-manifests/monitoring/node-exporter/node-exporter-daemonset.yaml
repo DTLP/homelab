@@ -21,6 +21,13 @@ spec:
             - containerPort: 9100
               name: metrics
               protocol: TCP
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 50m
+              memory: 48Mi
           args:
             - --web.listen-address=:9100
             - --web.disable-exporter-metrics
