@@ -10,7 +10,8 @@ spec:
         - name: controller
           resources:
             limits:
-              memory: 1Gi
+              cpu: 100m
+              memory: 144Mi
             requests:
-              cpu: 50m
-              memory: 64Mi
+              cpu: 10m
+              memory: 80Mi

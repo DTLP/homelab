@@ -13,9 +13,11 @@ patches:
   - path: patches/kyverno-admission-controller-args.yaml
   - path: patches/kyverno-admission-controller-master-schedule.yaml
   - path: patches/kyverno-admission-controller-replicas.yaml
+  - path: patches/kyverno-admission-controller-resources.yaml
   - path: patches/kyverno-background-controller-args.yaml
   - path: patches/kyverno-background-controller-resources.yaml
   - path: patches/kyverno-cleanup-controller-args.yaml
+  - path: patches/kyverno-cleanup-controller-resources.yaml
   - path: patches/kyverno-config.yaml
   - path: patches/kyverno-reports-controller-args.yaml
   - path: patches/kyverno-reports-controller-resources.yaml
