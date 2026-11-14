@@ -1,16 +1,5 @@
 {{ define "title" }}{{ .CommonAnnotations.summary }}{{ end }}
 
-{{/* The headline is sent as Slack's top-level text, which has no title_link.
-     Link it to the Alertmanager URL to match the clickable attachment title
-     that Slack no longer renders. */}}
-{{ define "headline" -}}
-{{- if .ExternalURL -}}
-<{{ .ExternalURL }}|{{ template "title" . }}>
-{{- else -}}
-{{ template "title" . }}
-{{- end -}}
-{{- end }}
-
 {{ define "body" }}
 {{ if gt (len .Alerts.Firing) 0 }}
 *Status*: {{ len .Alerts.Firing }} alert(s) firing

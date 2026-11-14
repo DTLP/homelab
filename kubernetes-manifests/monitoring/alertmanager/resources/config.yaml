@@ -20,12 +20,16 @@ receivers:
       authorization:
         type: Bearer
         credentials_file: /etc/secrets/slack
-    # Slack renders the top-level text (message_text) above the attachment and
-    # the attachment title below it. Keep the summary in the top-level text so
-    # the title stays at the top of the message, and leave the attachment title
-    # empty. The body remains in the attachment text below the title.
-    title: '{{ "" }}'
-    message_text: '{{ template "headline" . }}'
-    text: '{{ template "body" . }}'
+    # Slack collapses attachment text beyond 5 lines or ~700 characters behind
+    # "Show more". Field values are not collapsed, so the body lives in a
+    # full-width field. The attachment title keeps the summary at the top, its
+    # default title_link makes it clickable, and the attachment renders the
+    # status colour bar.
+    title: '{{ template "title" . }}'
+    text: '{{ "" }}'
+    fields:
+      - title: '{{ "" }}'
+        value: '{{ template "body" . }}'
+        short: false
     send_resolved: true
     update_message: true
