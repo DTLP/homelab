@@ -3,10 +3,13 @@ kind: Deployment
 metadata:
   name: alertmanager
 spec:
-  # A single replica owns the notification log on the RWO volume, so never run
-  # two pods against it during a rollout.
+  # A single replica owns the notification log on the RWO volume, so do not
+  # surge: the old pod must terminate before the new one starts.
   strategy:
-    type: Recreate
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
   selector:
     matchLabels:
       app: alertmanager
