@@ -1,0 +1,29 @@
+groups:
+  - name: cert-manager
+    rules:
+      - alert: CertificateFailedToRenew
+        expr: |
+          certmanager_certificate_renewal_timestamp_seconds > 0
+          and time() > certmanager_certificate_renewal_timestamp_seconds
+        for: 1h
+        labels:
+          instance: "{{ $labels.namespace }}/{{ $labels.name }}"
+        annotations:
+          summary: "Certificate {{ $labels.namespace }}/{{ $labels.name }} failed to renew"
+          description: "The renewal time has passed and the certificate has not been replaced. cert-manager renews 30 days before expiry by default, so this fires well before the certificate is unusable."
+          impact: "If the certificate expires, every endpoint under *.dtlp.cc fails TLS verification."
+          action: "Check the Certificate status and the cert-manager controller logs. Verify that the Cloudflare API token in the `cloudflare` secret is still valid."
+          command: "`kubectl --namespace {{ $labels.namespace }} describe certificate {{ $labels.name }}`"
+      - alert: CertificateExpiringSoon
+        expr: |
+          certmanager_certificate_expiration_timestamp_seconds > 0
+          and (certmanager_certificate_expiration_timestamp_seconds - time()) < 7 * 24 * 3600
+        for: 1h
+        labels:
+          instance: "{{ $labels.namespace }}/{{ $labels.name }}"
+        annotations:
+          summary: "Certificate {{ $labels.namespace }}/{{ $labels.name }} expires in less than 7 days"
+          description: "The certificate has less than 7 days left. This catches a renewal that has been failing for weeks, or a renewBefore that is configured too close to expiry."
+          impact: "When the certificate expires, every endpoint under *.dtlp.cc fails TLS verification."
+          action: "Fix issuance now or replace the certificate manually. Check the Certificate status and the cert-manager controller logs."
+          command: "`kubectl --namespace {{ $labels.namespace }} describe certificate {{ $labels.name }}`"
