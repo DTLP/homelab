@@ -23,6 +23,10 @@ spec:
           image: prom/prometheus:v3.14.0
           args:
             - "--config.file=/etc/prometheus/config.yaml"
+            # Keep the retained blocks under the 10Gi volume size, leaving
+            # room for the WAL, compaction scratch space and free space.
+            - "--storage.tsdb.retention.time=7d"
+            - "--storage.tsdb.retention.size=7GB"
           env:
             - name: PROMETHEUS_URL
               value: https://prometheus.dtlp.cc
@@ -35,7 +39,7 @@ spec:
               cpu: 10m
               memory: 288Mi
             limits:
-              cpu: 200m
+              cpu: "1"
               memory: 512Mi
           volumeMounts:
             - name: config
