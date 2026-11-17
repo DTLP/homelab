@@ -61,6 +61,10 @@ aliases quickly.
 - Unattended-upgrades installs security updates only; the weekly timer reboots
   when a reboot is required.
 - The server is monitored by [UptimeRobot](https://uptimerobot.com).
+- Container logs are sent to journald. Read them with
+`journalctl CONTAINER_NAME=mail`.
+- Postfix jail bans are permanent; Dovecot bans last seven days.
+- Messages in `Trash` older than 30 days are expunged automatically.
 
 ## Backups
 
