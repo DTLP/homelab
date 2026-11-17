@@ -357,6 +357,7 @@ runcmd:
     ExecStartPre=/bin/sh -c "chmod 0600 /mail/config/postfix-accounts.cf 2>/dev/null || true"
     ExecStart=/usr/bin/docker run \
       --rm \
+      --log-driver=journald \
       --name mail \
       -e POSTFIX_MAILBOX_SIZE_LIMIT=5368709120 \
       --hostname ${mailserver_hostname}.${domain_name} \
