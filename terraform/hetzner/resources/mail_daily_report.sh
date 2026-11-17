@@ -13,7 +13,7 @@ readonly RECIPIENT="admin@example.com"
 readonly SENDER="postmaster@example.com"
 readonly WINDOW_HOURS=24
 readonly LOG_LIMIT=25
-readonly NOISE_RE='TLS library problem|SSL_accept error|SSL_accept\(\) failed|non-SMTP command|disconnected during TLS handshake|tls_handshake_not_finished|hostname .* does not resolve'
+readonly NOISE_RE='TLS library problem|SSL_accept error|SSL_accept\(\) failed|TLS handshake failed for service=|non-SMTP command|disconnected during TLS handshake|tls_handshake_not_finished|hostname .* does not resolve'
 
 log() {
   printf '%s %s\n' "$(date -Is)" "$*"
@@ -96,7 +96,7 @@ subject="[mail] daily ${now_human%% *}: ${received:-0} in, ${delivered:-0} out, 
   fi
 
   printf '\n== Mail server log highlights ==\n\n'
-  tls_count="$(grep -icE 'SSL_accept error|Login aborted.*SSL_accept\(\) failed' "${raw_log}" || true)"
+  tls_count="$(grep -icE 'SSL_accept error|Login aborted.*SSL_accept\(\) failed|TLS handshake failed for service=' "${raw_log}" || true)"
   nonsmtp_count="$(grep -icE 'non-SMTP command' "${raw_log}" || true)"
   dns_count="$(grep -icE 'hostname .* does not resolve' "${raw_log}" || true)"
   highlight_count="$(grep -iE 'error|fatal|panic|warning|failed|failure' "${raw_log}" \
