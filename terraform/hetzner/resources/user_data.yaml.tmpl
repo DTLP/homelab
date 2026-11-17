@@ -195,6 +195,12 @@ write_files:
     content: |
       [postfix]
       bantime = -1
+  - path: /mail/config/dovecot.cf
+    permissions: "0644"
+    content: |
+      mailbox Trash {
+        autoexpunge = 30d
+      }
   - path: /usr/local/bin/docker-metadata-block
     permissions: "0755"
     content: |
