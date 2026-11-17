@@ -201,6 +201,33 @@ write_files:
       mailbox Trash {
         autoexpunge = 30d
       }
+  - path: /usr/local/bin/mail-daily-report
+    encoding: b64
+    content: ${mail_daily_report_b64}
+    permissions: "0755"
+  - path: /etc/systemd/system/mail-daily-report.service
+    permissions: "0644"
+    content: |
+      [Unit]
+      Description=Daily mailserver report to admin
+      After=docker.service
+      Requires=docker.service
+
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/local/bin/mail-daily-report
+  - path: /etc/systemd/system/mail-daily-report.timer
+    permissions: "0644"
+    content: |
+      [Unit]
+      Description=Daily mailserver report
+
+      [Timer]
+      OnCalendar=*-*-* 03:00:00 Europe/London
+      Persistent=true
+
+      [Install]
+      WantedBy=timers.target
   - path: /usr/local/bin/docker-metadata-block
     permissions: "0755"
     content: |
@@ -589,6 +616,9 @@ runcmd:
   - chmod 0755 /usr/local/bin/email-backup
   - systemctl daemon-reload
   - systemctl enable --now email-backup.timer
+
+  # Daily mailserver log summary
+  - systemctl enable --now mail-daily-report.timer
 
   # Reboot into the fixed kernel before the operator relies on the host.
   - |

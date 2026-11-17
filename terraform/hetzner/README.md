@@ -89,6 +89,17 @@ and restore the mail data to and from the local workstation over SSH.
 and `mail-restore` sends them back, stopping and restarting `mail` around each
 operation.
 
+## Daily report
+
+`mail-daily-report.timer` runs `/usr/local/bin/mail-daily-report` daily at
+03:00 Europe/London and emails a summary to `admin@example.com`. The report
+contains a Postfix `pflogsumm` summary, recent log warnings and errors, and
+fail2ban status and ban events.
+
+It runs before the 03:30 backup restarts the mail container, so the
+in-container fail2ban log covers almost the whole reporting window. Mail logs
+come from journald.
+
 ## DANE / TLSA
 
 The `_25._tcp.<mailserver_hostname>.<domain_name>` TLSA record is published
