@@ -184,6 +184,12 @@ write_files:
 
       [Install]
       WantedBy=timers.target
+  - path: /mail/config/postfix-master.cf
+    permissions: "0644"
+    content: |
+      submissions/inet/smtpd_client_connection_rate_limit=5
+      submissions/inet/smtpd_client_message_rate_limit=5
+      submissions/inet/smtpd_client_recipient_rate_limit=25
   - path: /usr/local/bin/docker-metadata-block
     permissions: "0755"
     content: |
