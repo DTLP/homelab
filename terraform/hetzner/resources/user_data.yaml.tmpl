@@ -190,6 +190,11 @@ write_files:
       submissions/inet/smtpd_client_connection_rate_limit=5
       submissions/inet/smtpd_client_message_rate_limit=5
       submissions/inet/smtpd_client_recipient_rate_limit=25
+  - path: /mail/config/fail2ban-jail.cf
+    permissions: "0644"
+    content: |
+      [postfix]
+      bantime = -1
   - path: /usr/local/bin/docker-metadata-block
     permissions: "0755"
     content: |
