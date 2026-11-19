@@ -55,7 +55,8 @@ trap 'rm -rf "${tmp_dir}"' EXIT
 
 readonly raw_log="${tmp_dir}/journal.log"
 readonly summary="${tmp_dir}/pflogsumm.txt"
-readonly iso_since="$(date -u -d "-${WINDOW_HOURS} hours" '+%Y-%m-%d %H:%M:%S')"
+readonly body="${tmp_dir}/body.txt"
+readonly iso_since="$(date -u -d "-${WINDOW_HOURS} hours" '+%Y-%m-%d %H:%M:00')"
 readonly since_human="$(date -u -d "-${WINDOW_HOURS} hours" '+%Y-%m-%d %H:%M UTC')"
 readonly now_human="$(date -u '+%Y-%m-%d %H:%M UTC')"
 
@@ -70,8 +71,8 @@ received="$(pflogsumm_count received "${summary}")"
 delivered="$(pflogsumm_count delivered "${summary}")"
 rejected="$(pflogsumm_count rejected "${summary}")"
 banned="$(docker exec "${CONTAINER}" awk -v since="${iso_since}" \
-  'substr($0, 1, 19) >= since && (/ Ban / || / Unban /)' \
-  /var/log/mail/fail2ban.log 2>/dev/null | wc -l)"
+  'substr($0, 1, 19) >= since && / Ban / && !/ Restore Ban /' \
+  /var/log/mail/fail2ban.log 2>/dev/null | wc -l || true)"
 
 subject="[mail] daily ${now_human%% *}: ${received:-0} in, ${delivered:-0} out, ${rejected:-0} rejected, ${banned:-0} banned"
 
@@ -100,7 +101,7 @@ subject="[mail] daily ${now_human%% *}: ${received:-0} in, ${delivered:-0} out, 
   nonsmtp_count="$(grep -icE 'non-SMTP command' "${raw_log}" || true)"
   dns_count="$(grep -icE 'hostname .* does not resolve' "${raw_log}" || true)"
   highlight_count="$(grep -iE 'error|fatal|panic|warning|failed|failure' "${raw_log}" \
-    | grep -ivE "${NOISE_RE}" | wc -l)"
+    | grep -ivE "${NOISE_RE}" | wc -l || true)"
   printf 'Scanner noise: %s TLS handshake failures, %s non-SMTP commands, %s reverse-DNS mismatches.\n' \
     "${tls_count:-0}" "${nonsmtp_count:-0}" "${dns_count:-0}"
   printf 'Other warnings and errors: %s\n\n' "${highlight_count:-0}"
@@ -121,7 +122,7 @@ subject="[mail] daily ${now_human%% *}: ${received:-0} in, ${delivered:-0} out, 
     for jail in "${jail_names[@]}"; do
       jail="$(printf '%s' "${jail}" | tr -d '[:space:]')"
       docker exec "${CONTAINER}" fail2ban-client status "${jail}" 2>/dev/null \
-        | grep -E 'Status for the jail|Currently failed|Currently banned|Total failed|Total banned' \
+        | grep -E 'Status for the jail|Currently failed|Currently banned|Total failed' \
         | sed 's/^[[:space:]]*//' \
         || true
       printf '\n'
@@ -130,15 +131,17 @@ subject="[mail] daily ${now_human%% *}: ${received:-0} in, ${delivered:-0} out, 
     printf 'Could not read fail2ban status.\n\n'
   fi
 
-  printf 'Bans in the window: %s\n\n' "${banned:-0}"
+  printf 'New bans in the window: %s\n\n' "${banned:-0}"
   ban_lines="$(docker exec "${CONTAINER}" awk -v since="${iso_since}" \
-    'substr($0, 1, 19) >= since && (/ Ban / || / Unban /)' \
+    'substr($0, 1, 19) >= since && (/ Ban / || / Unban /) && !/ Restore Ban /' \
     /var/log/mail/fail2ban.log 2>/dev/null | tail -n "${LOG_LIMIT}" || true)"
   if [[ -n "${ban_lines}" ]]; then
     printf '%s\n' "${ban_lines}"
   else
-    printf 'No ban or unban events.\n'
+    printf 'No new bans or unbans.\n'
   fi
-} | docker exec -i "${CONTAINER}" sendmail -t
+} >"${body}"
+
+docker exec -i "${CONTAINER}" sendmail -t <"${body}"
 
 log "daily report sent to ${RECIPIENT}"
