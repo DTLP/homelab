@@ -6,7 +6,15 @@ resources:
   - crds/traefik/crds/
   - traefik.yaml
   - traefik-ingress.yaml
+  - traefik-dashboard-middleware.yaml
   - traefik-ingressclass.yaml
   - traefik-rbac.yaml
   - traefik-service.yaml
   - network-policies.yaml
+
+secretGenerator:
+  - name: traefik-dashboard-auth
+    files:
+      - users=secrets/traefik-dashboard-auth
+    options:
+      disableNameSuffixHash: true

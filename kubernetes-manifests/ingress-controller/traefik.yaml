@@ -54,7 +54,7 @@ spec:
         - name: metrics
           containerPort: 9100
         args:
-          - "--api.insecure=true"
+          - "--api.dashboard=true"
           - "--ping=true"
           - "--log.level=INFO"
           - "--entryPoints.web.address=:80"

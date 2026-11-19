@@ -17,15 +17,31 @@ spec:
     - web-secure
   routes:
     - kind: Rule
-      match: Host(`private-ingress.dtlp.cc`)
+      match: Host(`private-ingress.dtlp.cc`) && PathPrefix(`/dashboard`)
+      middlewares:
+        - name: traefik-dashboard-auth
       services:
-        - name: traefik
-          kind: Service
-          port: 8080
+        - name: api@internal
+          kind: TraefikService
     - kind: Rule
-      match: Host(`traefik.dtlp.cc`)
+      match: Host(`private-ingress.dtlp.cc`) && PathPrefix(`/api`)
+      middlewares:
+        - name: traefik-dashboard-auth
       services:
-        - name: traefik
-          kind: Service
-          port: 8080
+        - name: api@internal
+          kind: TraefikService
+    - kind: Rule
+      match: Host(`traefik.dtlp.cc`) && PathPrefix(`/dashboard`)
+      middlewares:
+        - name: traefik-dashboard-auth
+      services:
+        - name: api@internal
+          kind: TraefikService
+    - kind: Rule
+      match: Host(`traefik.dtlp.cc`) && PathPrefix(`/api`)
+      middlewares:
+        - name: traefik-dashboard-auth
+      services:
+        - name: api@internal
+          kind: TraefikService
   tls: {}
