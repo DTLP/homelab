@@ -13,7 +13,5 @@ spec:
     - name: promtail
       expression: >-
         object.metadata.namespace == 'monitoring' &&
-        (
-          object.metadata.name == 'promtail' ||
-          object.metadata.name.startsWith('promtail-')
-        )
+        'app.kubernetes.io/name' in object.metadata.?labels.orValue({}) &&
+        object.metadata.labels['app.kubernetes.io/name'] == 'promtail'

@@ -11,7 +11,5 @@ spec:
     - name: node-exporter
       expression: >-
         object.metadata.namespace == 'monitoring' &&
-        (
-          object.metadata.name == 'node-exporter' ||
-          object.metadata.name.startsWith('node-exporter-')
-        )
+        'app' in object.metadata.?labels.orValue({}) &&
+        object.metadata.labels['app'] == 'node-exporter'

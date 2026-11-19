@@ -17,7 +17,7 @@ spec:
     - name: metallb-speaker
       expression: >-
         object.metadata.namespace == 'metallb-system' &&
-        (
-          object.metadata.name == 'speaker' ||
-          object.metadata.name.startsWith('speaker-')
-        )
+        'app' in object.metadata.?labels.orValue({}) &&
+        object.metadata.labels['app'] == 'metallb' &&
+        'component' in object.metadata.?labels.orValue({}) &&
+        object.metadata.labels['component'] == 'speaker'
