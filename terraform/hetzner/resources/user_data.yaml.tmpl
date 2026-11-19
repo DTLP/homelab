@@ -167,6 +167,7 @@ write_files:
       Type=oneshot
       ExecStart=/usr/local/bin/email-backup
       Environment=BACKUP_RETENTION_DAYS=${backup_retention_days}
+      Environment=BACKUP_MONTHLY_RETENTION_MONTHS=${backup_monthly_retention_months}
       Nice=10
       IOSchedulingClass=best-effort
       IOSchedulingPriority=7
@@ -209,6 +210,7 @@ write_files:
       Type=oneshot
       ExecStart=/usr/local/bin/pangolin-backup
       Environment=BACKUP_RETENTION_DAYS=${backup_retention_days}
+      Environment=BACKUP_MONTHLY_RETENTION_MONTHS=${backup_monthly_retention_months}
       Nice=10
       IOSchedulingClass=best-effort
       IOSchedulingPriority=7

@@ -7,6 +7,7 @@ readonly PASSPHRASE_FILE="/etc/email-backup/passphrase"
 readonly RCLONE_CONFIG="/etc/email-backup/rclone.conf"
 readonly RCLONE_REMOTE="dropbox:email-backups"
 readonly RETAIN_DAYS="${BACKUP_RETENTION_DAYS:-7}"
+readonly RETAIN_MONTHS="${BACKUP_MONTHLY_RETENTION_MONTHS:-6}"
 readonly PATHS=(/mail/config /mail/data /mail/state)
 
 log() {
@@ -54,9 +55,45 @@ rclone --config "$RCLONE_CONFIG" copy "$archive.sha256" "$RCLONE_REMOTE/"
 restart_mail
 trap - EXIT
 
-rclone --config "$RCLONE_CONFIG" delete --min-age "${RETAIN_DAYS}d" "$RCLONE_REMOTE/"
-find "$BACKUP_DIR" -maxdepth 1 -type f \
-  \( -name '*.tar.gz.pgp' -o -name '*.tar.gz.pgp.sha256' \) \
-  -mtime +"$RETAIN_DAYS" -delete
+prune_archives() {
+  local cutoff first_month name date month
+  local -A keep
+  local -A month_kept
+  local -a archives
+
+  cutoff=$(date -d "-${RETAIN_DAYS} days" +%F)
+  first_month=$(date -d "$(date +%Y-%m-01) -$((RETAIN_MONTHS - 1)) months" +%Y-%m)
+
+  mapfile -t archives < <(
+    {
+      rclone --config "$RCLONE_CONFIG" lsf --files-only "$RCLONE_REMOTE/"
+      find "$BACKUP_DIR" -maxdepth 1 -type f -name '*.tar.gz.pgp' -printf '%f\n'
+    } | grep -E '^[0-9]{4}-[0-9]{2}-[0-9]{2}\.tar\.gz\.pgp$' | sort -u
+  )
+
+  for name in "${archives[@]}"; do
+    date=${name:0:10}
+    month=${name:0:7}
+    if [[ $date > $cutoff || $date == $cutoff ]]; then
+      keep[$name]=1
+    elif [[ ( $month > $first_month || $month == $first_month ) &&
+      -z ${month_kept[$month]:-} ]]; then
+      keep[$name]=1
+      month_kept[$month]=1
+    fi
+  done
+
+  for name in "${archives[@]}"; do
+    if [[ -n ${keep[$name]:-} ]]; then
+      continue
+    fi
+    log "pruning $name"
+    rclone --config "$RCLONE_CONFIG" deletefile "$RCLONE_REMOTE/$name" 2>/dev/null || true
+    rclone --config "$RCLONE_CONFIG" deletefile "$RCLONE_REMOTE/$name.sha256" 2>/dev/null || true
+    rm -f "$BACKUP_DIR/$name" "$BACKUP_DIR/$name.sha256"
+  done
+}
+
+prune_archives
 
 log "backup complete: $archive"

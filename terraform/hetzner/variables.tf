@@ -209,3 +209,9 @@ variable "backup_retention_days" {
   type        = number
   default     = 7
 }
+
+variable "backup_monthly_retention_months" {
+  description = "Number of months to keep one archive per month"
+  type        = number
+  default     = 6
+}
