@@ -50,10 +50,12 @@ locals {
       ente_jwt_secret           = var.ente_jwt_secret
       ente_internal_admin       = var.ente_internal_admin
     }))
-    email_backup_b64          = base64encode(file("${path.module}/resources/email_backup.sh"))
-    mail_daily_report_b64     = base64encode(file("${path.module}/resources/mail_daily_report.sh"))
-    email_backup_password_b64 = base64encode(trimspace(var.email_backup_password))
-    backup_retention_days     = tostring(var.backup_retention_days)
+    email_backup_b64             = base64encode(file("${path.module}/resources/email_backup.sh"))
+    mail_daily_report_b64        = base64encode(file("${path.module}/resources/mail_daily_report.sh"))
+    email_backup_password_b64    = base64encode(trimspace(var.email_backup_password))
+    pangolin_backup_b64          = base64encode(file("${path.module}/resources/pangolin_backup.sh"))
+    pangolin_backup_password_b64 = base64encode(trimspace(var.pangolin_backup_password))
+    backup_retention_days        = tostring(var.backup_retention_days)
     rclone_config_b64 = base64encode(join("\n", [
       "[dropbox]",
       "type = dropbox",

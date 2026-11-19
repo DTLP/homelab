@@ -192,6 +192,12 @@ variable "email_backup_password" {
   sensitive   = true
 }
 
+variable "pangolin_backup_password" {
+  description = "Passphrase used to GPG-encrypt the daily Pangolin backup"
+  type        = string
+  sensitive   = true
+}
+
 variable "dropbox_token" {
   description = "rclone Dropbox OAuth token, generated with 'rclone authorize \"dropbox\"'"
   type        = string

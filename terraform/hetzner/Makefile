@@ -51,7 +51,7 @@ mail-alias-delete:
 	ssh -i ${SSH_KEY} ${SSH_USER}@${MAIL_HOST} docker exec mail setup alias del $$alias_name@example.com $$mailbox@example.com
 
 pangolin-backup:
-	ssh -i ${SSH_KEY} ${SSH_USER}@${MAIL_HOST} sudo tar -cvz ${PANGOLIN_CONFIG_REMOTE} > ${PANGOLIN_TAR}
+	ssh -i ${SSH_KEY} ${SSH_USER}@${MAIL_HOST} sudo tar -cvz ${PANGOLIN_CONFIG_REMOTE} /opt/pangolin/docker-compose.yml > ${PANGOLIN_TAR}
 
 pangolin-restore:
 	cat $(PANGOLIN_TAR) | ssh -i ${SSH_KEY} ${SSH_USER}@${MAIL_HOST} sudo tar -xzf - -C /
