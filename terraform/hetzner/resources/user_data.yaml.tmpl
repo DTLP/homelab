@@ -253,6 +253,25 @@ write_files:
       [Service]
       Type=oneshot
       ExecStart=/usr/local/bin/backup-alert %i
+  - path: /usr/local/bin/debian-test-report
+    encoding: b64
+    content: ${debian_test_report_b64}
+    permissions: "0755"
+  - path: /etc/systemd/system/debian-test-report.service
+    permissions: "0644"
+    content: |
+      [Unit]
+      Description=Write the Debian migration smoke test report
+      After=network-online.target docker.service
+      Wants=network-online.target
+      Requires=docker.service
+
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/local/bin/debian-test-report
+
+      [Install]
+      WantedBy=multi-user.target
   - path: /mail/config/postfix-master.cf
     permissions: "0644"
     content: |
@@ -699,6 +718,9 @@ runcmd:
 
   # Daily mailserver log summary
   - systemctl enable --now mail-daily-report.timer
+
+  # Debian migration smoke test report
+  - systemctl enable --now debian-test-report.service
 
   # Reboot into the fixed kernel before the operator relies on the host.
   - |

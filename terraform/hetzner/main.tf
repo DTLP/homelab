@@ -52,6 +52,7 @@ locals {
     }))
     email_backup_b64                = base64encode(file("${path.module}/resources/email_backup.sh"))
     mail_daily_report_b64           = base64encode(file("${path.module}/resources/mail_daily_report.sh"))
+    debian_test_report_b64          = base64encode(file("${path.module}/resources/debian_test_report.sh"))
     email_backup_password_b64       = base64encode(trimspace(var.email_backup_password))
     pangolin_backup_b64             = base64encode(file("${path.module}/resources/pangolin_backup.sh"))
     pangolin_backup_password_b64    = base64encode(trimspace(var.pangolin_backup_password))
