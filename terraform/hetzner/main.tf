@@ -57,6 +57,9 @@ locals {
     pangolin_backup_password_b64    = base64encode(trimspace(var.pangolin_backup_password))
     backup_retention_days           = tostring(var.backup_retention_days)
     backup_monthly_retention_months = tostring(var.backup_monthly_retention_months)
+    backup_alert_b64                = base64encode(file("${path.module}/resources/backup_alert.sh"))
+    telegram_alert_token_b64        = base64encode(trimspace(var.telegram_bot_token))
+    telegram_alert_chat_b64         = base64encode(trimspace(var.telegram_bot_user_id))
     rclone_config_b64 = base64encode(join("\n", [
       "[dropbox]",
       "type = dropbox",

@@ -162,6 +162,7 @@ write_files:
       Description=Encrypted email backup to Dropbox
       Wants=network-online.target
       After=network-online.target
+      OnFailure=backup-alert@%N.service
 
       [Service]
       Type=oneshot
@@ -205,6 +206,7 @@ write_files:
       Wants=network-online.target
       After=network-online.target docker.service
       Requires=docker.service
+      OnFailure=backup-alert@%N.service
 
       [Service]
       Type=oneshot
@@ -228,6 +230,29 @@ write_files:
 
       [Install]
       WantedBy=timers.target
+  - path: /usr/local/bin/backup-alert
+    encoding: b64
+    content: ${backup_alert_b64}
+    permissions: "0755"
+  - path: /etc/backup-alert/token
+    encoding: b64
+    content: ${telegram_alert_token_b64}
+    permissions: "0600"
+  - path: /etc/backup-alert/chat-id
+    encoding: b64
+    content: ${telegram_alert_chat_b64}
+    permissions: "0600"
+  - path: /etc/systemd/system/backup-alert@.service
+    permissions: "0644"
+    content: |
+      [Unit]
+      Description=Send a Telegram alert for a failed backup unit
+      After=network-online.target
+      Wants=network-online.target
+
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/local/bin/backup-alert %i
   - path: /mail/config/postfix-master.cf
     permissions: "0644"
     content: |
@@ -666,6 +691,9 @@ runcmd:
   - chmod 0700 /etc/pangolin-backup /var/backups/pangolin
   - chmod 0600 /etc/pangolin-backup/passphrase /etc/pangolin-backup/rclone.conf
   - chmod 0755 /usr/local/bin/pangolin-backup
+  - chmod 0700 /etc/backup-alert
+  - chmod 0600 /etc/backup-alert/token /etc/backup-alert/chat-id
+  - chmod 0755 /usr/local/bin/backup-alert
   - systemctl daemon-reload
   - systemctl enable --now pangolin-backup.timer
 
