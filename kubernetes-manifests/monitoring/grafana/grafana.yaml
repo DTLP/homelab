@@ -16,7 +16,7 @@ spec:
       serviceAccountName: grafana
       containers:
         - name: grafana
-          image: "grafana/grafana:13.2.0"
+          image: grafana/grafana@sha256:3fd54ae1214669f8355f065ec9f6445d5279a3d77095ab048ca045685272429b # 13.2.0
           imagePullPolicy: IfNotPresent
           ports:
             - name: grafana
@@ -81,7 +81,7 @@ spec:
         # as the terraform-applier-grafana-token secret for the
         # terraform-applier dashboards Module to consume.
         - name: terraform-applier-token
-          image: registry.uw.systems/system-public/alpine-bash-curl-jq:3.24
+          image: registry.uw.systems/system-public/alpine-bash-curl-jq@sha256:ca0cfc1cd60978d4f51975ac65d7f23716ce7d96e900e0f457a3498ae15cce45 # 3.24
           command: ["bash", "/scripts/provision.sh"]
           env:
             - name: GF_SECURITY_ADMIN_USER

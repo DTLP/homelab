@@ -19,7 +19,7 @@ spec:
         - name: registry-pull
       containers:
         - name: registry
-          image: registry:2.8.3
+          image: registry@sha256:a3d8aaa63ed8681a604f1dea0aa03f100d5895b6a58ace528858a7b332415373 # 2.8.3
           ports:
             - containerPort: 5000
           env:
@@ -44,7 +44,7 @@ spec:
             - name: storage
               mountPath: /var/lib/registry
         - name: cache-proxy
-          image: registry.dtlp.cc/library/registry-cache-proxy:sha-926c3bce842d8556e8de03c552a0fedb88e3f4b3
+          image: registry.dtlp.cc/library/registry-cache-proxy@sha256:d59bb2b035565a60fbb8a6fdd4757e64854e5c89cf580c1771c8ac6d2d1efbec # sha-926c3bce842d8556e8de03c552a0fedb88e3f4b3
           ports:
             - name: cache-proxy
               containerPort: 8081

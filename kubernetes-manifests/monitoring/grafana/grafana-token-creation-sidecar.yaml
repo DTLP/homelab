@@ -4,7 +4,7 @@
         # "terraform-applier-grafana-token" secret for the terraform-applier
         # dashboards Module to consume.
         - name: terraform-applier-token
-          image: registry.uw.systems/system-public/alpine-bash-curl-jq:3.24
+          image: registry.uw.systems/system-public/alpine-bash-curl-jq@sha256:ca0cfc1cd60978d4f51975ac65d7f23716ce7d96e900e0f457a3498ae15cce45 # 3.24
           command: ["bash", "/scripts/provision.sh"]
           env:
             - name: GF_SECURITY_ADMIN_USER
