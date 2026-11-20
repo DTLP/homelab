@@ -29,6 +29,3 @@ spec:
   - port: 8080
     targetPort: 8080
     name: dashboard
-  - port: 9100
-    targetPort: 9100
-    name: metrics
