@@ -39,6 +39,15 @@ spec:
               port: pve-exporter
             initialDelaySeconds: 15
             periodSeconds: 20
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 101
+            seccompProfile:
+              type: RuntimeDefault
       volumes:
         - name: config
           secret:

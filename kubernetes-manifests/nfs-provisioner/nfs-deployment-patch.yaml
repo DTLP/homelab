@@ -21,6 +21,13 @@ spec:
             limits:
               cpu: 50m
               memory: 48Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
       volumes:
         - name: nfs-client-root
           nfs:
