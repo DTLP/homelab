@@ -1,0 +1,47 @@
+sources:
+  kubernetes_logs:
+    type: kubernetes_logs
+    use_apiserver_cache: true
+    read_from: end
+
+transforms:
+  kubernetes_remap:
+    inputs:
+      - kubernetes_logs
+    type: remap
+    source: |
+      .app, _ = get(.kubernetes.pod_labels, ["app.kubernetes.io/name"])
+      if is_nullish(.app) {
+        .app, _ = get(.kubernetes.pod_labels, ["app"])
+      }
+      if is_nullish(.app) {
+        .app = .kubernetes.container_name
+      }
+      .component, _ = get(.kubernetes.pod_labels, ["app.kubernetes.io/component"])
+      if is_nullish(.component) {
+        .component, _ = get(.kubernetes.pod_labels, ["component"])
+      }
+      .namespace = .kubernetes.pod_namespace
+      .pod = .kubernetes.pod_name
+      .container = .kubernetes.container_name
+      .node_name = .kubernetes.pod_node_name
+      .filename = .file
+
+sinks:
+  loki_pods:
+    inputs:
+      - kubernetes_remap
+    type: loki
+    endpoint: http://loki.monitoring.svc.cluster.local:3100
+    path: /loki/api/v1/push
+    encoding:
+      codec: text
+    labels:
+      app: "{{ app }}"
+      component: "{{ component }}"
+      container: "{{ container }}"
+      filename: "{{ filename }}"
+      namespace: "{{ namespace }}"
+      node_name: "{{ node_name }}"
+      pod: "{{ pod }}"
+      stream: "{{ stream }}"

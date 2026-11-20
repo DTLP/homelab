@@ -1,7 +1,7 @@
 apiVersion: policies.kyverno.io/v1
 kind: PolicyException
 metadata:
-  name: promtail
+  name: vector
   namespace: kube-system
 spec:
   policyRefs:
@@ -10,8 +10,8 @@ spec:
     - name: hostpath-vols
       kind: ValidatingPolicy
   matchConditions:
-    - name: promtail
+    - name: vector
       expression: >-
         object.metadata.namespace == 'monitoring' &&
         'app.kubernetes.io/name' in object.metadata.?labels.orValue({}) &&
-        object.metadata.labels['app.kubernetes.io/name'] == 'promtail'
+        object.metadata.labels['app.kubernetes.io/name'] == 'vector'

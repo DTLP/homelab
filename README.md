@@ -181,7 +181,7 @@ with Kustomize and version-pinned per directory. Infrastructure deployed today:
 
 - **Networking** — Calico CNI, MetalLB, Traefik ingress, external-dns
 - **Certificates** — cert-manager with Cloudflare DNS-01 challenges
-- **Monitoring** — Prometheus, Grafana, Alertmanager, Loki, Promtail,
+- **Monitoring** — Prometheus, Grafana, Alertmanager, Loki, Vector,
   kube-state-metrics, node-exporter, pushgateway, pve-exporter
 - **Storage** — NFS client provisioner
 - **Registry** — a pull-through cache for `docker.io`. Images from `quay.io`

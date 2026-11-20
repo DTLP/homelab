@@ -12,4 +12,5 @@ resources:
   - terraform-applier/
 
   - namespaces.yaml
+  - vector-rbac.yaml
   - network-policies.yaml

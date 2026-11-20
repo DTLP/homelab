@@ -1,0 +1,33 @@
+sources:
+  host_logs:
+    type: file
+    include:
+      - /var/log/*.log
+    read_from: end
+
+transforms:
+  host_remap:
+    inputs:
+      - host_logs
+    type: remap
+    source: |
+      .hostname = get_env_var("VECTOR_SELF_NODE_NAME") ?? "unknown"
+      .service_name = replace(string!(.file), r'^.*/', "")
+      .service_name = replace(.service_name, ".log", "")
+      .filename = .file
+      .stream = "host"
+
+sinks:
+  loki_host:
+    inputs:
+      - host_remap
+    type: loki
+    endpoint: http://loki.monitoring.svc.cluster.local:3100
+    path: /loki/api/v1/push
+    encoding:
+      codec: text
+    labels:
+      filename: "{{ filename }}"
+      hostname: "{{ hostname }}"
+      service_name: "{{ service_name }}"
+      stream: "{{ stream }}"

@@ -12,7 +12,7 @@ resources:
   - mcp-grafana/
   - node-exporter/
   - prometheus/
-  - promtail/
+  - vector/
   - pushgateway/
   - pve-exporter/
   - network-policies.yaml
