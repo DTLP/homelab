@@ -29,6 +29,16 @@ spec:
             limits:
               cpu: 200m
               memory: 128Mi
+          readinessProbe:
+            tcpSocket:
+              port: pve-exporter
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: pve-exporter
+            initialDelaySeconds: 15
+            periodSeconds: 20
       volumes:
         - name: config
           secret:

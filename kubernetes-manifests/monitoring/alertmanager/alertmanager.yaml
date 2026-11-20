@@ -35,6 +35,18 @@ spec:
           limits:
             cpu: 100m
             memory: 128Mi
+        readinessProbe:
+          httpGet:
+            path: /-/ready
+            port: 9093
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /-/healthy
+            port: 9093
+          initialDelaySeconds: 15
+          periodSeconds: 20
         ports:
         - containerPort: 9093
         volumeMounts:

@@ -31,6 +31,17 @@ spec:
           args:
             - --web.listen-address=:9100
             - --web.disable-exporter-metrics
+          readinessProbe:
+            httpGet:
+              path: /
+              port: metrics
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: metrics
+            initialDelaySeconds: 15
+            periodSeconds: 20
       tolerations:
         - key: "node-role.kubernetes.io/control-plane"
           operator: "Exists"
