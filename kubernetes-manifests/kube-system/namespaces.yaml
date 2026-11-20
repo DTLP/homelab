@@ -26,11 +26,6 @@ metadata:
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: kafka
----
-apiVersion: v1
-kind: Namespace
-metadata:
   name: metallb-system
 ---
 apiVersion: v1

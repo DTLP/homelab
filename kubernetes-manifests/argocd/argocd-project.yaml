@@ -23,7 +23,6 @@ spec:
     - flux-system
     - git
     - ingress-controller
-    - kafka
     - kube-system
     - metallb-system
     - monitoring
@@ -41,8 +40,6 @@ spec:
     - namespace: git
       name: in-cluster
     - namespace: ingress-controller
-      name: in-cluster
-    - namespace: kafka
       name: in-cluster
     - namespace: kube-system
       name: in-cluster

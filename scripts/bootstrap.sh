@@ -77,7 +77,6 @@ apply "$MANIFESTS/nfs-provisioner" -n nfs-provisioner
 apply "$MANIFESTS/terraform-applier" -n terraform-applier
 apply "$MANIFESTS/registry" -n registry
 apply "$MANIFESTS/git" -n git
-apply "$MANIFESTS/kafka" -n kafka
 apply "$MANIFESTS/sandbox" -n sandbox
 
 # 9. The kube-system Application and NetworkPolicies.
