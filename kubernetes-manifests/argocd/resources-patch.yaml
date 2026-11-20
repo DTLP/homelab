@@ -39,6 +39,15 @@ spec:
             limits:
               cpu: "2"
               memory: 512Mi
+      initContainers:
+        - name: copyutil
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 200m
+              memory: 64Mi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -89,4 +98,13 @@ spec:
               memory: 16Mi
             limits:
               cpu: 50m
+              memory: 64Mi
+      initContainers:
+        - name: secret-init
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 200m
               memory: 64Mi
