@@ -5,8 +5,6 @@ data "template_file" "nfs" {
     hostname      = "nfs-0"
     admin_ssh_key = file("../secrets/id_ed25519.pub")
 
-    root_password = var.root_password
-    root_ssh_key  = var.root_ssh_key
     nfs_server_ip = var.nfs_server_ip
   }
 }
@@ -79,8 +77,7 @@ resource "proxmox_virtual_environment_vm" "nfs_vm" {
 
     user_account {
       username = "root"
-      password = var.root_password
-      keys     = [var.ssh_public_key]
+      keys     = [file("../secrets/id_ed25519.pub")]
     }
   }
 
