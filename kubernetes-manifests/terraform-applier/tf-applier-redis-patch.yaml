@@ -4,6 +4,9 @@ metadata:
   name: terraform-applier-redis
 spec:
   template:
+    metadata:
+      labels:
+        homelab/user-namespaces: disabled
     spec:
       securityContext:
         seccompProfile:

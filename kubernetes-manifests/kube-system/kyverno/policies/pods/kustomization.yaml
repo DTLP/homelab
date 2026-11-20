@@ -14,4 +14,3 @@ resources:
   - procMount.yaml
   - SELinux.yaml
   - sysctls.yaml
-  - user-namespaces.yaml

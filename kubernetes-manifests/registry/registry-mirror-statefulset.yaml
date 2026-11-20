@@ -14,6 +14,7 @@ spec:
     metadata:
       labels:
         app: registry-mirror
+        homelab/user-namespaces: disabled
     spec:
       imagePullSecrets:
         - name: registry-pull

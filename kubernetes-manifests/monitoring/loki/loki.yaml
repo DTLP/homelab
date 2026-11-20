@@ -13,6 +13,7 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: loki
+        homelab/user-namespaces: disabled
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "3100"

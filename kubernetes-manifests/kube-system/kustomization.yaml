@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
   - argocd-app.yaml
+  - admission-policies/
   - cert-manager/
   - cni/
   - coredns/
