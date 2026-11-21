@@ -14,7 +14,6 @@ spec:
     metadata:
       labels:
         app: forgejo
-        homelab/user-namespaces: disabled
     spec:
       containers:
         - name: forgejo

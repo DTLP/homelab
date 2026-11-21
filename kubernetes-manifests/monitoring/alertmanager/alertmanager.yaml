@@ -17,7 +17,6 @@ spec:
     metadata:
       labels:
         app: alertmanager
-        homelab/user-namespaces: disabled
     spec:
       containers:
       - name: alertmanager

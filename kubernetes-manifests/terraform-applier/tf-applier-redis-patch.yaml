@@ -6,7 +6,6 @@ spec:
   template:
     metadata:
       labels:
-        homelab/user-namespaces: disabled
     spec:
       securityContext:
         seccompProfile:

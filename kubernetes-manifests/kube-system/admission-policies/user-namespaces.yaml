@@ -21,19 +21,8 @@ spec:
       expression: >-
         !has(object.spec.volumes) ||
         object.spec.volumes.all(v, !has(v.hostPath))
-    - name: exclude-direct-nfs-volumes
-      expression: >-
-        !has(object.spec.volumes) ||
-        !object.spec.volumes.exists(v, has(v.nfs))
-    # NFS does not support idmap mounts, so pods that mount nfs-client PVCs
-    # opt out with this label until the storage moves to Longhorn.
     - name: exclude-longhorn-system
       expression: object.metadata.namespace != 'longhorn-system'
-    - name: exclude-nfs-workloads
-      expression: >-
-        !has(object.metadata.labels) ||
-        !('homelab/user-namespaces' in object.metadata.labels) ||
-        object.metadata.labels['homelab/user-namespaces'] != 'disabled'
   mutations:
     - patchType: ApplyConfiguration
       applyConfiguration:

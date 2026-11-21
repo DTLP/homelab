@@ -7,7 +7,6 @@ spec:
     metadata:
       labels:
         app: terraform-applier
-        homelab/user-namespaces: disabled
     spec:
       serviceAccountName: terraform-applier
       securityContext:
