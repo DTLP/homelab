@@ -6,3 +6,4 @@ resources:
   - ingress.yaml
   - services.yaml
   - namespaces.yaml
+  - resources.yaml

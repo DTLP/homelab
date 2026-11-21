@@ -1,0 +1,35 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: require-resource-requests-limits
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  matchConditions:
+    # Talos manages the control plane and addons (kube-proxy, CoreDNS), and
+    # static control-plane pods bypass admission entirely.
+    - name: exclude-kube-system
+      expression: object.metadata.namespace != 'kube-system'
+    # Longhorn's CSI sidecars, plugin and engine-image pods are chart-managed,
+    # and instance-managers are created dynamically by longhorn-manager. A deny
+    # policy here can stop storage from starting after a node event.
+    - name: exclude-longhorn-system
+      expression: object.metadata.namespace != 'longhorn-system'
+  variables:
+    - name: containers
+      expression: >-
+        object.spec.?containers.orValue([]) +
+        object.spec.?initContainers.orValue([])
+  validations:
+    - expression: >-
+        variables.containers.all(c,
+          c.?resources.?requests.?cpu.hasValue() &&
+          c.?resources.?requests.?memory.hasValue() &&
+          c.?resources.?limits.?cpu.hasValue() &&
+          c.?resources.?limits.?memory.hasValue())
+      message: Every container must set CPU and memory requests and limits.
