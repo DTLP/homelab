@@ -74,5 +74,5 @@ spec:
         accessModes: [ "ReadWriteOnce" ]
         resources:
           requests:
-            storage: 10Gi
-        storageClassName: nfs-client
+            storage: 5Gi
+        storageClassName: longhorn
