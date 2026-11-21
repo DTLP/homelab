@@ -24,6 +24,7 @@ spec:
     - git
     - ingress-controller
     - kube-system
+    - longhorn-system
     - metallb-system
     - monitoring
     - nfs-provisioner
@@ -42,6 +43,8 @@ spec:
     - namespace: ingress-controller
       name: in-cluster
     - namespace: kube-system
+      name: in-cluster
+    - namespace: longhorn-system
       name: in-cluster
     - namespace: metallb-system
       name: in-cluster

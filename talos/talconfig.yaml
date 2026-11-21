@@ -33,6 +33,9 @@ nodes:
     ipAddress: 192.168.0.40
     controlPlane: false
     installDisk: /dev/sda
+    nodeLabels:
+      longhorn.io/storage: "true"
+      node.longhorn.io/create-default-disk: "true"
     networkInterfaces:
       - deviceSelector:
           hardwareAddr: "bc:24:11:f2:05:a4"
@@ -47,6 +50,9 @@ nodes:
     ipAddress: 192.168.0.41
     controlPlane: false
     installDisk: /dev/sda
+    nodeLabels:
+      longhorn.io/storage: "true"
+      node.longhorn.io/create-default-disk: "true"
     networkInterfaces:
       - deviceSelector:
           hardwareAddr: "bc:24:11:b9:96:78"
@@ -59,6 +65,9 @@ nodes:
 
   - hostname: worker-2
     installDisk: /dev/sda
+    nodeLabels:
+      longhorn.io/storage: "true"
+      node.longhorn.io/create-default-disk: "true"
     ipAddress: 192.168.0.42
     controlPlane: false
     networkInterfaces:
@@ -75,6 +84,9 @@ nodes:
     ipAddress: 192.168.0.43
     controlPlane: false
     installDisk: /dev/sda
+    nodeLabels:
+      longhorn.io/storage: "true"
+      node.longhorn.io/create-default-disk: "true"
     networkInterfaces:
       - deviceSelector:
           hardwareAddr: "bc:24:11:0f:a7:c3"
@@ -113,8 +125,11 @@ worker:
   patches:
     - patches/user-namespaces.yaml
     - patches/registry-mirror.yaml
+    - patches/longhorn.yaml
   schematic:
     customization:
       systemExtensions:
         officialExtensions:
           - siderolabs/qemu-guest-agent
+          - siderolabs/iscsi-tools
+          - siderolabs/util-linux-tools

@@ -1,0 +1,22 @@
+global:
+  nodeSelector:
+    longhorn.io/storage: "true"
+
+persistence:
+  defaultClass: false
+  defaultClassReplicaCount: 2
+  reclaimPolicy: Delete
+
+longhornManager:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+
+longhornUI:
+  replicas: 1
+  ingress:
+    enabled: false

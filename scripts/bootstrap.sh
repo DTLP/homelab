@@ -72,6 +72,7 @@ apply "$MANIFESTS/flux-system" -n flux-system
 # 8. Workloads. Each directory creates its Application object as well, so
 # ArgoCD takes over reconciliation after the first apply.
 apply "$MANIFESTS/monitoring" -n monitoring
+apply "$MANIFESTS/longhorn-system" -n longhorn-system
 apply "$MANIFESTS/nfs-provisioner" -n nfs-provisioner
 apply "$MANIFESTS/terraform-applier" -n terraform-applier
 apply "$MANIFESTS/registry" -n registry

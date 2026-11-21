@@ -25,6 +25,8 @@ spec:
   matchConditions:
   - name: exclude-kube-system
     expression: object.metadata.namespace != 'kube-system'
+  - name: exclude-longhorn-system
+    expression: object.metadata.namespace != 'longhorn-system'
   variables:
   - name: allContainers
     expression: object.spec.?containers.orValue([]) +  object.spec.?initContainers.orValue([]) +  object.spec.?ephemeralContainers.orValue([])
@@ -73,6 +75,8 @@ spec:
   matchConditions:
   - name: exclude-kube-system
     expression: object.metadata.namespace != 'kube-system'
+  - name: exclude-longhorn-system
+    expression: object.metadata.namespace != 'longhorn-system'
   - name: exclude-exceptions
     expression: '!((object.metadata.namespace == ''metallb-system'' && has(object.metadata.labels) &&
       ''app'' in object.metadata.labels && object.metadata.labels[''app''] == ''metallb'' && ''component''
@@ -111,6 +115,8 @@ spec:
   matchConditions:
   - name: exclude-kube-system
     expression: object.metadata.namespace != 'kube-system'
+  - name: exclude-longhorn-system
+    expression: object.metadata.namespace != 'longhorn-system'
   validations:
   - message: HostIPC pods are disallowed. The field spec.hostIPC must be unset or set to `false`.
     expression: '!has(object.spec.hostIPC) || object.spec.hostIPC == false'
@@ -141,6 +147,8 @@ spec:
   matchConditions:
   - name: exclude-kube-system
     expression: object.metadata.namespace != 'kube-system'
+  - name: exclude-longhorn-system
+    expression: object.metadata.namespace != 'longhorn-system'
   - name: exclude-exceptions
     expression: '!((object.metadata.namespace == ''metallb-system'' && has(object.metadata.labels) &&
       ''app'' in object.metadata.labels && object.metadata.labels[''app''] == ''metallb'' && ''component''
@@ -175,6 +183,8 @@ spec:
   matchConditions:
   - name: exclude-kube-system
     expression: object.metadata.namespace != 'kube-system'
+  - name: exclude-longhorn-system
+    expression: object.metadata.namespace != 'longhorn-system'
   validations:
   - message: HostPID pods are disallowed. The field spec.hostPID must be unset or set to `false`.
     expression: '!has(object.spec.hostPID) || object.spec.hostPID == false'
@@ -206,6 +216,8 @@ spec:
   matchConditions:
   - name: exclude-kube-system
     expression: object.metadata.namespace != 'kube-system'
+  - name: exclude-longhorn-system
+    expression: object.metadata.namespace != 'longhorn-system'
   - name: exclude-exceptions
     expression: '!((object.metadata.namespace == ''monitoring'' && has(object.metadata.labels) && ''app.kubernetes.io/name''
       in object.metadata.labels && object.metadata.labels[''app.kubernetes.io/name''] == ''vector''))'
@@ -241,6 +253,8 @@ spec:
   matchConditions:
   - name: exclude-kube-system
     expression: object.metadata.namespace != 'kube-system'
+  - name: exclude-longhorn-system
+    expression: object.metadata.namespace != 'longhorn-system'
   - name: exclude-exceptions
     expression: '!((object.metadata.namespace == ''metallb-system'' && has(object.metadata.labels) &&
       ''app'' in object.metadata.labels && object.metadata.labels[''app''] == ''metallb'' && ''component''
@@ -285,6 +299,8 @@ spec:
       )"
   - name: exclude-kube-system
     expression: object.metadata.namespace != 'kube-system'
+  - name: exclude-longhorn-system
+    expression: object.metadata.namespace != 'longhorn-system'
   - name: exclude-exceptions
     expression: '!((object.metadata.namespace == ''metallb-system'' && has(object.metadata.labels) &&
       ''app'' in object.metadata.labels && object.metadata.labels[''app''] == ''metallb'' && ''component''
@@ -326,6 +342,8 @@ spec:
   matchConditions:
   - name: exclude-kube-system
     expression: object.metadata.namespace != 'kube-system'
+  - name: exclude-longhorn-system
+    expression: object.metadata.namespace != 'longhorn-system'
   variables:
   - name: allContainers
     expression: object.spec.?containers.orValue([]) +  object.spec.?initContainers.orValue([]) +  object.spec.?ephemeralContainers.orValue([])
@@ -363,6 +381,8 @@ spec:
   matchConditions:
   - name: exclude-kube-system
     expression: object.metadata.namespace != 'kube-system'
+  - name: exclude-longhorn-system
+    expression: object.metadata.namespace != 'longhorn-system'
   variables:
   - name: allContainers
     expression: object.spec.?containers.orValue([]) +  object.spec.?initContainers.orValue([]) +  object.spec.?ephemeralContainers.orValue([])
@@ -402,6 +422,8 @@ spec:
   matchConditions:
   - name: exclude-kube-system
     expression: object.metadata.namespace != 'kube-system'
+  - name: exclude-longhorn-system
+    expression: object.metadata.namespace != 'longhorn-system'
   variables:
   - name: allContainers
     expression: object.spec.?containers.orValue([]) +  object.spec.?initContainers.orValue([]) +  object.spec.?ephemeralContainers.orValue([])
@@ -441,6 +463,8 @@ spec:
   matchConditions:
   - name: exclude-kube-system
     expression: object.metadata.namespace != 'kube-system'
+  - name: exclude-longhorn-system
+    expression: object.metadata.namespace != 'longhorn-system'
   validations:
   - expression: "object.spec.?securityContext.?sysctls.orValue([]).all(s, \n  s.name in [\n    'kernel.shm_rmid_forced',\
       \ \n    'net.ipv4.ip_local_port_range', \n    'net.ipv4.ip_unprivileged_port_start', \n    'net.ipv4.tcp_syncookies',\
