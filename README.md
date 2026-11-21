@@ -185,7 +185,7 @@ with Kustomize and version-pinned per directory. Infrastructure deployed today:
 - **Storage** — Longhorn replicated block storage
 - **Registry** — a pull-through cache for `docker.io`. Images from `quay.io`
   and `ghcr.io` pull directly.
-- **Experiments** — Kafka, and a `sandbox/` namespace for play apps (Homer,
+- **Experiments** — a `sandbox/` namespace for play apps (Homer,
   Excalidraw, IT-Tools, asciip)
 
 ### Delivery model

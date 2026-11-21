@@ -63,7 +63,7 @@ flowchart LR
 
     subgraph Cluster["Talos cluster"]
         Traefik["Traefik<br/>ingress-controller"]
-        Traefik -->|IngressRoute| Svc["Services / Pods<br/>(argocd, grafana, kafka-ui, ...)"]
+        Traefik -->|IngressRoute| Svc["Services / Pods<br/>(argocd, grafana, registry, ...)"]
     end
 
     TraefikLB --> Traefik
@@ -96,7 +96,7 @@ flowchart LR
         AM["Alertmanager"]
     end
 
-    Promtail["Promtail (DaemonSet)<br/>pods + Talos /var/log"] --> Loki
+    Vector["Vector (DaemonSet)<br/>pods + Talos /var/log"] --> Loki
 
     Node --> Prom
     KSM --> Prom
@@ -206,13 +206,12 @@ Two namespaces are intentionally different:
 | ArgoCD                              | argocd             | GitOps deployment of namespaces                        |
 | Flux                                | flux-system        | GitOps for the sandbox namespace                       |
 | Prometheus + Alertmanager + Grafana | monitoring         | Metrics, alerting (Slack), dashboards                  |
-| Loki + Promtail                     | monitoring         | Log aggregation from pods and Talos hosts              |
+| Loki + Vector                       | monitoring         | Log aggregation from pods and Talos hosts              |
 | cert-manager                        | kube-system        | TLS certificates (Cloudflare DNS-01)                   |
 | external-dns                        | kube-system        | DNS records for `*.dtlp.cc`                            |
 | MetalLB                             | metallb-system     | LoadBalancer IP allocation                             |
 | Longhorn                            | longhorn-system    | Replicated block storage for PersistentVolumes         |
-| Kyverno                             | kube-system        | CEL validating policies                                |
-| Kafka + kafka-ui                    | kafka              | Streaming / message broker                             |
+| Admission policies                  | kube-system        | Native ValidatingAdmissionPolicy set                   |
 | terraform-applier                   | terraform-applier  | Runs Terraform modules in-cluster (Grafana dashboards) |
 | registry                            | registry           | Pull-through cache and mirror for `docker.io`          |
 
