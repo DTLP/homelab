@@ -60,10 +60,11 @@ cluster = {
       }
     }
     worker-3 = {
-      host   = "pve5"
-      cores  = 4
-      memory = 5120
-      type   = "worker"
+      host     = "pve5"
+      cores    = 4
+      memory   = 6825
+      floating = 5120
+      type     = "worker"
       ipv4 = {
         address = "192.168.0.43"
       }
