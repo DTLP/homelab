@@ -3,5 +3,14 @@ kind: Kustomization
 
 resources:
   - argocd-app.yaml
+  - ingress.yaml
+  - middleware.yaml
   - network-policies.yaml
   - upstream/longhorn.yaml
+
+secretGenerator:
+  - name: longhorn-auth
+    files:
+      - users=secrets/longhorn-dashboard-auth
+    options:
+      disableNameSuffixHash: true
