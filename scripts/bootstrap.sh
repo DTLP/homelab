@@ -57,7 +57,6 @@ apply "$MANIFESTS/ingress-controller" -n ingress-controller
 apply "$MANIFESTS/certs" -n certs
 
 # 5. Policy and RBAC controllers.
-apply "$MANIFESTS/kube-system/kyverno" -n kube-system
 apply "$MANIFESTS/kube-system/terraform-applier" -n kube-system
 
 # 6. ArgoCD. It must exist before any directory with an Application object is

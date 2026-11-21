@@ -1,0 +1,80 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: disallow-or-operator
+spec:
+  policyName: disallow-or-operator
+  validationActions:
+  - Audit
+  matchResources:
+    resourceRules:
+    - apiGroups:
+      - traefik.io
+      apiVersions:
+      - '*'
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - ingressroutes
+      - ingressroutetcps
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: disallow-wildcard-hostsni
+spec:
+  policyName: disallow-wildcard-hostsni
+  validationActions:
+  - Audit
+  matchResources:
+    resourceRules:
+    - apiGroups:
+      - traefik.io
+      apiVersions:
+      - '*'
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - ingressroutetcps
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: require-ingress-host
+spec:
+  policyName: require-ingress-host
+  validationActions:
+  - Audit
+  matchResources:
+    resourceRules:
+    - apiGroups:
+      - networking.k8s.io
+      apiVersions:
+      - '*'
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - ingresses
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: require-ingressroute-host
+spec:
+  policyName: require-ingressroute-host
+  validationActions:
+  - Audit
+  matchResources:
+    resourceRules:
+    - apiGroups:
+      - traefik.io
+      apiVersions:
+      - '*'
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - ingressroutes

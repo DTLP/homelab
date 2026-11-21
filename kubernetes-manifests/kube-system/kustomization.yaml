@@ -8,7 +8,6 @@ resources:
   - cni/
   - coredns/
   - external-dns/
-  - kyverno/
   - metrics-server/
   - terraform-applier/
 

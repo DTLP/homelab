@@ -1,0 +1,451 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: disallow-selinux
+  annotations:
+    policies.kyverno.io/title: Disallow SELinux
+    policies.kyverno.io/category: Pod Security Standards (Baseline)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: SELinux options can be used to escalate privileges and should not
+      be allowed. This policy ensures that the `seLinuxOptions` field is undefined.
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+    - apiGroups:
+      - ''
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - pods
+  matchConditions:
+  - name: exclude-kube-system
+    expression: object.metadata.namespace != 'kube-system'
+  variables:
+  - name: allContainers
+    expression: object.spec.?containers.orValue([]) +  object.spec.?initContainers.orValue([]) +  object.spec.?ephemeralContainers.orValue([])
+  validations:
+  - expression: "object.spec.?securityContext.?seLinuxOptions.?type.orValue('container_t') in ['container_t',\
+      \ 'container_init_t', 'container_kvm_t'] && variables.allContainers.all(c, \n  c.?securityContext.?seLinuxOptions.?type.orValue('container_t')\
+      \ in ['container_t', 'container_init_t', 'container_kvm_t']\n)"
+    message: Setting the SELinux type is restricted. The fields spec.securityContext.seLinuxOptions.type,
+      spec.containers[*].securityContext.seLinuxOptions.type, , spec.initContainers[*].securityContext.seLinuxOptions,
+      and spec.ephemeralContainers[*].securityContext.seLinuxOptions.type must either be unset or set
+      to one of the allowed values (container_t, container_init_t, or container_kvm_t).
+  - expression: "object.spec.?securityContext.?seLinuxOptions.?user.orValue('') == '' &&  object.spec.?securityContext.?seLinuxOptions.?role.orValue('')\
+      \ == '' && variables.allContainers.all(c, \n  c.?securityContext.?seLinuxOptions.?user.orValue('')\
+      \ == '' && \n  c.?securityContext.?seLinuxOptions.?role.orValue('') == ''\n)"
+    message: Setting the SELinux user or role is forbidden. The fields spec.securityContext.seLinuxOptions.user,
+      spec.securityContext.seLinuxOptions.role, spec.containers[*].securityContext.seLinuxOptions.user,
+      spec.containers[*].securityContext.seLinuxOptions.role, spec.initContainers[*].securityContext.seLinuxOptions.user,
+      spec.initContainers[*].securityContext.seLinuxOptions.role, spec.ephemeralContainers[*].securityContext.seLinuxOptions.user,
+      and spec.ephemeralContainers[*].securityContext.seLinuxOptions.role must be unset.
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: pod-capabilities
+  annotations:
+    policies.kyverno.io/title: Pod Capabilities
+    policies.kyverno.io/category: Pod Security Standards (Restricted)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: Adding capabilities other than `NET_BIND_SERVICE` is disallowed.
+      Rules with exeptions for particular workloads must be added here. Default rule maps Kubernetes restricted
+      pod security standard
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+    - apiGroups:
+      - ''
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - pods
+  matchConditions:
+  - name: exclude-kube-system
+    expression: object.metadata.namespace != 'kube-system'
+  - name: exclude-exceptions
+    expression: '!((object.metadata.namespace == ''metallb-system'' && has(object.metadata.labels) &&
+      ''app'' in object.metadata.labels && object.metadata.labels[''app''] == ''metallb'' && ''component''
+      in object.metadata.labels && object.metadata.labels[''component''] == ''speaker''))'
+  variables:
+  - name: allContainers
+    expression: object.spec.?containers.orValue([]) +  object.spec.?initContainers.orValue([]) +  object.spec.?ephemeralContainers.orValue([])
+  validations:
+  - message: Any capabilities added other than NET_BIND_SERVICE are disallowed.
+    expression: "variables.allContainers.all(c, \n  c.?securityContext.?capabilities.?add.orValue([]).all(cap,\
+      \ cap in ['NET_BIND_SERVICE', ''])\n)"
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: disallow-host-ipc-pods
+  annotations:
+    policies.kyverno.io/title: Disallow HostIPC Pods
+    policies.kyverno.io/category: Pod Security Standards (Baseline)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: This policy ensures Pods do not use the host's IPC namespace
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+    - apiGroups:
+      - ''
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - pods
+  matchConditions:
+  - name: exclude-kube-system
+    expression: object.metadata.namespace != 'kube-system'
+  validations:
+  - message: HostIPC pods are disallowed. The field spec.hostIPC must be unset or set to `false`.
+    expression: '!has(object.spec.hostIPC) || object.spec.hostIPC == false'
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: disallow-host-network-pods
+  annotations:
+    policies.kyverno.io/title: Disallow HostNetwork Pods
+    policies.kyverno.io/category: Pod Security Standards (Baseline)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: This policy ensures Pods do not use the host's network interfaces.
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+    - apiGroups:
+      - ''
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - pods
+  matchConditions:
+  - name: exclude-kube-system
+    expression: object.metadata.namespace != 'kube-system'
+  - name: exclude-exceptions
+    expression: '!((object.metadata.namespace == ''metallb-system'' && has(object.metadata.labels) &&
+      ''app'' in object.metadata.labels && object.metadata.labels[''app''] == ''metallb'' && ''component''
+      in object.metadata.labels && object.metadata.labels[''component''] == ''speaker''))'
+  validations:
+  - message: HostNetwork pods are disallowed. The field spec.hostNetwork must be unset or set to `false`.
+    expression: '!has(object.spec.hostNetwork) || object.spec.hostNetwork == false'
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: disallow-host-pid-pods
+  annotations:
+    policies.kyverno.io/title: Disallow HostPID Pods
+    policies.kyverno.io/category: Pod Security Standards (Baseline)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: This policy ensures Pods cannot use host's PID.
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+    - apiGroups:
+      - ''
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - pods
+  matchConditions:
+  - name: exclude-kube-system
+    expression: object.metadata.namespace != 'kube-system'
+  validations:
+  - message: HostPID pods are disallowed. The field spec.hostPID must be unset or set to `false`.
+    expression: '!has(object.spec.hostPID) || object.spec.hostPID == false'
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: hostpath-vols
+  annotations:
+    policies.kyverno.io/title: Limit hostPath Volumes to Specific Directories
+    policies.kyverno.io/category: Other
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: hostPath volumes consume the underlying node's file system. Mounting
+      host paths should be disabled by default, except for specific cases
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+    - apiGroups:
+      - ''
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - pods
+  matchConditions:
+  - name: exclude-kube-system
+    expression: object.metadata.namespace != 'kube-system'
+  - name: exclude-exceptions
+    expression: '!((object.metadata.namespace == ''monitoring'' && has(object.metadata.labels) && ''app.kubernetes.io/name''
+      in object.metadata.labels && object.metadata.labels[''app.kubernetes.io/name''] == ''vector''))'
+  validations:
+  - message: HostPath volumes are not allowed.
+    expression: '!has(object.spec.volumes) || object.spec.volumes.all(v, !has(v.hostPath))'
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: disallow-host-ports
+  annotations:
+    policies.kyverno.io/title: Disallow hostPorts
+    policies.kyverno.io/category: Pod Security Standards (Baseline)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: Access to host ports allows potential snooping of network traffic
+      and should not be allowed, or at minimum restricted to a known list. This policy ensures the `hostPort`
+      field is unset or set to `0`.
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+    - apiGroups:
+      - ''
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - pods
+  matchConditions:
+  - name: exclude-kube-system
+    expression: object.metadata.namespace != 'kube-system'
+  - name: exclude-exceptions
+    expression: '!((object.metadata.namespace == ''metallb-system'' && has(object.metadata.labels) &&
+      ''app'' in object.metadata.labels && object.metadata.labels[''app''] == ''metallb'' && ''component''
+      in object.metadata.labels && object.metadata.labels[''component''] == ''speaker''))'
+  variables:
+  - name: allContainers
+    expression: object.spec.?containers.orValue([]) +  object.spec.?initContainers.orValue([]) +  object.spec.?ephemeralContainers.orValue([])
+  validations:
+  - message: Use of host ports is disallowed. The fields spec.containers[*].ports[*].hostPort , spec.initContainers[*].ports[*].hostPort,
+      and spec.ephemeralContainers[*].ports[*].hostPort must either be unset or set to `0`.
+    expression: "variables.allContainers.all(c, \n  c.?ports.orValue([]).all(p, !has(p.hostPort) || p.hostPort\
+      \ == 0)\n)"
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: restrict-scheduling-to-master-nodes
+  annotations:
+    policies.kyverno.io/title: Restrict scheduling to master nodes
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: Scheduling non-system Pods to control plane nodes (which run kubelet)
+      is often undesirable because it takes away resources from the control plane components and can represent
+      a possible security threat vector. This policy prevents users from setting a toleration in a Pod
+      spec which allows running on control plane nodes with the taint key `node-role.kubernetes.io/master`
+      or `node-role.kubernetes.io/control-plane`.
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+    - apiGroups:
+      - ''
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - pods
+  matchConditions:
+  - name: exclude-system-namespaces
+    expression: "!(\n  request.namespace == 'kube-system' ||\n  request.namespace.startsWith('sys-')\n\
+      )"
+  - name: exclude-kube-system
+    expression: object.metadata.namespace != 'kube-system'
+  - name: exclude-exceptions
+    expression: '!((object.metadata.namespace == ''metallb-system'' && has(object.metadata.labels) &&
+      ''app'' in object.metadata.labels && object.metadata.labels[''app''] == ''metallb'' && ''component''
+      in object.metadata.labels && object.metadata.labels[''component''] == ''speaker'') || (object.metadata.namespace
+      == ''monitoring'' && has(object.metadata.labels) && ''app'' in object.metadata.labels && object.metadata.labels[''app'']
+      == ''node-exporter'') || (object.metadata.namespace == ''monitoring'' && has(object.metadata.labels)
+      && ''app.kubernetes.io/name'' in object.metadata.labels && object.metadata.labels[''app.kubernetes.io/name'']
+      == ''vector''))'
+  validations:
+  - message: Pods may not use tolerations which schedule on control plane nodes.
+    expression: "object.spec.?tolerations.orValue([]).all(t, \n    t.?key.orValue('') != 'node-role.kubernetes.io/master'\
+      \ && \n    t.?key.orValue('') != 'node-role.kubernetes.io/control-plane'\n  )"
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: disallow-privilege-escalation
+  annotations:
+    policies.kyverno.io/title: Disallow Privilege Escalation
+    policies.kyverno.io/category: Pod Security Standards (Restricted)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: Privilege escalation, such as via set-user-ID or set-group-ID file
+      mode, should not be allowed. This policy ensures the `allowPrivilegeEscalation` field is set to
+      `false`.
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+    - apiGroups:
+      - ''
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - pods
+  matchConditions:
+  - name: exclude-kube-system
+    expression: object.metadata.namespace != 'kube-system'
+  variables:
+  - name: allContainers
+    expression: object.spec.?containers.orValue([]) +  object.spec.?initContainers.orValue([]) +  object.spec.?ephemeralContainers.orValue([])
+  validations:
+  - expression: "variables.allContainers.all(c, \n  c.?securityContext.?allowPrivilegeEscalation.orValue(false)\
+      \ == false\n)"
+    messageExpression: '''Privilege escalation is disallowed. The following containers have allowPrivilegeEscalation
+      set to true: '' +  variables.allContainers.filter(c, c.?securityContext.?allowPrivilegeEscalation.orValue(false)
+      == true).map(c, c.name).join('', '')'
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: disallow-privileged-containers
+  annotations:
+    policies.kyverno.io/title: Disallow Privileged Containers
+    policies.kyverno.io/category: Pod Security Standards (Baseline)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: Privileged mode disables most security mechanisms and must not be
+      allowed. This policy ensures Pods do not call for privileged mode.
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+    - apiGroups:
+      - ''
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - pods
+  matchConditions:
+  - name: exclude-kube-system
+    expression: object.metadata.namespace != 'kube-system'
+  variables:
+  - name: allContainers
+    expression: object.spec.?containers.orValue([]) +  object.spec.?initContainers.orValue([]) +  object.spec.?ephemeralContainers.orValue([])
+  validations:
+  - expression: "variables.allContainers.all(c, \n  c.?securityContext.?privileged.orValue(false) == false\n\
+      )"
+    messageExpression: '''Privileged mode is disallowed. The following containers have privileged set
+      to true: '' +  variables.allContainers.filter(c, c.?securityContext.?privileged.orValue(false) ==
+      true).map(c, c.name).join('', '')'
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: disallow-proc-mount
+  annotations:
+    policies.kyverno.io/title: Disallow procMount
+    policies.kyverno.io/category: Pod Security Standards (Baseline)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: The default /proc masks are set up to reduce attack surface and should
+      be required. This policy ensures nothing but the default procMount can be specified. Note that in
+      order for users to deviate from the `Default` procMount requires setting a feature gate at the API
+      server.
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+    - apiGroups:
+      - ''
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - pods
+  matchConditions:
+  - name: exclude-kube-system
+    expression: object.metadata.namespace != 'kube-system'
+  variables:
+  - name: allContainers
+    expression: object.spec.?containers.orValue([]) +  object.spec.?initContainers.orValue([]) +  object.spec.?ephemeralContainers.orValue([])
+  validations:
+  - expression: "variables.allContainers.all(c, \n  c.?securityContext.?procMount.orValue('Default') ==\
+      \ 'Default'\n)"
+    messageExpression: '''Changing the proc mount from the default is not allowed. The following containers
+      have an invalid procMount: '' +  variables.allContainers.filter(c, c.?securityContext.?procMount.orValue(''Default'')
+      != ''Default'').map(c, c.name).join('', '')'
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: restrict-sysctls
+  annotations:
+    policies.kyverno.io/title: Restrict sysctls
+    policies.kyverno.io/category: Pod Security Standards (Baseline)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: Sysctls can disable security mechanisms or affect all containers
+      on a host, and should be disallowed except for an allowed "safe" subset. A sysctl is considered
+      safe if it is namespaced in the container or the Pod, and it is isolated from other Pods or processes
+      on the same Node. This policy ensures that only those "safe" subsets can be specified in a Pod.
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+    - apiGroups:
+      - ''
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - pods
+  matchConditions:
+  - name: exclude-kube-system
+    expression: object.metadata.namespace != 'kube-system'
+  validations:
+  - expression: "object.spec.?securityContext.?sysctls.orValue([]).all(s, \n  s.name in [\n    'kernel.shm_rmid_forced',\
+      \ \n    'net.ipv4.ip_local_port_range', \n    'net.ipv4.ip_unprivileged_port_start', \n    'net.ipv4.tcp_syncookies',\
+      \ \n    'net.ipv4.ping_group_range'\n  ]\n)"
+    messageExpression: "'Setting additional sysctls above the allowed type is disallowed. Invalid sysctls\
+      \ found: ' +  object.spec.?securityContext.?sysctls.orValue([]).filter(s, !(s.name in [\n  'kernel.shm_rmid_forced',\
+      \ \n  'net.ipv4.ip_local_port_range', \n  'net.ipv4.ip_unprivileged_port_start', \n  'net.ipv4.tcp_syncookies',\
+      \ \n  'net.ipv4.ping_group_range'\n])).map(s, s.name).join(', ')"

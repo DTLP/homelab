@@ -1,0 +1,98 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: restrict-external-ips
+  annotations:
+    policies.kyverno.io/title: Restrict External IPs
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Service
+    policies.kyverno.io/description: 'Service externalIPs can be used for a MITM attack (CVE-2020-8554).
+      Restrict externalIPs or limit to a known set of addresses. See: https://github.com/kyverno/kyverno/issues/1367.
+      This policy validates that the `externalIPs` field is not set on a Service.'
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+    - apiGroups:
+      - ''
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - services
+  matchConditions:
+  - name: exclude-kube-system
+    expression: object.metadata.namespace != 'kube-system'
+  validations:
+  - expression: '!has(object.spec.externalIPs) || size(object.spec.externalIPs) == 0'
+    message: externalIPs are not allowed.
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: restrict-load-balancer-ip
+  annotations:
+    policies.kyverno.io/title: Restrict LoadBalancer IP
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Service
+    policies.kyverno.io/description: We use Service loadBalancerIP to pin external IPs for external load
+      balancer services. We should only allow specific services to specific addresses, in order to avoid
+      someone hijacking an external service IP from their service.
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+    - apiGroups:
+      - ''
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - services
+  matchConditions:
+  - name: exclude-kube-system
+    expression: object.metadata.namespace != 'kube-system'
+  - name: exclude-exceptions
+    expression: '!((object.metadata.namespace == ''ingress-controller'' && object.metadata.name == ''traefik''))'
+  validations:
+  - expression: '!has(object.spec.loadBalancerIP)'
+    message: loadBalancerIP is not allowed.
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: restrict-nodeport
+  annotations:
+    policies.kyverno.io/title: Disallow NodePort
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Service
+    policies.kyverno.io/description: A Kubernetes Service of type NodePort uses a host port to receive
+      traffic from any source. A NetworkPolicy cannot be used to control traffic to host ports. Although
+      NodePort Services can be useful, their use must be limited to Services with additional upstream
+      security checks. This policy validates that any new Services do not use the `NodePort` type.
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+    - apiGroups:
+      - ''
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - services
+  matchConditions:
+  - name: exclude-kube-system
+    expression: object.metadata.namespace != 'kube-system'
+  validations:
+  - expression: '!has(object.spec.type) || object.spec.type != ''NodePort'''
+    message: Services of type NodePort are not allowed.

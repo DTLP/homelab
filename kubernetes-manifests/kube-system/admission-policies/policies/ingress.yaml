@@ -1,0 +1,127 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: disallow-or-operator
+  annotations:
+    policies.kyverno.io/title: Disallow OR Operator
+    policies.kyverno.io/category: Traefik
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: IngressRoute,IngressRouteTCP
+    policies.kyverno.io/description: Using || can allow you to subvert other restrictions and hijack traffic
+      with non-specific rules that match generic paths or headers
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+    - apiGroups:
+      - traefik.io
+      apiVersions:
+      - '*'
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - ingressroutes
+      - ingressroutetcps
+  matchConditions:
+  - name: exclude-kube-system
+    expression: object.metadata.namespace != 'kube-system'
+  validations:
+  - expression: object.spec.?routes.orValue([]).all(route, !route.?match.orValue('').contains('||'))
+    message: Route matches must not contain ||
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: disallow-wildcard-hostsni
+  annotations:
+    policies.kyverno.io/title: Disallow Wildcard HostSNI
+    policies.kyverno.io/category: Traefik
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: IngressRouteTCP
+    policies.kyverno.io/description: Prevent IngressRouteTCP from hijacking all traffic by preventing
+      wildcard HostSNIs.
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+    - apiGroups:
+      - traefik.io
+      apiVersions:
+      - '*'
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - ingressroutetcps
+  matchConditions:
+  - name: exclude-kube-system
+    expression: object.metadata.namespace != 'kube-system'
+  validations:
+  - expression: object.spec.?routes.orValue([]).all(route, !route.?match.orValue('').matches('HostSNI\\(`.*\\*.*`\\)'))
+    message: HostSNI rules must not contain a wildcard host '*'
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: require-ingress-host
+  annotations:
+    policies.kyverno.io/title: Require Ingress Host
+    policies.kyverno.io/category: Traefik
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Ingress
+    policies.kyverno.io/description: prevent ingresses from hijacking the default traefik route by requiring
+      an explicit host value
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+    - apiGroups:
+      - networking.k8s.io
+      apiVersions:
+      - '*'
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - ingresses
+  matchConditions:
+  - name: exclude-kube-system
+    expression: object.metadata.namespace != 'kube-system'
+  validations:
+  - expression: has(object.spec) && has(object.spec.rules) && size(object.spec.rules) > 0 && object.spec.rules.all(rule,
+      has(rule.host) && rule.host != null && rule.host != "")
+    message: Ingresses must specify a host
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: require-ingressroute-host
+  annotations:
+    policies.kyverno.io/title: Require IngressRoutes Host Specification
+    policies.kyverno.io/category: Traefik
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: IngressRoute
+    policies.kyverno.io/description: Every IngressRoute match must contain a specific host with a valid
+      hostname as defined by RFC 1123. By requiring a Host rule, we prevent widespread hijacking by non-specific
+      rules like PathPrefix(`/`).
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+    - apiGroups:
+      - traefik.io
+      apiVersions:
+      - '*'
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - ingressroutes
+  matchConditions:
+  - name: exclude-kube-system
+    expression: object.metadata.namespace != 'kube-system'
+  validations:
+  - expression: "object.spec.?routes.orValue([]).all(route, \n  route.?match.orValue('').matches('Host\\\
+      \\((`(([a-zA-Z0-9]{1,})|([a-zA-Z0-9]+(-[a-zA-Z0-9]+)*\\\\.)+[a-z]{2,})`(, ?)?)+\\\\)')\n)"
+    message: All route matches must contain a Host rule with valid hostnames as defined by RFC 1123
