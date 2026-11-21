@@ -45,11 +45,6 @@ metadata:
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: nfs-provisioner
----
-apiVersion: v1
-kind: Namespace
-metadata:
   name: registry
 ---
 apiVersion: v1

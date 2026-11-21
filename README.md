@@ -111,19 +111,19 @@ The Proxmox cluster hosts the following virtual machines:
 | ------------- | ----- | ------ | ---------------------------------- |
 | Control plane | 1     | Talos  | Kubernetes master (master-0)       |
 | Worker nodes  | 4     | Talos  | Kubernetes workers                 |
-| NFS server    | 1     | Ubuntu | Persistent storage for the cluster |
 
 - Talos version and Kubernetes version are pinned in [`talos/talenv.yaml`](talos/talenv.yaml) and templated via [Talhelper](https://github.com/budimanjojo/talhelper).
 - A single control plane node (`master-0`) serves as the API endpoint. Three
   control planes with a VIP were more than this hardware can carry, so a single
   node is a deliberate tradeoff.
-- The NFS VM serves cluster PVCs through `nfs-client`, the default `StorageClass`.
+- Persistent volumes are backed by Longhorn, which replicates each volume across
+  the worker nodes.
 
 ### Data and recovery
 
-The NFS VM holds every PersistentVolume and is a single point of failure. It is
-not backed up. The data on those volumes (metrics, logs, dashboard state, Kafka
-topics) is disposable. Configuration and secrets live in Git, so recovery means
+Persistent volumes are replicated by Longhorn across the worker nodes' local
+disks, but they are not backed up. The data (metrics, logs, and dashboard state)
+is disposable. Configuration and secrets live in Git, so recovery means
 rebuilding the cluster from this repository, not restoring a backup.
 
 ## How it's managed
@@ -149,7 +149,6 @@ self-contained module with state stored remotely in HCP Terraform:
 - [`terraform/proxmox/k8s`](terraform/proxmox/k8s) — creates the Talos VMs,
   applies the machine configuration, boots the cluster and exports the
   kubeconfig.
-- [`terraform/proxmox/nfs`](terraform/proxmox/nfs) — the NFS storage VM.
 - [`terraform/grafana`](terraform/grafana) — Grafana dashboards.
 - [`terraform/hetzner`](terraform/hetzner) — a Hetzner Cloud VM running
   docker-mailserver, Pangolin and Ente Photos, reachable over a WireGuard
@@ -183,7 +182,7 @@ with Kustomize and version-pinned per directory. Infrastructure deployed today:
 - **Certificates** — cert-manager with Cloudflare DNS-01 challenges
 - **Monitoring** — Prometheus, Grafana, Alertmanager, Loki, Vector,
   kube-state-metrics, node-exporter, pushgateway, pve-exporter
-- **Storage** — NFS client provisioner
+- **Storage** — Longhorn replicated block storage
 - **Registry** — a pull-through cache for `docker.io`. Images from `quay.io`
   and `ghcr.io` pull directly.
 - **Experiments** — Kafka, and a `sandbox/` namespace for play apps (Homer,

@@ -6,9 +6,9 @@ ArgoCD.
 
 ## Infrastructure
 
-Five HP EliteDesk nodes form a single Proxmox VE cluster (`lab`). Each hosts
-Talos Kubernetes VMs; an Ubuntu VM provides shared NFS storage. All VMs use
-static addresses matched by MAC, with 192.168.0.1 as the gateway.
+Five HP EliteDesk nodes form a single Proxmox VE cluster (`lab`). Each hosts a
+Talos Kubernetes VM. All VMs use static addresses matched by MAC, with
+192.168.0.1 as the gateway.
 
 ```mermaid
 flowchart TB
@@ -32,14 +32,11 @@ flowchart TB
         W3["worker-3<br/>192.168.0.43"]
     end
 
-    NFS["nfs-0 (Ubuntu)<br/>192.168.0.60<br/>/data"]
-
     P1 --> M0
     P2 --> W0
     P3 --> W1
     P4 --> W2
     P5 --> W3
-    P5 --> NFS
 ```
 
 The single control plane is a deliberate tradeoff. Three control planes with a
@@ -115,27 +112,21 @@ flowchart LR
 
 ## Storage
 
-Shared storage comes from the nfs-0 VM and is exposed to the cluster through a
-dynamic NFS provisioner.
+Persistent volumes are provided by Longhorn, which replicates each volume across
+the worker nodes' local NVMe disks.
 
 ```mermaid
 flowchart LR
-    NFS["nfs-0<br/>192.168.0.60:/data"]
-
-    Prov["nfs-subdir-external-provisioner<br/>nfs-provisioner"] -->|NFS| NFS
-
-    SC["StorageClass nfs-client<br/>(default)"]
-    Prov --> SC
-
-    PVC["PVCs<br/>Prometheus, Grafana, Loki, Kafka, ..."] --> SC
+    PVC["PVCs<br/>Prometheus, Grafana, Loki, registry, ..."] --> SC["StorageClass longhorn"]
+    SC --> LH["Longhorn<br/>replicated volumes"]
 ```
 
 ## Data and recovery
 
-All PersistentVolumes live on the `nfs-0` VM, which is a single point of
-failure. The data is disposable: metrics, logs, dashboard state, and Kafka topics
-are not backed up. Configuration and secrets are in Git, so recovery means
-rebuilding the cluster from this repository.
+Persistent volumes are replicated across the worker nodes, but they are not
+backed up. The data is disposable: metrics, logs, and dashboard state.
+Configuration and secrets are in Git, so recovery means rebuilding the cluster
+from this repository.
 
 ## GitOps and provisioning
 
@@ -145,7 +136,7 @@ Infrastructure is bootstrapped and kept in sync from this repository.
 flowchart LR
     subgraph IaC["Infrastructure-as-Code"]
         Ansible["Ansible<br/>Proxmox cluster + VMs"]
-        TF["Terraform<br/>proxmox-k8s, proxmox-nfs, grafana, hetzner"]
+        TF["Terraform<br/>proxmox-k8s, grafana, hetzner"]
         TH["Talhelper<br/>talconfig.yaml + talenv.yaml"]
     end
 
@@ -219,8 +210,8 @@ Two namespaces are intentionally different:
 | cert-manager                        | kube-system        | TLS certificates (Cloudflare DNS-01)                   |
 | external-dns                        | kube-system        | DNS records for `*.dtlp.cc`                            |
 | MetalLB                             | metallb-system     | LoadBalancer IP allocation                             |
+| Longhorn                            | longhorn-system    | Replicated block storage for PersistentVolumes         |
 | Kyverno                             | kube-system        | CEL validating policies                                |
-| nfs-provisioner                     | nfs-provisioner    | NFS-backed default StorageClass                        |
 | Kafka + kafka-ui                    | kafka              | Streaming / message broker                             |
 | terraform-applier                   | terraform-applier  | Runs Terraform modules in-cluster (Grafana dashboards) |
 | registry                            | registry           | Pull-through cache and mirror for `docker.io`          |
@@ -228,7 +219,7 @@ Two namespaces are intentionally different:
 ## Provisioning
 
 - **Ansible** bootstraps the Proxmox cluster (formation, SSH, NVMe mount) and
-  the Ubuntu cloud image for the NFS VM.
+  the Ubuntu cloud image used by the Forgejo runner VM.
 - **Terraform** (`terraform/proxmox/k8s`) provisions the Talos VMs on Proxmox
   (disk images, networking, resource sizing) and applies Talos machine configs.
   Talos and Kubernetes versions come from `talos/talenv.yaml`; machine secrets

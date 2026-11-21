@@ -27,7 +27,6 @@ spec:
     - longhorn-system
     - metallb-system
     - monitoring
-    - nfs-provisioner
     - registry
     - terraform-applier
 
@@ -49,8 +48,6 @@ spec:
     - namespace: metallb-system
       name: in-cluster
     - namespace: monitoring
-      name: in-cluster
-    - namespace: nfs-provisioner
       name: in-cluster
     - namespace: registry
       name: in-cluster
