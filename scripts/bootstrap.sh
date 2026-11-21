@@ -48,13 +48,14 @@ apply_file "$MANIFESTS/kube-system/namespaces.yaml"
 # 3. Platform services that the rest of the stack depends on.
 apply "$MANIFESTS/metallb-system" -n metallb-system
 apply "$MANIFESTS/kube-system/cert-manager" -n kube-system
-apply "$MANIFESTS/kube-system/external-dns" -n kube-system
 apply "$MANIFESTS/kube-system/metrics-server" -n kube-system
 apply "$MANIFESTS/kube-system/coredns" -n kube-system
 
-# 4. Ingress and the wildcard certificate.
+# 4. Ingress and the wildcard certificate. external-dns follows the ingress
+# controller because its traefik-proxy source needs the Traefik CRDs.
 apply "$MANIFESTS/ingress-controller" -n ingress-controller
 apply "$MANIFESTS/certs" -n certs
+apply "$MANIFESTS/kube-system/external-dns" -n kube-system
 
 # 5. Policy and RBAC controllers.
 apply "$MANIFESTS/kube-system/terraform-applier" -n kube-system

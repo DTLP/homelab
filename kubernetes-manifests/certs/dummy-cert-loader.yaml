@@ -1,6 +1,5 @@
-# Dummy service that is used to register Ingresses and IngressRoutes in this
-# namesapce. This does not bind to any apps but allows traefik to load
-# certificate.
+# Dummy service that is used to register IngressRoutes in this namesapce. This
+# does not bind to any apps but allows traefik to load certificate.
 #
 # Tis Service needs to have an endpoint of some kind. Using # externalName that
 # doesn't point anywhere seems to satisfy Traefik, so it loads the IngressRoutes

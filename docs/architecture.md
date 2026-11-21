@@ -53,10 +53,10 @@ private MetalLB address. Nothing is port-forwarded, so every UI and API is
 reachable only from the LAN. TLS is terminated at Traefik with a wildcard
 certificate issued via cert-manager DNS-01.
 
-`external-dns` watches `Ingress` and `Service` resources and upserts their
-records in the Cloudflare zone. Every ingress sets the target annotation
-`private-ingress.dtlp.cc`, so the records point at that name, which resolves to
-the private MetalLB address.
+`external-dns` watches Traefik `IngressRoute` and `Service` resources and
+upserts their records in the Cloudflare zone. Every route sets the target
+annotation `private-ingress.dtlp.cc`, so the records point at that name, which
+resolves to the private MetalLB address.
 
 ```mermaid
 flowchart LR

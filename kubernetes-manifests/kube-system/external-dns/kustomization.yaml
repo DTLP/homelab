@@ -19,3 +19,20 @@ patches:
     target:
       kind: ClusterRoleBinding
       name: external-dns-viewer
+  - patch: |-
+      - op: add
+        path: /rules/-
+        value:
+          apiGroups:
+            - traefik.io
+          resources:
+            - ingressroutes
+            - ingressroutetcps
+            - ingressrouteudps
+          verbs:
+            - get
+            - watch
+            - list
+    target:
+      kind: ClusterRole
+      name: external-dns

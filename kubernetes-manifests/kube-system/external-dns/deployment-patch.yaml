@@ -14,13 +14,15 @@ spec:
         - name: external-dns
           args:
             - --domain-filter=dtlp.cc
+            - --exclude-domains=private-ingress.dtlp.cc
+            - --exclude-domains=tls-cert-loader.dtlp.cc
             - --log-level=error
             - --policy=upsert-only
             - --provider=cloudflare
             - --publish-internal-services
             - --registry=txt
-            - --source=ingress
             - --source=service
+            - --source=traefik-proxy
             - --txt-owner-id=homelab
           env:
             - name: CF_API_EMAIL
