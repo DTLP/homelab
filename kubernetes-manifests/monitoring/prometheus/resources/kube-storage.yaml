@@ -9,4 +9,4 @@ groups:
           summary: "PVC {{ $labels.persistentvolumeclaim }} in namespace {{ $labels.namespace }} is over 90% full"
           description: "PersistentVolumeClaim {{ $labels.persistentvolumeclaim }} in namespace {{ $labels.namespace }} is using more than 90% of its capacity."
           impact: "Potential service interruption or data loss."
-          action: "Review usage trends and cleanup the volume or consider insreasing the size."
+          action: "Review usage trends and cleanup the volume or consider increasing the size."
