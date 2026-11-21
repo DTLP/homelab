@@ -107,11 +107,13 @@ through the TP-Link switch.
 
 The Proxmox cluster hosts the following virtual machines:
 
-| VM(s)         | Count | OS     | Role                               |
-| ------------- | ----- | ------ | ---------------------------------- |
-| Control plane | 1     | Talos  | Kubernetes master (master-0)       |
-| Worker nodes  | 4     | Talos  | Kubernetes workers                 |
+| VM(s)          | Count | OS     | Role                              |
+| -------------- | ----- | ------ | --------------------------------- |
+| Control plane  | 1     | Talos  | Kubernetes master (master-0)      |
+| Worker nodes   | 4     | Talos  | Kubernetes workers                |
+| Forgejo runner | 1     | Ubuntu | CI runner for Forgejo Actions     |
 
+- The Forgejo runner VM shares pve1 with `master-0`.
 - Talos version and Kubernetes version are pinned in [`talos/talenv.yaml`](talos/talenv.yaml) and templated via [Talhelper](https://github.com/budimanjojo/talhelper).
 - A single control plane node (`master-0`) serves as the API endpoint. Three
   control planes with a VIP were more than this hardware can carry, so a single
@@ -122,9 +124,11 @@ The Proxmox cluster hosts the following virtual machines:
 ### Data and recovery
 
 Persistent volumes are replicated by Longhorn across the worker nodes' local
-disks, but they are not backed up. The data (metrics, logs, and dashboard state)
-is disposable. Configuration and secrets live in Git, so recovery means
-rebuilding the cluster from this repository, not restoring a backup.
+disks, but they are not backed up. Most of the data (metrics, logs, and dashboard
+state) is disposable. Forgejo's repositories are the exception: losing them
+costs more than history, though they can be rebuilt. Configuration and secrets
+live in Git, so recovery means rebuilding the cluster from this repository, not
+restoring a backup.
 
 ## How it's managed
 
@@ -155,10 +159,11 @@ self-contained module with state stored remotely in HCP Terraform:
   tunnel.
 
 The Talos cluster runs **Calico** for pod networking. A fresh cluster is
-provisioned with the default Flannel CNI disabled by the
-[`cni-none-patch`](terraform/proxmox/k8s/resources/cni-none-patch.yaml) applied
-to every node, so `terraform apply` never installs Flannel. Calico and the
-platform services are then installed from `kubernetes-manifests/` by
+provisioned with the default Flannel CNI disabled by `cniConfig.name: none` in
+[`talos/talconfig.yaml`](talos/talconfig.yaml), so `terraform apply` never
+installs Flannel. Calico comes from
+[`kubernetes-manifests/kube-system/cni/`](kubernetes-manifests/kube-system/cni),
+and the platform services are installed from `kubernetes-manifests/` by
 [`scripts/bootstrap.sh`](scripts/bootstrap.sh):
 
 ```
@@ -183,6 +188,7 @@ with Kustomize and version-pinned per directory. Infrastructure deployed today:
 - **Monitoring** — Prometheus, Grafana, Alertmanager, Loki, Vector,
   kube-state-metrics, node-exporter, pushgateway, pve-exporter
 - **Storage** — Longhorn replicated block storage
+- **Git** — Forgejo at `git.dtlp.cc`, with a runner VM for Actions
 - **Registry** — a pull-through cache for `docker.io`. Images from `quay.io`
   and `ghcr.io` pull directly.
 - **Experiments** — a `sandbox/` namespace for play apps (Homer,
@@ -192,11 +198,12 @@ with Kustomize and version-pinned per directory. Infrastructure deployed today:
 
 Delivery is split by what each tool owns:
 
-- **ArgoCD** is the main tool for Kubernetes resources. Each directory under
-  `kubernetes-manifests/` carries an `Application`, and ArgoCD reconciles every
-  namespace with server-side apply and automated prune and self-heal.
-- **terraform-applier** owns the Terraform workspaces, such as the Grafana
-  dashboards module, and applies them on a schedule.
+- **ArgoCD** is the main tool for Kubernetes resources. Every ArgoCD-managed
+  directory under `kubernetes-manifests/` carries an `Application`, and ArgoCD
+  reconciles each namespace with server-side apply and automated prune and
+  self-heal. Auto-sync is paused when a migration needs manual control.
+- **terraform-applier** owns the Grafana dashboards module and applies it on a
+  schedule.
 - **Flux** manages only the `sandbox` namespace. It is a deliberate exception to
   ArgoCD, kept to preserve hands-on experience with an alternative controller.
 

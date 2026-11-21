@@ -41,13 +41,15 @@ because nothing in the lab needs more.
 **Revisit if.** Image pulls, backups, or Longhorn replication start saturating
 the link.
 
-### Four workers, one VM per host
+### Four workers, one Kubernetes VM per host
 
-**Decision.** Run one control plane and four workers, one VM per host in host
-order: `master-0` on pve1, then `worker-0` through `worker-3` on pve2 to pve5.
+**Decision.** Run one control plane and four workers, one Kubernetes VM per host
+in host order: `master-0` on pve1, then `worker-0` through `worker-3` on pve2 to
+pve5. The Forgejo runner VM is the one exception and shares pve1 with `master-0`.
 
 **Why.** Five hosts with 4 vCPUs and 8GB of RAM each cannot carry more. This is
-the largest split the hardware allows while keeping every VM on its own host.
+the largest split the hardware allows while keeping each Kubernetes VM on its
+own host and leaving room for the runner.
 
 **Tradeoff.** Any maintenance on `master-0` takes the Kubernetes API down.
 Accepted because the lab tolerates downtime and rebuilding is cheap.
