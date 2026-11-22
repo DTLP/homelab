@@ -283,6 +283,29 @@ write_files:
     content: |
       [postfix]
       bantime = -1
+
+      [pre-tls]
+      enabled = true
+      filter = dms-pre-tls
+      logpath = /var/log/mail.log
+      backend = auto
+      maxretry = 10
+      findtime = 1h
+      bantime = 1w
+  - path: /mail/config/user-patches.sh
+    permissions: "0755"
+    content: |
+      #!/bin/bash
+      # Install the fail2ban filter used by the pre-tls jail. Fail2ban starts
+      # after the setup stage that runs this script, so it is in place before
+      # the jails load.
+      set -euo pipefail
+
+      cat >/etc/fail2ban/filter.d/dms-pre-tls.conf <<'EOF'
+      [Definition]
+      failregex = ^.*postfix/(?:submissions/)?smtpd\[\d+\]: SSL_accept error from [^\[\]]*\[<HOST>\].*$
+      ignoreregex =
+      EOF
   - path: /mail/config/dovecot.cf
     permissions: "0644"
     content: |
