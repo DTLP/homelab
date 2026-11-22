@@ -78,3 +78,51 @@
     - name: Print cluster status
       debug:
         var: cluster_status.stdout
+
+- name: Set the CPU frequency governor to schedutil
+  hosts: pve_nodes
+  become: true
+
+  vars:
+    cpu_governor: schedutil
+
+  tasks:
+    - name: Check that the governor is available
+      command: cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors
+      register: available_governors
+      changed_when: false
+      check_mode: false
+
+    - name: Fail when the governor is not available
+      assert:
+        that: cpu_governor in available_governors.stdout
+        fail_msg: "{{ cpu_governor }} is not offered by the kernel"
+
+    - name: Persist the governor across reboots
+      copy:
+        dest: /etc/systemd/system/cpu-governor.service
+        mode: "0644"
+        content: |
+          [Unit]
+          Description=Set the CPU frequency governor to {{ cpu_governor }}
+          After=multi-user.target
+
+          [Service]
+          Type=oneshot
+          RemainAfterExit=yes
+          ExecStart=/bin/sh -c 'for c in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do echo {{ cpu_governor }} > "$c"; done'
+
+          [Install]
+          WantedBy=multi-user.target
+      register: cpu_governor_unit
+
+    - name: Reload systemd
+      systemd:
+        daemon_reload: yes
+      when: cpu_governor_unit.changed
+
+    - name: Apply the governor now and enable the unit
+      systemd:
+        name: cpu-governor.service
+        enabled: yes
+        state: started
