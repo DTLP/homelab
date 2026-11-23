@@ -6,7 +6,7 @@ resources:
   - network-policies.yaml
   - tf-applier-ingress.yaml
 
-  - github.com/utilitywarehouse/terraform-applier//manifests/base/namespaced?ref=v2.6.2
+  - github.com/utilitywarehouse/terraform-applier//manifests/base/namespaced?ref=v2.7.0
 
 patches:
   - path: tf-applier-patch.yaml
