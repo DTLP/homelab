@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: pve-exporter
-          image: prompve/prometheus-pve-exporter@sha256:4867684c0a937716f11f770a32d32958bded507cf570fc334f774392afcb2f37 # 3.10.0
+          image: prompve/prometheus-pve-exporter@sha256:e49466559449074596e762dd09c9a76c9be9b6a1ffacf7bc8ceb827169cb180e # 3.12.0
           ports:
             - name: pve-exporter
               containerPort: 9221
