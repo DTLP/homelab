@@ -12,7 +12,7 @@ spec:
           name: cmp-plugin
       containers:
         - name: asp
-          image: quay.io/utilitywarehouse/argocd-voodoobox-plugin@sha256:940e4542b5a41aef9a6887b8fcbe3e584756322a024ded8305e5c14b0a762560 # v0.5.1
+          image: quay.io/utilitywarehouse/argocd-voodoobox-plugin@sha256:7034b58b8c6d4a718a3fb3e67599e44d5ce6d53357408c44c876fd666f017d55 # v0.5.2
           imagePullPolicy: IfNotPresent
           command: [/var/run/argocd/argocd-cmp-server]
           securityContext:
