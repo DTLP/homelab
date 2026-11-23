@@ -98,6 +98,18 @@ Actions, or anything else.
   GitOps, check the Application is Synced and Healthy. Follow the app's upgrade
   notes (e.g. single-replica StatefulSet means brief downtime; the agent
   buffers and retries).
+- If you disable ArgoCD auto-sync for a manual rollout, applying a namespace
+  directory that contains its own `argocd-app.yaml` re-enables it. ArgoCD can
+  then revert the rollout to `main` within seconds. Re-disable sync in the
+  namespace immediately after every apply, or apply the rendered manifests with
+  the `Application` object filtered out.
+- Upstream kustomize bases can lag the release image (metrics-server and
+  external-dns both shipped a new ref that still pointed at the previous image).
+  Check the rendered `image:` and pin the release image by digest when it does
+  not match.
+- A single-replica Deployment with an RWO PVC (Grafana) deadlocks on
+  `RollingUpdate`; set `strategy.type: Recreate` so the old pod releases the
+  volume before the new one starts.
 
 ## 6. Rollout specifics: Talos / Kubernetes control plane
 
@@ -116,6 +128,17 @@ Actions, or anything else.
   Running, no `NetworkUnavailable`/pressure conditions on nodes.
 - Re-apply the CoreDNS anti-affinity with `scripts/coredns-spread.sh`. Talos
   owns the deployment and can reset it during an upgrade.
+- `make upgrade-talos` skips the drain for every node. Longhorn's
+  instance-manager pods cannot be evicted within the drain timeout, and a
+  failed drain leaves the node cordoned with the new slot staged but not
+  booted. Use `--drain=false`, then uncordon.
+- The script waits only for the Talos API to report the target version. The
+  Kubernetes API can still be restarting when the next node is processed, so
+  cordon/uncordon operations may fail; confirm the API is back before relying
+  on node operations.
+- Read the installer reference from the live machine config. The config can be
+  one escaped YAML line, so extract the full image token rather than a fixed
+  field.
 
 ## 7. Repo-wide upgrade conventions
 
