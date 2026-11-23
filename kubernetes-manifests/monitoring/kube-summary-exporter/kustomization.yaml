@@ -4,7 +4,7 @@ kind: Kustomization
 resources:
   - rbac.yaml
 
-  - github.com/utilitywarehouse/kube-summary-exporter//manifests/base?ref=v0.4.8
+  - github.com/utilitywarehouse/kube-summary-exporter//manifests/base?ref=v0.4.10
 
 patches:
   - path: resources-patch.yaml
