@@ -7,7 +7,7 @@ resources:
   - metallb-l2advertisement.yaml
   - network-policies.yaml
 
-  - github.com/metallb/metallb/config/native?ref=v0.16.1
+  - github.com/metallb/metallb/config/native?ref=v0.16.2
 
 patches:
   - path: remove-namespace.yaml
