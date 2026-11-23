@@ -16,6 +16,8 @@ spec:
         app.kubernetes.io/name: grafana
     spec:
       serviceAccountName: grafana
+      imagePullSecrets:
+        - name: registry-pull
       containers:
         - name: grafana
           image: grafana/grafana@sha256:0615ec4fbd4072004b7d86b46ded63013a74b7d6eb1119273dd89e8fa25c13cf # 13.3.1
@@ -84,7 +86,7 @@ spec:
         # as the terraform-applier-grafana-token secret for the
         # terraform-applier dashboards Module to consume.
         - name: terraform-applier-token
-          image: registry.uw.systems/system-public/alpine-bash-curl-jq@sha256:ca0cfc1cd60978d4f51975ac65d7f23716ce7d96e900e0f457a3498ae15cce45 # 3.24
+          image: registry.dtlp.cc/library/alpine-bash-curl-jq@sha256:ca0cfc1cd60978d4f51975ac65d7f23716ce7d96e900e0f457a3498ae15cce45 # 3.24
           command: ["bash", "/scripts/provision.sh"]
           env:
             - name: GF_SECURITY_ADMIN_USER
