@@ -1,4 +1,4 @@
-CALICO_VERSION := v3.32.1
+CALICO_VERSION := v3.33.1
 
 .PHONY: get-upstream
 get-upstream:
