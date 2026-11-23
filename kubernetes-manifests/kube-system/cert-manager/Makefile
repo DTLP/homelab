@@ -1,4 +1,4 @@
-VERSION ?= v1.21.1
+VERSION ?= v1.21.3
 NAMESPACE ?= kube-system
 
 .PHONY: get-upstream
