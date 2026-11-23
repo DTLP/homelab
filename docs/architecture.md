@@ -155,7 +155,7 @@ flowchart LR
     Argo --> Cluster
     Flux --> Cluster
 
-    Renovate["Renovate<br/>(disabled)"] -.->|dependency PRs| Repo
+    Renovate["Renovate<br/>(on demand)"] -.->|dependency PRs| Repo
     TerraformApplier["terraform-applier<br/>Grafana dashboards"] -.-> TF
 
     Cluster["Talos Kubernetes cluster"]
@@ -182,7 +182,8 @@ The Kustomizations do not set `namespace`. The namespace comes from the ArgoCD
 Application destination; `scripts/bootstrap.sh` passes `-n` when it applies a
 directory directly.
 
-Renovate is configured but disabled to stop PR noise.
+Renovate tracks dependency updates and opens a pull request only when one is
+approved from its Dependency Dashboard issue.
 
 ## Network policies
 
@@ -228,4 +229,5 @@ Two namespaces are intentionally different:
 - **ArgoCD** watches the repository's `kubernetes-manifests/` and applies each
   namespace's kustomization with server-side apply. **Flux** manages only the
   sandbox namespace.
-- **Renovate** is configured but disabled to stop PR noise.
+- **Renovate** tracks dependency updates and opens pull requests on approval
+  from the Dependency Dashboard.

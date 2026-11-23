@@ -230,10 +230,10 @@ password manager and is not in the repository.
 
 ### Keeping things fresh
 
-- [Renovate](https://github.com/renovatebot/renovate) is configured but
-  currently disabled (`"enabled": false` in [`renovate.json`](renovate.json))
-  to stop the PR noise. The configuration is kept in place so it can be
-  re-enabled.
+- [Renovate](https://github.com/renovatebot/renovate) tracks dependency updates
+  but opens no pull requests until one is approved from the Dependency
+  Dashboard issue, so upgrades happen on demand. See
+  [Upgrade on demand](docs/decisions.md#upgrade-on-demand-from-a-dependency-dashboard).
 - A CI workflow ([`.github/workflows/manifest-diff.yaml`](.github/workflows/manifest-diff.yaml))
   renders Kustomize diffs of changed manifests on every pull request.
 

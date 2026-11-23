@@ -197,22 +197,28 @@ a bad prune.
 
 **Revisit if.** The drift becomes a recurring problem.
 
-### Upgrade on demand, with agents
+### Upgrade on demand, from a dependency dashboard
 
-**Decision.** Upgrade Talos, Kubernetes, and manifests when it suits, usually
-with an agent doing the work. Renovate stays disabled.
+**Decision.** Let Renovate track dependency updates, but create no branches or
+pull requests until one is approved from the Dependency Dashboard issue. Upgrade
+Talos, Kubernetes, and manifests when it suits, usually with an agent doing the
+work.
 
-**Why.** Renovate produced more pull requests than the lab justified. Agents
-read the changelog, plan the upgrade order, check application health before the
+**Why.** Renovate's default push model produced more pull requests than the lab
+justified. Approval inverts it: the dashboard lists what is behind, and ticking
+an entry starts a pull request when there is time for it. An agent can then read
+the changelog, plan the upgrade order, check application health before the
 upgrade, run it, watch health afterwards, report back, and commit the changes.
 Rollback is reverting the commit.
 
-**Tradeoff.** The lab drifts behind current versions. Skipping versions usually
-means stepping through the intermediate releases; a direct jump is fine when the
-upstream supports it.
+**Tradeoff.** The dashboard only shows what Renovate detects, so it is not a
+complete inventory. Entries can sit for weeks, and the lab still drifts behind
+current versions. An approved update is a normal pull request that needs review.
+Skipping versions usually means stepping through the intermediate releases; a
+direct jump is fine when the upstream supports it.
 
-**Revisit if.** Renovate's volume becomes manageable, or upgrades slip because
-they are too much manual work.
+**Revisit if.** The dashboard becomes noise itself, or upgrades slip because
+nobody opens it.
 
 ### Terraform state in HCP Terraform
 
