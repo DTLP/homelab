@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: homer
-          image: b4bz/homer@sha256:ace7c6a2cfb66e13f0e94d5534cb569562f190aa5cac9446b2453ef7822cd195 # v26.4.2
+          image: b4bz/homer@sha256:92032ac8bcb812283bfe93750d0fe6ce52a6010699a0de46fdcbf2164e56a970 # v26.11.4
           ports:
           - containerPort: 8080
           resources:
