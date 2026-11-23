@@ -56,9 +56,9 @@ upgrade-k8s: etcd-snapshot
 	DRY=$$([ -n "$(DRY_RUN)" ] && echo --dry-run || true) && \
 	talosctl upgrade-k8s --to $$KUBERNETES_VERSION -n 192.168.0.30 $$DRY
 
-# master-0 runs only static control-plane pods and DaemonSets, so draining it
-# would evict nothing. Skip the drain and accept the control-plane downtime
-# during the reboot.
+# Draining blocks on the Longhorn instance-manager pods, which cannot be
+# evicted within the drain timeout. Skip the drain for every node and let
+# Kubernetes and Longhorn recover after the reboot.
 upgrade-talos: etcd-snapshot
 	@TALOS_VERSION=$$(grep '^TALOS_VERSION' $(TALENV) | cut -d ':' -f2 | tr -d ' ') && \
 	for node in $(NODES); do \
@@ -66,11 +66,10 @@ upgrade-talos: etcd-snapshot
 		if [ "$$current" = "$$TALOS_VERSION" ]; then \
 			echo "skipping node $$node. already on $$TALOS_VERSION"; \
 		else \
-			image=$$(talosctl -n $$node get machineconfig -o yaml 2>/dev/null | awk '/image: .*installer/ {print $$2; exit}'); \
+			image=$$(talosctl -n $$node get machineconfig -o yaml 2>/dev/null | sed -n 's/.*image: \([^ \\]*installer[^ \\]*\).*/\1/p' | head -1); \
 			image=$${image%:*}; \
 			if [ -z "$$image" ]; then echo "could not determine installer image for $$node"; exit 1; fi; \
-			drain="--drain-timeout=10m"; \
-			if [ "$$node" = "192.168.0.30" ]; then drain="--drain=false"; fi; \
+			drain="--drain=false"; \
 			echo "upgrading node $$node to $$TALOS_VERSION using $$image:$$TALOS_VERSION"; \
 			talosctl upgrade --wait=false $$drain -n $$node --image "$$image:$$TALOS_VERSION" & upgrade_pid=$$!; \
 			echo "waiting for $$node to reboot into $$TALOS_VERSION"; \
