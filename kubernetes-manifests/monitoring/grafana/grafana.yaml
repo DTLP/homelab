@@ -5,6 +5,8 @@ metadata:
   labels:
     app.kubernetes.io/name: grafana
 spec:
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app.kubernetes.io/name: grafana
@@ -16,7 +18,7 @@ spec:
       serviceAccountName: grafana
       containers:
         - name: grafana
-          image: grafana/grafana@sha256:3fd54ae1214669f8355f065ec9f6445d5279a3d77095ab048ca045685272429b # 13.2.0
+          image: grafana/grafana@sha256:0615ec4fbd4072004b7d86b46ded63013a74b7d6eb1119273dd89e8fa25c13cf # 13.3.1
           imagePullPolicy: IfNotPresent
           ports:
             - name: grafana
