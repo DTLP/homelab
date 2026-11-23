@@ -30,6 +30,17 @@
     {
       "matchPackageNames": ["docker.io/calico/**"],
       "groupName": "calico"
+    },
+    {
+      "description": "Images in the internal registry Renovate cannot reach",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["registry.dtlp.cc/**"],
+      "enabled": false
+    },
+    {
+      "description": "Kubernetes API versions, which are not upgrades",
+      "matchDatasources": ["kubernetes-api"],
+      "enabled": false
     }
   ],
   "customManagers": [
