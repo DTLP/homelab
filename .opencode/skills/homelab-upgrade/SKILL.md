@@ -114,6 +114,8 @@ Actions, or anything else.
   Talos-managed bootstrap manifests (e.g. flannel RBAC when Calico is the CNI).
 - Post-upgrade: all nodes `Ready` and at the target version, control-plane pods
   Running, no `NetworkUnavailable`/pressure conditions on nodes.
+- Re-apply the CoreDNS anti-affinity with `scripts/coredns-spread.sh`. Talos
+  owns the deployment and can reset it during an upgrade.
 
 ## 7. Repo-wide upgrade conventions
 
