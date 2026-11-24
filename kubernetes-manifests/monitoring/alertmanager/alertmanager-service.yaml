@@ -8,3 +8,22 @@ spec:
     targetPort: 9093
   selector:
     app: alertmanager
+---
+# Headless service for Alertmanager gossip and for Prometheus to discover every
+# replica. The regular service above is only for the UI and the ingress.
+apiVersion: v1
+kind: Service
+metadata:
+  name: alertmanager-headless
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true
+  ports:
+  - name: web
+    port: 9093
+    targetPort: web
+  - name: cluster
+    port: 9094
+    targetPort: cluster
+  selector:
+    app: alertmanager

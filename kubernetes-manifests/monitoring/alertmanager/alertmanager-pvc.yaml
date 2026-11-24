@@ -1,3 +1,5 @@
+# Kept after the move to the Alertmanager StatefulSet. The StatefulSet creates
+# per-replica PVCs; this one still holds the old notification log.
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:

@@ -1,15 +1,11 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: alertmanager
 spec:
-  # A single replica owns the notification log on the RWO volume, so do not
-  # surge: the old pod must terminate before the new one starts.
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 0
-      maxUnavailable: 1
+  serviceName: alertmanager-headless
+  replicas: 2
+  podManagementPolicy: Parallel
   selector:
     matchLabels:
       app: alertmanager
@@ -20,9 +16,23 @@ spec:
     spec:
       securityContext:
         fsGroup: 65534
+      # Keep the two replicas on separate nodes so a single node cannot take
+      # both Alertmanagers down at once.
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: alertmanager
+              topologyKey: kubernetes.io/hostname
       containers:
       - name: alertmanager
         image: prom/alertmanager@sha256:e638797febd034838eca8b98cdbd46f951e9bf7f178777aa8669167406a9946c # v0.35.0
+        env:
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
         args:
           - "--config.file=/etc/alertmanager/config.yaml"
           # Snapshot the notification log often, otherwise a restart can
@@ -30,6 +40,10 @@ spec:
           - "--data.maintenance-interval=1m"
           - "--storage.path=/alertmanager"
           - "--web.external-url=https://alertmanager.dtlp.cc"
+          - "--cluster.listen-address=0.0.0.0:9094"
+          - "--cluster.advertise-address=$(POD_IP):9094"
+          - "--cluster.peer=alertmanager-0.alertmanager-headless.monitoring.svc.cluster.local:9094"
+          - "--cluster.peer=alertmanager-1.alertmanager-headless.monitoring.svc.cluster.local:9094"
         resources:
           requests:
             cpu: 10m
@@ -59,7 +73,10 @@ spec:
           seccompProfile:
             type: RuntimeDefault
         ports:
-        - containerPort: 9093
+        - name: web
+          containerPort: 9093
+        - name: cluster
+          containerPort: 9094
         volumeMounts:
         - name: config
           mountPath: /etc/alertmanager/config.yaml
@@ -82,6 +99,12 @@ spec:
       - name: slack
         secret:
           secretName: slack
-      - name: data
-        persistentVolumeClaim:
-          claimName: alertmanager-data
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
+        storageClassName: longhorn
