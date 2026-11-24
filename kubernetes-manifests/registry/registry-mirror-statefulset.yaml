@@ -19,7 +19,7 @@ spec:
         - name: registry-pull
       containers:
         - name: registry
-          image: registry@sha256:a3d8aaa63ed8681a604f1dea0aa03f100d5895b6a58ace528858a7b332415373 # 2.8.3
+          image: registry:2.8.3@sha256:a3d8aaa63ed8681a604f1dea0aa03f100d5895b6a58ace528858a7b332415373 # 2.8.3
           ports:
             - containerPort: 5000
           env:
