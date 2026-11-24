@@ -126,6 +126,13 @@ Actions, or anything else.
   Talos-managed bootstrap manifests (e.g. flannel RBAC when Calico is the CNI).
 - Post-upgrade: all nodes `Ready` and at the target version, control-plane pods
   Running, no `NetworkUnavailable`/pressure conditions on nodes.
+- Wait for each node to be `Ready` and uncordoned before upgrading the next
+  one. The `upgrade-talos` target does this; skipping it lets every
+  single-replica pod collect on the one node that is available.
+- After the last node, run `make -C talos rebalance`. It triggers a one-shot
+  descheduler Job and re-applies the CoreDNS anti-affinity. The
+  `upgrade-talos` target runs it automatically. Verify the distribution with
+  `kubectl get pods -A -o wide`.
 - Re-apply the CoreDNS anti-affinity with `scripts/coredns-spread.sh`. Talos
   owns the deployment and can reset it during an upgrade.
 - `make upgrade-talos` skips the drain for every node. Longhorn's
@@ -150,8 +157,9 @@ These apply to every component, not just Kubernetes.
   that fits this cluster, mention one or two as optional follow-ups, for example
   "Kubernetes now has X; it could replace Y here. Want to try it separately?"
   Keep them out of the upgrade itself and wait for the user to ask.
-- **Snapshot before you start.** Note the state of nodes, applications, and
-  resource use so you can tell afterwards whether something actually changed.
+- **Snapshot before you start.** Note the state of nodes, applications, pod
+  distribution, and resource use so you can tell afterwards whether something
+  actually changed.
 - **Order: control plane first, then workers.** Upgrade `master-0`, verify it,
   then each worker in turn, verifying nodes and pods as they return. Use the
   same order for Kubernetes itself.

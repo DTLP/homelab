@@ -2,7 +2,7 @@ TALENV := talenv.yaml
 NODES := 192.168.0.30 192.168.0.40 192.168.0.41 192.168.0.42 192.168.0.43
 HOSTS := master-0 worker-0 worker-1 worker-2 worker-3
 
-.PHONY: help genconfig apply-config sync etcd-snapshot upgrade-k8s upgrade-talos
+.PHONY: help genconfig apply-config sync etcd-snapshot upgrade-k8s upgrade-talos rebalance
 
 help:
 	@echo "Talos cluster management targets"
@@ -16,6 +16,7 @@ help:
 	@echo "  upgrade-k8s                Upgrade Kubernetes control plane to KUBERNETES_VERSION"
 	@echo "                             (DRY_RUN=1 to dry run first)"
 	@echo "  upgrade-talos              Upgrade nodes to TALOS_VERSION, skipping nodes already on it"
+	@echo "  rebalance                  Trigger the descheduler and re-apply CoreDNS anti-affinity"
 	@echo ""
 	@echo "apply-config options:"
 	@echo "  make apply-config                     apply to all nodes"
@@ -79,6 +80,21 @@ upgrade-talos: etcd-snapshot
 				sleep 5; \
 			done; \
 			kill $$upgrade_pid 2>/dev/null; wait $$upgrade_pid 2>/dev/null; \
+			host=$$(kubectl get nodes -o wide --no-headers | awk -v ip="$$node" '$$6==ip {print $$1}'); \
+			if [ -z "$$host" ]; then echo "could not find Kubernetes node for $$node"; exit 1; fi; \
+			echo "waiting for $$host to be Ready and schedulable"; \
+			kubectl wait --for=condition=Ready node/"$$host" --timeout=300s; \
+			kubectl uncordon "$$host" >/dev/null 2>&1 || true; \
 		fi; \
 	done
 	@for host in $(HOSTS); do kubectl uncordon $$host >/dev/null 2>&1 || true; done
+	@$(MAKE) --no-print-directory rebalance
+
+# Rebalance after an upgrade. The descheduler moves pods off the nodes that
+# collected them while the other nodes were rebooting, and the CoreDNS
+# anti-affinity is re-applied because Talos owns that Deployment.
+rebalance:
+	@job="descheduler-manual-$$(date +%s)"; \
+	echo "==> triggering descheduler job $$job"; \
+	kubectl -n kube-system create job --from=cronjob/descheduler "$$job"; \
+	../scripts/coredns-spread.sh
