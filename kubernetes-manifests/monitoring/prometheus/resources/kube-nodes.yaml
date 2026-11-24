@@ -48,3 +48,43 @@ groups:
           description: "{{ $labels.instance }} has rebooted more than once in the last 3 hours."
           impact: "Workloads are repeatedly interrupted and control-plane stability is at risk."
           action: "Check the boot history in `/var/log/kernel.log` and `/var/log/kernel.log.1`, for example with `talosctl -n <node> read /var/log/kernel.log`. Look for `boot sequence: failed` and for a service stuck in `Waiting` during startup."
+      # MemAvailable can stay above the kubelet eviction threshold while the node
+      # is already stalling on reclaim. PSI catches that case.
+      - alert: NodeMemoryPressure
+        expr: rate(node_pressure_memory_stalled_seconds_total[5m]) > 0.1
+        for: 10m
+        annotations:
+          summary: "Memory pressure on {{ $labels.instance }}"
+          description: "The node spent more than 10% of the last 5 minutes stalled on memory."
+          impact: "Kubelet, the container runtime and workloads can miss health checks and restart."
+          action: "Check memory usage and pod placement on the node. Rebalance pods and look for a workload that grew unexpectedly."
+      - alert: NodeMemoryAvailableLow
+        expr: (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 < 20
+        for: 10m
+        annotations:
+          summary: "Low available memory on {{ $labels.instance }}"
+          description: "Less than 20% of memory has been available for the last 10 minutes."
+          impact: "The node is close to memory reclaim or the OOM killer."
+          action: "Check memory usage and pod placement. Rebalance pods or increase the node size."
+      - alert: NodeMemoryRequestSaturation
+        expr: |
+          sum by (node) (kube_pod_container_resource_requests{resource="memory"})
+          /
+          sum by (node) (kube_node_status_allocatable{resource="memory"}) > 0.8
+        for: 10m
+        annotations:
+          summary: "Memory requests are above 80% on {{ $labels.node }}"
+          description: "Pods request more than 80% of the node's allocatable memory."
+          impact: "The scheduler has little room to place new pods, and actual usage can exceed requests."
+          action: "Spread workloads across nodes and review the requests for the largest pods."
+      - alert: PodDistributionSkew
+        expr: |
+          max(count by (node) (kube_pod_info{node!="master-0"}))
+          >
+          2 * avg(count by (node) (kube_pod_info{node!="master-0"}))
+        for: 30m
+        annotations:
+          summary: "Pods are concentrated on one node"
+          description: "One worker has more than twice the average number of pods."
+          impact: "A single node failure or memory pressure affects a large part of the cluster."
+          action: "Check `kubectl get pods -A -o wide` and rebalance with the descheduler or by restarting single-replica workloads."
