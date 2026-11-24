@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: descheduler-policy
+  namespace: kube-system
+data:
+  policy.yaml: |
+    apiVersion: descheduler/v1alpha2
+    kind: DeschedulerPolicy
+    maxNoOfPodsToEvictPerNode: 10
+    profiles:
+      - name: default
+        pluginConfig:
+          - name: DefaultEvictor
+            args:
+              nodeFit: true
+              # Do not evict a pod that was just rescheduled. Without this a
+              # pod that lands back on the same node can be evicted again on
+              # the next run.
+              minPodAge: 10m
+              podProtections:
+                # Keep the default PodsWithLocalStorage protection. The
+                # cluster uses Longhorn for persistent volumes, so there are
+                # no evictable local-storage workloads to lose.
+                extraEnabled:
+                  - PodsWithPVC
+          - name: RemoveDuplicates
+            args:
+              namespaces:
+                exclude:
+                  - kube-system
+          - name: LowNodeUtilization
+            args:
+              thresholds:
+                cpu: 20
+                memory: 20
+                pods: 20
+              targetThresholds:
+                cpu: 50
+                memory: 50
+                pods: 50
+              evictableNamespaces:
+                exclude:
+                  - kube-system
+                  - longhorn-system
+        plugins:
+          balance:
+            enabled:
+              - RemoveDuplicates
+              - LowNodeUtilization

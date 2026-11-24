@@ -1,0 +1,53 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: descheduler
+  namespace: kube-system
+spec:
+  schedule: "*/15 * * * *"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 120
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 600
+      activeDeadlineSeconds: 300
+      template:
+        spec:
+          serviceAccountName: descheduler
+          priorityClassName: system-cluster-critical
+          restartPolicy: Never
+          securityContext:
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: descheduler
+              image: registry.k8s.io/descheduler/descheduler@sha256:bacb4a3bddf0ca9f5b2cc3469f05292da38d4819bb3d7f1b66e485abae84efec # v0.37.0
+              command:
+                - /bin/descheduler
+              args:
+                - --policy-config-file=/policy/policy.yaml
+                - --v=3
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 128Mi
+                limits:
+                  cpu: 200m
+                  memory: 256Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+                runAsUser: 1000
+              volumeMounts:
+                - name: policy
+                  mountPath: /policy
+          volumes:
+            - name: policy
+              configMap:
+                name: descheduler-policy
