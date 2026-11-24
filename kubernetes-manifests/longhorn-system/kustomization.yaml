@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
   - argocd-app.yaml
   - ingress.yaml
+  - limitrange.yaml
   - middleware.yaml
   - network-policies.yaml
   - upstream/longhorn.yaml

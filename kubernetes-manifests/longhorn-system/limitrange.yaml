@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: longhorn-default-requests
+spec:
+  limits:
+    - type: Container
+      # Longhorn creates the CSI sidecars and instance managers at runtime.
+      # Give every container a request so they are Burstable instead of
+      # BestEffort, which is what the Talos OOM controller kills first.
+      defaultRequest:
+        cpu: 10m
+        memory: 32Mi
