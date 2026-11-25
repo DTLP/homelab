@@ -5,7 +5,6 @@ resources:
   - alertmanager.yaml
   - alertmanager-ingress.yaml
   - alertmanager-pdb.yaml
-  - alertmanager-pvc.yaml
   - alertmanager-service.yaml
 
 configMapGenerator:
