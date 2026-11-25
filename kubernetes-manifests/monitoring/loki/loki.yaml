@@ -34,7 +34,7 @@ spec:
               cpu: 20m
               memory: 208Mi
             limits:
-              cpu: 50m
+              cpu: 200m
               memory: 416Mi
           volumeMounts:
             - name: tmp
