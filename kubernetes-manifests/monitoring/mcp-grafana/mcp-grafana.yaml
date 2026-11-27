@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
         - name: mcp-grafana
-          image: grafana/mcp-grafana:1.6.3@sha256:0479c026fd40a95e6a176855b8570e06845790f8a45de2f9c1ec8ba3ba06a8bf # 1.3.0
+          image: grafana/mcp-grafana:1.6.3@sha256:0479c026fd40a95e6a176855b8570e06845790f8a45de2f9c1ec8ba3ba06a8bf # 1.6.3
           imagePullPolicy: IfNotPresent
           args:
             - --transport=streamable-http

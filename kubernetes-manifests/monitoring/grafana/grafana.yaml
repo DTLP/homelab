@@ -20,7 +20,7 @@ spec:
         - name: registry-pull
       containers:
         - name: grafana
-          image: grafana/grafana:13.3.2@sha256:81556409ba48b2b922e0adb69a2511337d8ba7578f11962eefa6149a2d815101 # 13.3.1
+          image: grafana/grafana:13.3.2@sha256:81556409ba48b2b922e0adb69a2511337d8ba7578f11962eefa6149a2d815101 # 13.3.2
           imagePullPolicy: IfNotPresent
           ports:
             - name: grafana
