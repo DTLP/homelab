@@ -3,5 +3,5 @@ kind: Kustomization
 
 resources:
   - asciip.yaml
-  - asciip-ingress.yaml
-  - asciip-service.yaml
+  - ingress.yaml
+  - service.yaml
