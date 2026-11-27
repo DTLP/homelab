@@ -3,7 +3,6 @@ kind: Kustomization
 
 resources:
   - homer/
-  # - it-tools/
 
   - fluxcd.yaml
   - network-policies.yaml
