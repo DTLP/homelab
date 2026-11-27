@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: forgejo
-          image: codeberg.org/forgejo/forgejo:16.0.7-rootless@sha256:85c09de612c60347d3d44582ca8cb32e7ac46309a544e35b2cb27dad2e5ad5bd # 16.0.3-rootless
+          image: codeberg.org/forgejo/forgejo:16.0.7-rootless@sha256:85c09de612c60347d3d44582ca8cb32e7ac46309a544e35b2cb27dad2e5ad5bd # 16.0.7-rootless
           imagePullPolicy: IfNotPresent
           env:
             - name: FORGEJO__server__DOMAIN
