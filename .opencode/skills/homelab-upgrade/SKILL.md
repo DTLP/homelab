@@ -167,7 +167,9 @@ These apply to every component, not just Kubernetes.
   warnings, and anomalies before reporting back.
 - **Never upgrade to a `.0` patch release.** Wait for at least `.1`.
 - **Pin images by digest, not tag.** Add a `# vX.Y.Z` comment so the version
-  stays readable without depending on the tag.
+  stays readable without depending on the tag. Renovate updates the tag and
+  digest but leaves that comment on the old version, so fix it in the PR
+  branch and include it in the upgrade commit rather than in a follow-up.
 
 ## Output
 
