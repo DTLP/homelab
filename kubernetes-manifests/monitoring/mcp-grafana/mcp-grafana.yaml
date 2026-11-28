@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
         - name: mcp-grafana
-          image: grafana/mcp-grafana:1.6.3@sha256:0479c026fd40a95e6a176855b8570e06845790f8a45de2f9c1ec8ba3ba06a8bf # 1.6.3
+          image: grafana/mcp-grafana:2.3.0@sha256:c27248b5919d09d64ea273ca1b128b32902c6796f6e2dfcd11849d4f1363f9ed # v2.3.0
           imagePullPolicy: IfNotPresent
           args:
             - --transport=streamable-http
@@ -42,6 +42,7 @@ spec:
             - --disable-write
             - --max-loki-log-limit=100
             - --log-level=info
+            - --usage-stats=disabled
             - --allowed-hosts=mcp-grafana:8000,mcp-grafana,mcp-grafana.dtlp.cc,localhost,localhost:8000
           env:
             - name: GRAFANA_URL
