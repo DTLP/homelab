@@ -42,6 +42,7 @@ spec:
             - --disable-write
             - --max-loki-log-limit=100
             - --log-level=info
+            - --usage-stats=disabled
             - --allowed-hosts=mcp-grafana:8000,mcp-grafana,mcp-grafana.dtlp.cc,localhost,localhost:8000
           env:
             - name: GRAFANA_URL
